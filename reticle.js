@@ -30,7 +30,6 @@ export const newReticle = cnfg => {
           g.moveTo(  -20, 0);
           g.lineTo(-2000, 0);
           }); 
-  console.log( r.parent );
         return self;
         },
       show: ()=>{
