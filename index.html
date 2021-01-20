@@ -33,22 +33,28 @@ import  { newLineChart } from './linechart.js';
 
 
 
-const data=[];
-const samples=200;
 let n=140
 
+const shockwave= (n, count=500)=>{
+  let buf =[];
+  for( let x=0; x<count; x++) 
+    buf[x]= //(500-n)*
+    x<n?  1/(n-x) * -Math.sin(((x-n)*2)*Math.PI/50)  
+:      0//   1/(n-x) * -Math.sin(((x-n)*2    )*Math.PI/50)  
+  //    x<n? /* (x)       **4  / n**4   * */ -Math.sin((x-n)*2*Math.PI/50)  
+  // :  x<n*2? /* (2*n-x)  **77  / n**77  * */ -Math.sin((x-n)*2*Math.PI/50) 
+  //  :  0;
+  return buf;
+}
 
-for( let x=0; x<samples; x++) data[x]=
-x<n?
-        (x)  **4  / n**4  * -Math.sin(  (x-n)   *2*Math.PI/50)  
-        :
-    (2*n-x)  **77  / n**77  * -Math.sin(  (x-n)   *2*Math.PI/50) ;
-
-const g = newLineChart (  {  parent:app.stage, data,
+const g = newLineChart (  {  parent:app.stage, data: shockwave(100),
                         x:{ /*min:0, max:1,*/ px:win.width}, 
                         y:{ /*min:0, max:1,*/ px:win.height}, 
                           })
                           .show();
+
+app.ticker.add( t=> g.plot( shockwave( (Date.now()/10)%500 )) )                          
+
 
 
 
