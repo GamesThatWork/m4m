@@ -25,41 +25,48 @@ const win = document.querySelector("canvas");
 
 
 
-
-//********************* test the graph ****************
+//********************* test the linechart ****************
    
 import  { newLineChart } from './linechart.js';
  
 
 
 
-let n=140
+let wavelength=15;
 
 const shockwave= (n, count=500)=>{
   let buf =[];
   for( let x=0; x<count; x++) 
-    buf[x]= //(500-n)*
-    x<n?  1/(n-x) * -Math.sin(((x-n)*2)*Math.PI/50)  
-:      0//   1/(n-x) * -Math.sin(((x-n)*2    )*Math.PI/50)  
+    buf[x]=  
+        x<n?  Math.sin( (0 + (n-x)/wavelength ) *Math.PI)  / (n-x)
+    :      0
+  // experimental power equations -- no joy  
+  //   1/(n-x) * -Math.sin(((x-n)*2    )*Math.PI/50)  
   //    x<n? /* (x)       **4  / n**4   * */ -Math.sin((x-n)*2*Math.PI/50)  
   // :  x<n*2? /* (2*n-x)  **77  / n**77  * */ -Math.sin((x-n)*2*Math.PI/50) 
   //  :  0;
   return buf;
 }
 
-const g = newLineChart (  {  parent:app.stage, data: shockwave(100),
-                        x:{ /*min:0, max:1,*/ px:win.width}, 
-                        y:{ /*min:0, max:1,*/ px:win.height}, 
+const g = newLineChart (  {  parent:app.stage, data: null,
+                        x:{  min:0.1, max:500,   px:win.width}, 
+                        y:{  min:-.05, max:.22,  px:win.height}, 
                           })
                           .show();
-
-app.ticker.add( t=> g.plot( shockwave( (Date.now()/10)%500 )) )                          
-
+var count=0;
+app.ticker.add( t=> {
+  let n = Math.floor( (Date.now()/4) %500 );
+  //let n = count++ %500;
+    if (n>1)  g.plot( shockwave( n ));
+    else      g.reset();
+    });
 
 
 
 //********************* test the reticle ********************
 import  { newReticle } from './reticle.js';
+
+/*
 const r = newReticle(  {  parent:app.stage, 
                           min:{radius:50,heat:1}, 
                           max:{radius:70,heat:1}
@@ -72,7 +79,7 @@ win.addEventListener("mouseleave",e=>
     gsap.to(r, {x:win.width/2, y:win.height/2, duration: .5, ease: "elastic.out(1.1, 0.2 )"}));
 win.addEventListener("mouseenter",e=> 
     gsap.from( r, {immediacy:0, duration:1, ease: "linear"}));
-
+*/
     </script>
   </body>
 </html>*

@@ -2,12 +2,14 @@
 export const newLineChart = cnfg => {
     const r=cnfg ; 
     const blurFilter = new PIXI.filters.BlurFilter();
-    const plotLayers=[ false, false];// new PIXI.Graphics(), new PIXI.Graphics()  ];
-    const gridLayer= new PIXI.Graphics();
-    const allLayers= [ gridLayer, ...plotLayers ];
+    var plotLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
+    var markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
+    var gridLayer=   new PIXI.Graphics();
+    var allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
 
-    const lineWidth = [5,3];
-    const color={data:0xFF1100};
+    const width={data:[9,3]              , peak:[11,1]   };
+    const color={data:[0x770000,0x55FF00], peak:[0x000000,0x1F0000]};
+    
     const data={buf:r.data};
     const parent= r.parent;
 
@@ -34,11 +36,12 @@ export const newLineChart = cnfg => {
       }
 
 
-    data.min = data.buf.reduce( (min,d)=> min<d? min:d,  Infinity );
-    data.max = data.buf.reduce( (max,d)=> max>d? max:d, -Infinity );
+    data.min    = r.y.min || data.buf.reduce( (min,d)=> min<d? min:d,  Infinity );
+    data.max    = r.y.max || data.buf.reduce( (max,d)=> max>d? max:d, -Infinity );
+    data.length = r.x.max || data.buf.length;
     data.span= data.max-data.min;
     const pad  = { top:40, right:40, bottom:40, left:40 };
-    let mx = (r.x.px -pad.left -pad.right) / (data.buf.length-1);
+    let mx = (r.x.px -pad.left -pad.right) / (data.length-1);
     let bx =          pad.left;
     let plotx= x=> mx* x  + bx;
     let my =-(r.y.px -pad.bottom -pad.top) / (data.span);
@@ -50,33 +53,51 @@ export const newLineChart = cnfg => {
       displayObject: new PIXI.Container(),
 
       construct: ()=>{
+        plotLayers=[ false, false];// new PIXI.Graphics(), new PIXI.Graphics()  ];
+        markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
+        gridLayer=   new PIXI.Graphics();
+        allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
         self.grid();
-        self.plot( data.buf );
+        if(data.buf) self.plot( data.buf );
+        console.log("CONSTRUCT");
         return self;
         },
       plot: ( d )=>{
-       
-  //  console.log( d );
-       plotLayers.forEach( (p, layer) =>{
-        if(p) { 
-          parent.removeChild(p)
-          p.destroy();
-          }
-        p= new PIXI.Graphics();
-        plotLayers[layer]=allLayers[layer+1]=p;
-        p.lineStyle(  lineWidth[ layer ], color.data, 1);
-        p.moveTo(   plotx(0), ploty( d[0]) );
-        d.forEach( (y,x) => p.lineTo( plotx(x), ploty(y)  ) );
-        parent.addChild(p);
-        }); 
-        
+        blurFilter.blur = 20;     
+        let peak = d.reduce( (max,v,i,a)=> a[max]>a[i]? max:i, 0 );
+        markLayers.forEach( (m, layer) =>{
+          if( !layer ) m.filters = [blurFilter];    
+          m.lineStyle(  width.peak[ layer ], color.peak[ layer ], .40);
+          m.moveTo(   plotx( peak), ploty( data.min ) );
+          m.lineTo(   plotx( peak), ploty( d[peak]  ) );
+          }); 
+        plotLayers.forEach( (p, layer) =>{
+          if(p) { 
+            parent.removeChild(p)
+            p.destroy();
+            }
+          p= new PIXI.Graphics();
+          plotLayers[layer]=allLayers[layer+3]=p;
+          if( !layer ) p.filters = [blurFilter];    
+          p.lineStyle(  width.data[ layer ], color.data[layer], 1);
+          p.moveTo(   plotx(0), ploty( d[0]) );
+          d.forEach( (y,x) => p.lineTo( plotx(x), ploty(y)  ) );
+          parent.addChild(p);
+          }); 
         return self;  
         }, 
       grid: ()=>{
-        let g = gridLayer;        
+        let g = gridLayer;     
+        g.beginFill(0x122100);
+        g.drawRect(0,0, r.x.px, r.y.px);
+        g.endFill();
+        g.beginFill(0x113311);
+        g.drawRect(pad.left,pad.top, r.x.px-pad.right-pad.left, r.y.px-pad.top-pad.bottom);
+        g.endFill();
+
         g.lineStyle(  grid.x.width, grid.x.color, 1);
         for(let i=0; i<grid.x.n; i++  ) {
-          let x = plotx( (i/(grid.x.n-1)) *data.buf.length);
+          let x = plotx( (i/(grid.x.n-1)) *data.length);
           g.moveTo(   x, pad.top);
           g.lineTo(   x, r.y.px-pad.bottom);
           txt( x,r.y.px-pad.bottom*.80, "label", String(i) );
@@ -93,12 +114,18 @@ export const newLineChart = cnfg => {
         txt( r.x.px/2, 8,         "title");
         },
       show: ()=>{
-        allLayers.forEach( g => r.parent.addChild(g) );
+        allLayers.forEach( g =>{ if(g) r.parent.addChild(g);} );
         return self;
         },
       destruct: ()=>{ 
-        allLayers.forEach( g => { g.destroy(); });
+        allLayers.forEach( g => { if(g) g.destroy( true ); });
         return null;
+        },
+      reset: ()=>{ 
+        self.destruct();
+        self.construct();
+        self.show();
+        return self;
         }
       }
     return self.construct();
