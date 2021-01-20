@@ -8,13 +8,51 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/PixiPlugin.min.js"></script>
   </head>
   <body>
-    <script type="module">
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    </style>
+
+
+
+
+<script type="module">
 
 const app = new PIXI.Application();
 document.body.appendChild(app.view);
 const win = document.querySelector("canvas");
 
-//********************* test the reticle ***************************************************
+
+
+
+
+
+//********************* test the graph ****************
+   
+import  { newLineChart } from './linechart.js';
+ 
+
+
+
+const data=[];
+const samples=200;
+let n=140
+
+
+for( let x=0; x<samples; x++) data[x]=
+x<n?
+        (x)  **4  / n**4  * -Math.sin(  (x-n)   *2*Math.PI/50)  
+        :
+    (2*n-x)  **77  / n**77  * -Math.sin(  (x-n)   *2*Math.PI/50) ;
+
+const g = newLineChart (  {  parent:app.stage, data,
+                        x:{ /*min:0, max:1,*/ px:win.width}, 
+                        y:{ /*min:0, max:1,*/ px:win.height}, 
+                          })
+                          .show();
+
+
+
+//********************* test the reticle ********************
 import  { newReticle } from './reticle.js';
 const r = newReticle(  {  parent:app.stage, 
                           min:{radius:50,heat:1}, 
@@ -31,4 +69,4 @@ win.addEventListener("mouseenter",e=>
 
     </script>
   </body>
-</html>
+</html>*
