@@ -57,8 +57,8 @@ var count=0;
 app.ticker.add( t=> {
   let n = Math.floor( (Date.now()/4) %500 );
   //let n = count++ %500;
-    if (n>1)  g.plot( shockwave( n ));
-    else      g.reset();
+    if (n<3)  g.reset();
+    else      g.plot( shockwave( n )); 
     });
 
 
