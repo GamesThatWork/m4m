@@ -59,7 +59,6 @@ export const newLineChart = cnfg => {
         allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
         self.grid();
         if(data.buf) self.plot( data.buf );
-        console.log("CONSTRUCT");
         return self;
         },
       plot: ( d )=>{
@@ -68,8 +67,12 @@ export const newLineChart = cnfg => {
         markLayers.forEach( (m, layer) =>{
           if( !layer ) m.filters = [blurFilter];    
           m.lineStyle(  width.peak[ layer ], color.peak[ layer ], .40);
-          m.moveTo(   plotx( peak), ploty( data.min ) );
-          m.lineTo(   plotx( peak), ploty( d[peak]  ) );
+          m.moveTo(     plotx( peak), ploty( data.min) );
+          m.lineTo(     plotx( peak), ploty( d[peak] ) );
+          m.lineStyle(  0);
+          m.beginFill(0x000000);
+          m.drawCircle( plotx( peak), ploty( d[peak] ), 7 );
+          m.endFill();
           }); 
         plotLayers.forEach( (p, layer) =>{
           if(p) { 
@@ -113,8 +116,17 @@ export const newLineChart = cnfg => {
         txt(       20, r.y.px/2,  "y"    ).rotation=3*Math.PI/2;
         txt( r.x.px/2, 8,         "title");
         },
-      show: ()=>{
+       show: ()=>{
         allLayers.forEach( g =>{ if(g) r.parent.addChild(g);} );
+        return self;
+        },
+      dragReport: cb=>{
+        gridLayer.interactive = true;
+        gridLayer.on( 'pointermove', cb );
+        /*gridLayer.on('pointerdown',      e=> gridLayer.on( 'pointermove', cb ));
+        gridLayer.on('pointerup',        e=> gridLayer.off('pointermove', cb ));
+        gridLayer.on('pointerupoutside', e=> gridLayer.off('pointermove', cb ));
+        gridLayer.on('pointerdown',      e=> console.log(  "pointerdown   dragreport"));*/
         return self;
         },
       destruct: ()=>{ 
