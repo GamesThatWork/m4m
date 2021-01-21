@@ -12,25 +12,34 @@ export const newLineChart = cnfg => {
     
     const data={buf:r.data};
     const parent= r.parent;
-
-
+    var overlay;
+    let  steelcolor=0xFF1100;
+    let  glasscolor=0xDDAA00;
 
     const textStyle={ 
       default:{  fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center'},
       label:{    fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center'},
+      glass:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: glasscolor,       align: 'right'},
+      steel:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: steelcolor,       align: 'right'},
       title:{    fontFamily: 'Share Tech Mono',  fontSize: 26,  fill: 'lightblue',  align: 'center'}
       };
 
+ 
+
     const grid = {
-      title:{   color:0x448844,          label:"OVERPRESSURE" }, 
-      x:{ n:15, color:0x448844, width:1, label:"KILOMETERS", scale:30}, 
-      y:{ n:8, color:0x888888,  width:1, label:"kPa", scale:30},
+      glass:{   color:glasscolor, width:3, label:"GLASS BREAKS" }, 
+      steel:{   color:steelcolor, width:3, label:"STEEL BREAKS" }, 
+      title:{   color:0x448844,            label:"OVERPRESSURE" }, 
+      x:{ n:15, color:0x448844,   width:1, label:"KILOMETERS", scale:30}, 
+      y:{ n:8,  color:0x888888,   width:1, label:"kPa", scale:30},
        } 
     
     const txt= (x,y, type, content )=>{
-      let t = new PIXI.Text( content || grid[type].label, 
-         textStyle[type] || textStyle.default);
-      t.position.set( x- t.width/2, y);
+      let style = textStyle[type] || textStyle.default;
+      let t = new PIXI.Text( content || grid[type].label, style);
+      if ( style.align=='right'  )  x-=t.width;
+      if ( style.align=='center' )  x-=t.width/2;
+      t.position.set( x, y);
       gridLayer.addChild(t);
       return t;
       }
@@ -64,6 +73,7 @@ export const newLineChart = cnfg => {
       plot: ( d )=>{
         blurFilter.blur = 20;     
         let peak = d.reduce( (max,v,i,a)=> a[max]>a[i]? max:i, 0 );
+        overlay.alpha= d[peak]/data.max;
         markLayers.forEach( (m, layer) =>{
           if( !layer ) m.filters = [blurFilter];    
           m.lineStyle(  width.peak[ layer ], color.peak[ layer ], .40);
@@ -115,7 +125,41 @@ export const newLineChart = cnfg => {
         txt( r.x.px/2, r.y.px-20, "x"    );
         txt(       20, r.y.px/2,  "y"    ).rotation=3*Math.PI/2;
         txt( r.x.px/2, 8,         "title");
+
+        overlay =gradientRect();
+        overlay.position.set( pad.left, pad.top);
+        overlay.width  =  r.x.px-pad.left-pad.right;
+        overlay.height =  r.y.px-pad.bottom-pad.top;
+        overlay.blendMode= PIXI.BLEND_MODES.LIGHTEN;
+        g.addChild( overlay );
+      
+      
+        if( r.glass){
+          g.lineStyle(  grid.glass.width, grid.glass.color, .4);
+          let y = 0.80* (r.y.px-pad.bottom-pad.top)+pad.top;
+          g.moveTo(   pad.left,         y);
+          g.lineTo(   r.x.px-pad.right, y);
+          txt( r.x.px-pad.left-10, y-17, "glass");
+          }
+        if( r.steel){
+          g.lineStyle(  grid.steel.width, grid.steel.color, .4);
+          y = 0.10* (r.y.px-pad.bottom-pad.top)+pad.top;
+          g.moveTo(   pad.left,         y);
+          g.lineTo(   r.x.px-pad.right, y);
+          txt( r.x.px-pad.left-10, y-17, "steel" );
+          } 
+        if( r.equation ){
+          let texture = PIXI.Texture.from('/assets/equation.png');
+          const equation = new PIXI.Sprite(texture);
+          equation.width*=.6;
+          equation.height*=.6;
+          equation.position.set((r.x.px-equation.width)/2, (r.y.px-equation.height)/2);
+          equation.blendMode= PIXI.BLEND_MODES.ADD;
+          equation.alpha =0.2;
+          g.addChild(equation);
+          }
         },
+
        show: ()=>{
         allLayers.forEach( g =>{ if(g) r.parent.addChild(g);} );
         return self;
@@ -131,14 +175,40 @@ export const newLineChart = cnfg => {
         },
       destruct: ()=>{ 
         allLayers.forEach( g => { if(g) g.destroy( true ); });
-        return null;
+        return self;
         },
-      reset: ()=>{ 
+      reset: r =>{ 
         self.destruct();
-        self.construct();
+        self.construct(r);
         self.show();
         return self;
         }
       }
     return self.construct();
     }
+
+
+
+    
+    function gradientRect() {
+      const quality = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = quality;
+      canvas.height = 1;
+    
+      const ctx = canvas.getContext('2d');
+    
+      // use canvas2d API to create gradient
+      const grd = ctx.createLinearGradient(0, 0, quality, 0);
+      grd.addColorStop(  0, 'rgba(255, 255, 255, 1.0)');
+      grd.addColorStop( .125, 'rgba(255, 125, 125, 0.4)');
+      grd.addColorStop( .5, 'rgba(255,  25,  25, 0.2)');
+      grd.addColorStop(  1, 'rgba(255,   0,   0, 0.0)');
+    
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, quality, 1);
+    
+      return new PIXI.Sprite(  PIXI.Texture.from(canvas) );
+    }
+    
+    
