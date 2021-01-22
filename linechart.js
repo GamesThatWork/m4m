@@ -11,7 +11,7 @@ export const newLineChart = cnfg => {
     const color={data:[0x770000,0x55FF00], peak:[0x000000,0x1F0000]};
     
     const data={buf:r.data};
-    const parent= r.parent;
+    const parent= new PIXI.Container();
     var overlay;
     let  steelcolor=0xFF1100;
     let  glasscolor=0xDDAA00;
@@ -32,7 +32,9 @@ export const newLineChart = cnfg => {
       title:{   color:0x448844,            label:"OVERPRESSURE" }, 
       x:{ n:15, color:0x448844,   width:1, label:"KILOMETERS", scale:30}, 
       y:{ n:8,  color:0x888888,   width:1, label:"kPa", scale:30},
-       } 
+      hasBounds: false,
+      hasEquation: false
+    } 
     
     const txt= (x,y, type, content )=>{
       let style = textStyle[type] || textStyle.default;
@@ -59,9 +61,9 @@ export const newLineChart = cnfg => {
   
     
     const self={
-      displayObject: new PIXI.Container(),
-
+      get hitBox() {return gridLayer;},
       construct: ()=>{
+        r.parent.addChild( parent );
         plotLayers=[ false, false];// new PIXI.Graphics(), new PIXI.Graphics()  ];
         markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
         gridLayer=   new PIXI.Graphics();
@@ -88,8 +90,7 @@ export const newLineChart = cnfg => {
           if(p) { 
             parent.removeChild(p)
             p.destroy();
-            }
-          p= new PIXI.Graphics();
+            }          p= new PIXI.Graphics();
           plotLayers[layer]=allLayers[layer+3]=p;
           if( !layer ) p.filters = [blurFilter];    
           p.lineStyle(  width.data[ layer ], color.data[layer], 1);
@@ -101,6 +102,8 @@ export const newLineChart = cnfg => {
         }, 
       grid: ()=>{
         let g = gridLayer;     
+        g.interactive=true;
+        g.interactiveChildren=true;
         g.beginFill(0x122100);
         g.drawRect(0,0, r.x.px, r.y.px);
         g.endFill();
@@ -131,41 +134,47 @@ export const newLineChart = cnfg => {
         overlay.width  =  r.x.px-pad.left-pad.right;
         overlay.height =  r.y.px-pad.bottom-pad.top;
         overlay.blendMode= PIXI.BLEND_MODES.LIGHTEN;
+        overlay.alpha=0;
         g.addChild( overlay );
-      
-      
-        if( r.glass){
-          g.lineStyle(  grid.glass.width, grid.glass.color, .4);
-          let y = 0.80* (r.y.px-pad.bottom-pad.top)+pad.top;
-          g.moveTo(   pad.left,         y);
-          g.lineTo(   r.x.px-pad.right, y);
-          txt( r.x.px-pad.left-10, y-17, "glass");
-          }
-        if( r.steel){
-          g.lineStyle(  grid.steel.width, grid.steel.color, .4);
-          y = 0.10* (r.y.px-pad.bottom-pad.top)+pad.top;
-          g.moveTo(   pad.left,         y);
-          g.lineTo(   r.x.px-pad.right, y);
-          txt( r.x.px-pad.left-10, y-17, "steel" );
-          } 
-        if( r.equation ){
-          let texture = PIXI.Texture.from('/assets/equation.png');
-          const equation = new PIXI.Sprite(texture);
-          equation.width*=.6;
-          equation.height*=.6;
-          equation.position.set((r.x.px-equation.width)/2, (r.y.px-equation.height)/2);
-          equation.blendMode= PIXI.BLEND_MODES.ADD;
-          equation.alpha =0.2;
-          g.addChild(equation);
-          }
+        if( grid.hasBounds   ) self.bounds(); 
+        if( grid.hasEquation ) self.equation(); 
+//console.log( g,gridLayer );
+        return self;
+        },
+      bounds: ()=>{
+        grid.hasBounds = true;
+        let g= gridLayer;
+        g.lineStyle(  grid.glass.width, grid.glass.color, .4);
+        let y = 0.80* (r.y.px-pad.bottom-pad.top)+pad.top;
+        g.moveTo(   pad.left,         y);
+        g.lineTo(   r.x.px-pad.right, y);
+        txt( r.x.px-pad.left-10, y-17, "glass");
+        g.lineStyle(  grid.steel.width, grid.steel.color, .4);
+        y = 0.10* (r.y.px-pad.bottom-pad.top)+pad.top;
+        g.moveTo(   pad.left,         y);
+        g.lineTo(   r.x.px-pad.right, y);
+        txt( r.x.px-pad.left-10, y-17, "steel" );
+        return self;
+        }, 
+      equation: ()=>{
+        grid.hasEquation = true;
+        let texture = PIXI.Texture.from('/assets/equation.png');
+        const eq = new PIXI.Sprite(texture);
+        eq.width*=.6;
+        eq.height*=.6;
+        eq.position.set((r.x.px-eq.width)/2, (r.y.px-eq.height)/2);
+        eq.blendMode= PIXI.BLEND_MODES.ADD;
+        eq.alpha =0.2;
+        gridLayer.addChild(eq);
+        return self;
         },
 
-       show: ()=>{
-        allLayers.forEach( g =>{ if(g) r.parent.addChild(g);} );
+      show: ()=>{
+        allLayers.forEach( g =>{ if(g) parent.addChild(g);} );
         return self;
         },
       dragReport: cb=>{
-        gridLayer.interactive = true;
+        //gridLayer.interactive = true;
         gridLayer.on( 'pointermove', cb );
         /*gridLayer.on('pointerdown',      e=> gridLayer.on( 'pointermove', cb ));
         gridLayer.on('pointerup',        e=> gridLayer.off('pointermove', cb ));
@@ -174,12 +183,13 @@ export const newLineChart = cnfg => {
         return self;
         },
       destruct: ()=>{ 
-        allLayers.forEach( g => { if(g) g.destroy( true ); });
+        parent.children.forEach( g => { if(g) g.destroy( true ); });
+        r.parent.removeChild( parent );
         return self;
         },
       reset: r =>{ 
         self.destruct();
-        self.construct(r);
+        self.construct();
         self.show();
         return self;
         }

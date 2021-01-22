@@ -14,13 +14,15 @@ export const newReticle = cnfg => {
       set y( v ) { graphicLayers.forEach(g => g.position.y=v) },
   
       construct: ()=>{
+
         graphicLayers.forEach( (g, layer) =>{
           g.lineStyle(  lineWidth[ layer ], r.min.color, 1);
-          g.drawCircle(0, 0, r.min.radius  );
+          g.drawCircle( 0, 0, r.min.radius  );
           g.lineStyle(  lineWidth[ layer ], r.max.color, .7);
           g.drawCircle(0, 0, r.max.radius  );
           blurFilter.blur = 10;
-          if( !layer ) g.filters = [blurFilter];        g.lineStyle( lineWidth[ layer ],  [0x00FF00,0x80FF80][layer], 1);
+          if( !layer ) g.filters = [blurFilter];    
+          g.lineStyle( lineWidth[ layer ],  [0x00FF00,0x80FF80][layer], 1);
           g.moveTo( 0,   20);
           g.lineTo( 0, 2000);
           g.moveTo( 0,  -20);
@@ -29,6 +31,7 @@ export const newReticle = cnfg => {
           g.lineTo( 2000, 0);
           g.moveTo(  -20, 0);
           g.lineTo(-2000, 0);
+      //    g.mask= mask;
           }); 
         return self;
         },
@@ -47,7 +50,7 @@ export const newReticle = cnfg => {
         },
       destruct: ()=>{ 
         graphicLayers.forEach( g => { g.destroy(); });
-        return null;
+        return self;
         }
       }
     return self.construct();
