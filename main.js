@@ -169,6 +169,7 @@ document.addEventListener('keydown', e=>{
         g.bounds();
         break; 
     case 'KeyT':
+        plot=false;
         let h = g.hitBox;
         h.interactive=h.interactiveChildren=true;
         console.log("HITBOX", h);
