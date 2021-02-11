@@ -17,6 +17,13 @@ document.body.appendChild(app.view);
 /** 
 * * Visible version of the overpressure equation  (Sprite)
 */
+
+import  { newMath } from './math.js';
+
+
+
+const math=  newMath ().destruct();
+
 const equation  =new PIXI.Sprite.from( '/assets/equation.png');
     equation.visible=false;
     equation.position.set(60,180);
@@ -38,7 +45,7 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
     import  { newLineChart } from './linechart.js';
     let wavelength=25;
     let tZero=0;    
-    
+    /*
     const shockwave= (n, count=500)=>{
       let buf =[];
       for( let x=0; x<count; x++) 
@@ -47,12 +54,27 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
         :      0
       return buf;
     }
+*/
+
+   
+      const curves =[
+        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0   ,     // shock 
+        (x,n )=>  x<n+wavelength?   .005                                          / (1+(n-x)**2)          :   0   ,     // pulse
+        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / 1000                  :   0   ,     // wavetrain
+//        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (1+(n-x)**2*x**1.2 )  :   0   ,     // decay
+        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*100 ) )  :   0   ,     // decay
+        (x,n )=>  x<n+wavelength?   1                                             / (5+x**1.2 )           :   0   ,     // prop
+        ]
+      var curvenumber=0;
     
-      // experimental power equations -- no joy  
-      //   1/(n-x) * -Math.sin(((x-n)*2    )*Math.PI/50)  
-      //    x<n? /* (x)       **4  / n**4   * */ -Math.sin((x-n)*2*Math.PI/50)  
-      // :  x<n*2? /* (2*n-x)  **77  / n**77  * */ -Math.sin((x-n)*2*Math.PI/50) 
-      //  :  0;
+    
+  
+  const buf=  Array.from(Array(500));
+
+    const shockwave= (n, count=500)=>{
+    for( let x=0; x<count; x++)     buf[x]=  curves[ curvenumber ]( x,n);
+    return buf;
+    }
     
     
     var synch=false, extra=false;
@@ -151,11 +173,24 @@ document.addEventListener('keydown', e=>{
             R:   reset
          ---?:---this-helpscreen---`) ;
         break;
+
+
+        case 'Digit1': math.pulse();  break;
+        case 'Digit2': math.wave();   break;
+        case 'Digit3': math.decay();  break;
+        case 'Digit4': math.prop();   break;
+    
+        case 'KeyE':
+          newMath (  {  parent:document.body, x: 30, y:50} );
+          math.full();
+          math.toggle();
+          break
+
+
+
+
     case 'KeyM':
         map.visible=!map.visible;
-        break; 
-    case 'KeyE':
-        eq.visible=!eq.visible;
         break; 
     case 'KeyG':
         g.show();
@@ -174,6 +209,9 @@ document.addEventListener('keydown', e=>{
         h.interactive=h.interactiveChildren=true;
         console.log("HITBOX", h);
         h.on("mousemove", trackit);
+        break; 
+    case 'KeyC':
+        curvenumber=++curvenumber % curves.length;
         break; 
     case 'KeyS':
         synch= (synch=="max")? false : "max";

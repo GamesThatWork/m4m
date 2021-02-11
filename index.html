@@ -1,12 +1,48 @@
 <!doctype html>
 <html>
   <head>
-    <title>Weaponeer</title>
+    <title>Shock Doc</title>
     <style> @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');</style>
     <script src="pixi.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/PixiPlugin.min.js"></script>
+    
+ 
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/mml-chtml.js" type="text/javascript" id="MathJax-script" async ></script>
     <script  type="module" src="main.js"></script>
   </head>
-  <body></body>
+  <body>
+<style>
+    body {
+      margin:0; padding:0;
+      background-color:black; 
+      color:white; 
+      font-size:44px;
+      } 
+    #container {  position: relative; }
+      canvas,
+      #panel,
+      #mapid,
+      #math { position: absolute;  }
+        canvas        {  z-index:  1;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
+        #math         {  z-index:  2;  top: 90px; left: 60px;                              }
+        #mapid        {  z-index:  3;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
+        #panel        {  z-index:  4;  top: 12px; left: 12px; width:  40vw; height:  19vh; 
+                        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                        font-size:    .8vw;  padding: .5vw;  color:darkolivegreen;    display:none;     }
+  </style>
+</head>
+
+<body>
+
+  <div id="container">
+    <canvas ></canvas>
+    <div id="math" ></div>
+    <div id="mapid"></div>
+    <div id="panel">Hello</div>
+  </div>
+
+
+
+  </body>
 </html>*
