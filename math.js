@@ -30,7 +30,7 @@ export const newMath = cnfg => {
       pulse: ()=>  self.construct( eq.head + eq.pulse                                                             ),
       wave:  ()=>  self.construct( eq.head             + eq.cosine                                      ),
       decay: ()=>  self.construct( eq.head + '<mfrac>' + eq.cosine + eq.decay + '</mfrac>'              ),
-      prop:  ()=>  self.construct( eq.head + '<mfrac>' + eq.cosine + eq.decay + '</mfrac>' + eq.cuberoot),
+      prop:  ()=>  self.construct( eq.head +                                                 eq.cuberoot),
       full:  ()=>  self.construct( eq.head + '<mfrac>' + eq.cosine + eq.decay + '</mfrac>' + eq.cuberoot),
 
 
@@ -99,7 +99,7 @@ cosine:`
       </mfrac>
       <mo>+</mo>
       <mfrac>
-        <mi>Ï€</mi>
+        <mi>π</mi>
         <mn>4</mn>
       </mfrac>
     </mfenced>
