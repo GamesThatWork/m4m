@@ -59,10 +59,12 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
    
       const curves =[
         (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0   ,     // shock 
-        (x,n )=>  x<n+wavelength?   .005                                          / (1+(n-x)**2)          :   0   ,     // pulse
-        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / 1000                  :   0   ,     // wavetrain
-//        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (1+(n-x)**2*x**1.2 )  :   0   ,     // decay
-        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*100 ) )  :   0   ,     // decay
+//      (x,n )=>  x<n+wavelength?   .005                                          / (1+(n-x)**2)          :   0   ,     // pulse
+//      (x,n )=> (x<n+wavelength && x>n)?  .6 / ((x-n+wavelength/2)*(x-n+wavelength/2))                  :   0   ,     // pulse
+        (x,n )=>   .0036 / ((x-n+wavelength/2)*(x-n+wavelength/2)+.5)                   ,     // pulse
+        (x,n )=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.002        :   0   ,     // wavetrain
+//      (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (1+(n-x)**2*x**1.2 )  :   0   ,     // decay
+        (x,n )=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )     :   0   ,     // decay
         (x,n )=>  x<n+wavelength?   1                                             / (5+x**1.2 )           :   0   ,     // prop
         ]
       var curvenumber=0;
@@ -156,6 +158,127 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
     map.addEventListener("mouseenter",e=> 
         gsap.from( r, {immediacy:0, duration:1, ease: "linear"}));
     */
+
+   const newPanel = ()=>{
+  
+    const dom = document.querySelector("#panel");
+    dom.innerHTML=`
+      <div id='msg' >text here </div>
+      <button>Next</button>
+      `;
+  
+  
+    return self= {
+      msg:      text=> dom.querySelector("div").innerText=text,
+      next:     func=> dom.querySelector("button").addEventListener( "click", func, {once:true}),
+      step:     s=> { self.msg(s.msg); self.next(s.next) },
+      toggle:   ()=> dom.style.display= (dom.style.display=='none')? 'block':'none',
+      }
+  }
+  
+  
+  const step=[
+    {   
+      msg:`Overpressure Model and Decomposition: Demo for Dr Chad Rumchik
+
+      All graphs and math operations in this demo are utterly FAKE.  
+
+
+      (Please referesh browser if demo freezes.)
+
+      Source of equation
+          Modeling of the whole process of shock wave overpressure of free-field air explosion,
+          Defence Technology,
+          Zai-qing Xue, Shunping Li, Chun-liang Xin, Li-ping Shi, Hong-bin Wu,
+          Volume 15, Issue 5,2019,
+          (https://www.sciencedirect.com/science/article/pii/S2214914719300753)
+      `, 
+        next: e=>{
+          g.bounds();
+          g.show();
+          p.step( step[1] );
+      } },
+      {   
+        msg:`We give the kids a 'scope that plots:
+               
+        y: pressure (MPa) 
+        x: distance (km)
+        t: time     (msec)
+
+        (all units are FAKE)
+                `, 
+        next: e=>{
+        //  math= newMath (  {  parent:document.body, x: 30, y:50} );
+          math.full();
+          tZero=Date.now();
+          g.reset();
+          curvenumber=0;
+          plot = true; 
+          p.step( step[2] );
+      } },
+      {   
+        msg:`The result we are aiming for is a full model of the moving shockwave
+                `, 
+        next: e=>{
+          g.reset();
+          math.pulse();
+          curvenumber=1;
+          p.step( step[3] );
+      } },
+      {   
+        msg:`We might start the kids with a simple spike representing the impulse component
+                `, 
+        next: e=>{
+          g.reset();
+          math.wave();
+          curvenumber=2;
+          p.step( step[4] );
+      } },
+      {   
+        msg:`Then model the pressure as a wavetrain (cosine curve))
+                `, 
+        next: e=>{
+          g.reset();
+          math.decay();
+          curvenumber=3;
+          p.step( step[5] );
+      } },
+      {   
+        msg:`Then add a term to model the wave's decay 
+                `, 
+        next: e=>{
+          g.reset();
+          math.prop();
+          curvenumber=4;
+          p.step( step[6] );
+      } },
+      {   
+        msg:`Let's show (free-air) propagation in 3 dimensions: Peak pressure follows inverse cube of distance
+                `, 
+        next: e=>{
+          g.reset();
+          math.full();
+          curvenumber=0;
+          p.step( step[7] );
+      } },
+      {   
+        msg:`Finally we put it all together
+                `, 
+        next: e=>{
+              location.reload();
+        } }
+   ]
+  
+  var demo=true;
+  const p= newPanel();
+  
+  p.step( step[0] );
+   
+
+
+
+
+
 
 
 document.addEventListener('keydown', e=>{
