@@ -31,7 +31,7 @@ export const newLineChart = cnfg => {
       steel:{   color:steelcolor, width:3, label:"STEEL BREAKS" }, 
       title:{   color:0x448844,            label:"OVERPRESSURE" }, 
       x:{ n:15, color:0x448844,   width:1, label:"KILOMETERS", scale:30}, 
-      y:{ n:8,  color:0x888888,   width:1, label:"kPa", scale:30},
+      y:{ n:8,  color:0x888888,   width:1, label:"MPa", scale:30},
       hasBounds: false,
       hasEquation: false
     } 
