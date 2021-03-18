@@ -8,6 +8,7 @@ export const newLineChart = cnfg => {
     var allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
 
     const width={data:[9,3]              , peak:[11,1]   };
+
     const color={data:[0x770000,0x55FF00], peak:[0x000000,0x1F0000]};
     
     const data={buf:r.data};
@@ -46,6 +47,28 @@ export const newLineChart = cnfg => {
       return t;
       }
 
+    const sound = {
+      dom: null,
+      playOnce: true,
+      construct: ()=> {
+        sound.dom= new Audio("assets/exploslow.ogg");
+      //  sound.dom.playbackRate=.25;  - slowed down in editor saved as ..slow file
+        sound.dom.volume=.1;
+        
+        sound.played=0;
+        },
+      play: ()=> {
+        if( sound.playOnce && sound.played )  return;
+        if(!sound.dom) sound.construct();
+        console.log( "SOUND", sound);
+        sound.dom.play();
+        sound.played++;
+      }
+    }
+
+
+
+const clipVal=.0049;
 
     data.min    = r.y.min || data.buf.reduce( (min,d)=> min<d? min:d,  Infinity );
     data.max    = r.y.max || data.buf.reduce( (max,d)=> max>d? max:d, -Infinity );
@@ -58,7 +81,7 @@ export const newLineChart = cnfg => {
     let my =-(r.y.px -pad.bottom -pad.top) / (data.span);
     let by =  r.y.px -pad.bottom;
     let ploty= y=> my*(y-data.min) + by;
-  
+
     
     const self={
       get hitBox() {return gridLayer;},
@@ -70,10 +93,16 @@ export const newLineChart = cnfg => {
         allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
         self.grid();
         if(data.buf) self.plot( data.buf );
+        sound.construct();
         return self;
+
         },
-      plot: ( d )=>{
+      plot: ( dOrig )=>{
+        sound.play();
         blurFilter.blur = 20;     
+
+        let d= dOrig.map( v=> v>clipVal? clipVal:v )
+
         let peak = d.reduce( (max,v,i,a)=> a[max]>a[i]? max:i, 0 );
         overlay.alpha= d[peak]/data.max;
         markLayers.forEach( (m, layer) =>{
@@ -90,7 +119,8 @@ export const newLineChart = cnfg => {
           if(p) { 
             parent.removeChild(p)
             p.destroy();
-            }          p= new PIXI.Graphics();
+            }  
+          p= new PIXI.Graphics();
           plotLayers[layer]=allLayers[layer+3]=p;
           if( !layer ) p.filters = [blurFilter];    
           p.lineStyle(  width.data[ layer ], color.data[layer], 1);
@@ -144,12 +174,12 @@ export const newLineChart = cnfg => {
       bounds: ()=>{
         grid.hasBounds = true;
         let g= gridLayer;
-        g.lineStyle(  grid.glass.width, grid.glass.color, .4);
+        g.lineStyle(  grid.glass.width, grid.glass.color );
         let y = 0.80* (r.y.px-pad.bottom-pad.top)+pad.top;
         g.moveTo(   pad.left,         y);
         g.lineTo(   r.x.px-pad.right, y);
         txt( r.x.px-pad.left-10, y-17, "glass");
-        g.lineStyle(  grid.steel.width, grid.steel.color, .4);
+        g.lineStyle(  grid.steel.width, grid.steel.color );
         y = 0.10* (r.y.px-pad.bottom-pad.top)+pad.top;
         g.moveTo(   pad.left,         y);
         g.lineTo(   r.x.px-pad.right, y);
@@ -168,7 +198,6 @@ export const newLineChart = cnfg => {
         gridLayer.addChild(eq);
         return self;
         },
-
       show: ()=>{
         allLayers.forEach( g =>{ if(g) parent.addChild(g);} );
         return self;
@@ -188,6 +217,7 @@ export const newLineChart = cnfg => {
         return self;
         },
       reset: r =>{ 
+        console.log("PLOTTER reset");
         self.destruct();
         self.construct();
         self.show();
