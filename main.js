@@ -26,7 +26,7 @@ const equation  =new PIXI.Sprite.from( '/assets/equation.png');
 let chart =new PIXI.Container();
     chart.position.set(12,460);
     app.stage.addChild( chart )
-let map =new PIXI.Sprite.from( '/assets/map.png');
+let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     map.visible=false;
     map.position.set(1020,0);
     app.stage.addChild( map )
@@ -64,15 +64,20 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
                               });
     
     var plot=false, nLast=10000;
+
+
+
+//every frame
     app.ticker.add( t=> {
       if( plot ){
         let n = Math.floor( ((Date.now()-tZero)/4) %500 );
-        if (n<nLast)  g.reset();
+        if (n<nLast)  g.replot();
         nLast=n;
         g.plot( shockwave( n )); 
         }
       });
-    
+
+//every mouse move    
     function trackit( e ){
       let p= e.data.getLocalPosition( chart );  
       let x= (p.x-37)/923;
@@ -115,7 +120,7 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
         else  retOptions[which].radius =newRadius;  
         r.destruct();
         r = newReticle(retOptions).move(map.width/2,map.height/2)
-                                  .show();
+                                 .show();
       }
       
         
@@ -127,14 +132,8 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
       gsap.from( r, {immediacy:0, duration:1, ease: "linear"});
       map.on("mousemove", track);
       });
-    /*
-        map.addEventListener("mousemove", e=> r.move(e.clientX, e.clientY) );
-    map.addEventListener("mouseleave",e=> 
-        gsap.to(r, {x:map.width/2, y:map.height/2, duration: .5, ease: "elastic.out(1.1, 0.2 )"}));
-    map.addEventListener("mouseenter",e=> 
-        gsap.from( r, {immediacy:0, duration:1, ease: "linear"}));
-    */
-var helptext= document.createElement("ul");
+
+const helptext= document.createElement("ul");
 helptext.innerHTML=`
     <li><b>M</b>:   map toggle                 </li>
     <li><b>E</b>:   equation toggle            </li>
@@ -149,11 +148,6 @@ helptext.innerHTML=`
     <li><b>any other key</b>: toggles this help</li>
 ` ;
 
-
-  
-
-
-      
 const action={      
     KeyM: e=>   map.visible=!map.visible,
     KeyE: e=>   eq.visible=!eq.visible,
