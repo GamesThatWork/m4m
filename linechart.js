@@ -5,6 +5,8 @@ export const newLineChart = cnfg => {
     var plotLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
     var markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
     var gridLayer=   new PIXI.Graphics();
+    var boundsLayer=   new PIXI.Graphics();
+    
     var allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
 
     const width={data:[9,3]              , peak:[11,1]   };
@@ -54,21 +56,21 @@ export const newLineChart = cnfg => {
         sound.dom= new Audio("assets/exploslow.ogg");
       //  sound.dom.playbackRate=.25;  - slowed down in editor saved as ..slow file
         sound.dom.volume=.1;
-        
         sound.played=0;
         },
+      replay: ()=> sound.played=0,
       play: ()=> {
         if( sound.playOnce && sound.played )  return;
         if(!sound.dom) sound.construct();
         console.log( "SOUND", sound);
         sound.dom.play();
         sound.played++;
-      }
-    }
+        }
+        }
 
 
 
-const clipVal=.0049;
+const clipVal=.005;
 
     data.min    = r.y.min || data.buf.reduce( (min,d)=> min<d? min:d,  Infinity );
     data.max    = r.y.max || data.buf.reduce( (max,d)=> max>d? max:d, -Infinity );
@@ -87,10 +89,11 @@ const clipVal=.0049;
       get hitBox() {return gridLayer;},
       construct: ()=>{
         r.parent.addChild( parent );
-        plotLayers=[ false, false];// new PIXI.Graphics(), new PIXI.Graphics()  ];
+        plotLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
         markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
         gridLayer=   new PIXI.Graphics();
-        allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
+        boundsLayer= new PIXI.Graphics();
+        allLayers= [ gridLayer, ...markLayers, ...plotLayers, boundsLayer ];
         self.grid();
         if(data.buf) self.plot( data.buf );
         sound.construct();
@@ -100,11 +103,11 @@ const clipVal=.0049;
       plot: ( dOrig )=>{
         sound.play();
         blurFilter.blur = 20;     
-
         let d= dOrig.map( v=> v>clipVal? clipVal:v )
-
         let peak = d.reduce( (max,v,i,a)=> a[max]>a[i]? max:i, 0 );
-        overlay.alpha= d[peak]/data.max;
+
+        overlay.alpha= d[peak]/data.max;  // visual blast effect 
+
         markLayers.forEach( (m, layer) =>{
           if( !layer ) m.filters = [blurFilter];    
           m.lineStyle(  width.peak[ layer ], color.peak[ layer ], .40);
@@ -115,22 +118,18 @@ const clipVal=.0049;
           m.drawCircle( plotx( peak), ploty( d[peak] ), 7 );
           m.endFill();
           }); 
+
         plotLayers.forEach( (p, layer) =>{
-          if(p) { 
-            parent.removeChild(p)
-            p.destroy();
-            }  
-          p= new PIXI.Graphics();
-          plotLayers[layer]=allLayers[layer+3]=p;
+          p.clear();
           if( !layer ) p.filters = [blurFilter];    
           p.lineStyle(  width.data[ layer ], color.data[layer], 1);
           p.moveTo(   plotx(0), ploty( d[0]) );
           d.forEach( (y,x) => p.lineTo( plotx(x), ploty(y)  ) );
-          parent.addChild(p);
           }); 
         return self;  
         }, 
       grid: ()=>{
+        console.log( "PLOT: grid");
         let g = gridLayer;     
         g.interactive=true;
         g.interactiveChildren=true;
@@ -143,8 +142,7 @@ const clipVal=.0049;
 
         g.lineStyle(  grid.x.width, grid.x.color, 1);
         for(let i=0; i<grid.x.n; i++  ) {
-          let x = plotx( (i/(grid.x.n-1)) *data.length);
-          g.moveTo(   x, pad.top);
+          let x = plotx( (i/(grid.x.n-1)) *data.length);          g.moveTo(   x, pad.top);
           g.lineTo(   x, r.y.px-pad.bottom);
           txt( x,r.y.px-pad.bottom*.80, "label", String(i) );
           } 
@@ -172,8 +170,10 @@ const clipVal=.0049;
         return self;
         },
       bounds: ()=>{
+        console.log( "PLOT: bounds");
+
         grid.hasBounds = true;
-        let g= gridLayer;
+        let g= boundsLayer;
         g.lineStyle(  grid.glass.width, grid.glass.color );
         let y = 0.80* (r.y.px-pad.bottom-pad.top)+pad.top;
         g.moveTo(   pad.left,         y);
@@ -216,12 +216,15 @@ const clipVal=.0049;
         r.parent.removeChild( parent );
         return self;
         },
+      replot: r =>{ 
+        console.log("PLOTTER replot");
+        sound.replay();
+        markLayers.forEach( m=>m.clear());
+        return self;
+        },
       reset: r =>{ 
         console.log("PLOTTER reset");
-        self.destruct();
-        self.construct();
-        self.show();
-        return self;
+        return self.destruct().construct().show();
         }
       }
     return self.construct();
