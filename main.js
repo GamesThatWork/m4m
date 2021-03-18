@@ -63,20 +63,20 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
                             y:{  min:-.00081, max:.005,  px:500}, 
                               });
     
-    var plot=false;
+    var plot=false, nLast=10000;
     app.ticker.add( t=> {
       if( plot ){
         let n = Math.floor( ((Date.now()-tZero)/4) %500 );
-        if (n<5)  g.reset();
+        if (n<nLast)  g.reset();
+        nLast=n;
         g.plot( shockwave( n )); 
         }
       });
     
     function trackit( e ){
-      let p= e.data.getLocalPosition(e.target);
+      let p= e.data.getLocalPosition( chart );  
       let x= (p.x-37)/923;
       if( x<0 || x>1) return;
-      console.log( x, p);
       g.plot( shockwave(x * 500) )
       if( synch ) setRadius( synch, x*111+50);
       }
@@ -134,57 +134,44 @@ let map =new PIXI.Sprite.from( '/assets/map.png');
     map.addEventListener("mouseenter",e=> 
         gsap.from( r, {immediacy:0, duration:1, ease: "linear"}));
     */
+var helptext= document.createElement("ul");
+helptext.innerHTML=`
+    <li><b>M</b>:   map toggle                 </li>
+    <li><b>E</b>:   equation toggle            </li>
+    <li><b>G</b>:   graph toggle               </li>
+    <li><b>P</b>:      plot travelling wave    </li>
+    <li><b>B</b>:      bounds (glass & steel)  </li>
+    <li><b>T</b>:      trace peak ("scrub")    </li>
+    <li><b>S</b>:          synch outer ring    </li>
+    <li><b>X</b>:          synch inner ring    </li>
+    <li><b>R</b>:   reset                      </li>
+    <li><b>Esc</b>: End demo                   </li>
+    <li><b>any other key</b>: toggles this help</li>
+` ;
 
 
-document.addEventListener('keydown', e=>{
-   switch(e.code){
-     default: 
-        alert(`
-            M:   map toggle
-            E:   equation toggle
-            G:   graph toggle
-            P:      plot travelling wave 
-            B:      bounds (glass & steel) 
-            T:      trace peak ("scrub")
-            S:          synch outer ring 
-            X:          synch inner ring 
-            R:   reset
-         ---?:---this-helpscreen---`) ;
-        break;
-    case 'KeyM':
-        map.visible=!map.visible;
-        break; 
-    case 'KeyE':
-        eq.visible=!eq.visible;
-        break; 
-    case 'KeyG':
-        g.show();
-        break; 
-    case 'KeyP':
-        tZero=Date.now();
-        g.reset();
-        plot=!plot;
-        break; 
-    case 'KeyB':
-        g.bounds();
-        break; 
-    case 'KeyT':
-        let h = g.hitBox;
-        h.interactive=h.interactiveChildren=true;
-        console.log("HITBOX", h);
-        h.on("mousemove", trackit);
-        break; 
-    case 'KeyS':
-        synch= (synch=="max")? false : "max";
-        g.reset();
-        break; 
-    case 'KeyX':
-        synch= (synch=="min")? false : "min";
-        g.reset();
-        break; 
-    case 'KeyR':
-        g.reset();
-        break; 
-    }});
+  
+
+
+      
+const action={      
+    KeyM: e=>   map.visible=!map.visible,
+    KeyE: e=>   eq.visible=!eq.visible,
+    KeyG:       g.show,
+    KeyP: e=>{  tZero=Date.now();     g.reset();   plot=!plot; }, 
+    KeyB:       g.bounds, 
+    KeyT: e=>{  let h = g.hitBox;    h.interactive=h.interactiveChildren=true;   h.on("mousemove", trackit); },
+    KeyS: e=>{  synch= (synch=="max")? false : "max";     g.reset();     g.show(); }, 
+    KeyX: e=>{  synch= (synch=="min")? false : "min";     g.reset();     g.show(); }, 
+    KeyR:       g.reset,
+    help: e=>{  
+                let body = document.querySelector("body");
+                body.requestFullscreen();
+                if(       body.firstChild.isSameNode( helptext ))  body.removeChild(  helptext );
+                else if ( body.firstChild )                        body.insertBefore( helptext, body.firstChild)
+                else                                               body.appendChild(  helptext );
+              }
+        };
+document.addEventListener('keydown', e=> (action[e.code] || action.help) () );
  
  
