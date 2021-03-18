@@ -49,7 +49,7 @@ export const newReticle = cnfg => {
         return self;
         },
       destruct: ()=>{ 
-        graphicLayers.forEach( g => { g.destroy(); });
+        graphicLayers.forEach( g => g.clear() );
         return self;
         }
       }
