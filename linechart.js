@@ -53,20 +53,20 @@ export const newLineChart = cnfg => {
       dom: null,
       playOnce: true,
       construct: ()=> {
-        sound.dom= new Audio("assets/exploslow.ogg");
-      //  sound.dom.playbackRate=.25;  - slowed down in editor saved as ..slow file
-        sound.dom.volume=.1;
-        sound.played=0;
+        sound.api= new Audio("assets/exploslow.ogg");
+        sound.api.volume=.1;
         },
-      replay: ()=> sound.played=0,
+      replay: ()=> sound.playOnce=true,
       play: ()=> {
-        if( sound.playOnce && sound.played )  return;
-        if(!sound.dom) sound.construct();
-        console.log( "SOUND", sound);
-        sound.dom.play();
-        sound.played++;
+        if( sound.playOnce ){ 
+          if( !sound.api) sound.construct();
+          console.log( "SOUND", sound);
+          sound.api.currentTime=0;
+          sound.api.play();
+          sound.playOnce=false;
+          }
         }
-        }
+      }
 
 
 
