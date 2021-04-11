@@ -43,7 +43,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
       let buf =[];
       for( let x=0; x<count; x++) 
         buf[x]=  
-            x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)
+            x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n*(n-x))
         :      0
       return buf;
     }
