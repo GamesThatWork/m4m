@@ -1,0 +1,15 @@
+body{
+    background-color: black;
+    color:chartreuse;
+}
+li {
+    font-family: 'Share Tech Mono';
+    font-size: 30px;
+    white-space: pre;
+    text-shadow: 1px 1px 5px yellow;
+    }
+ul{
+    position:absolute;
+    top:  4vh;
+    left: 12vw;
+}
