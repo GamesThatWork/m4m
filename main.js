@@ -1,3 +1,13 @@
+
+
+import  { newMath } from './math.js';
+import  { newLineChart } from './linechart.js';
+import  { newReticle } from './reticle.js';
+
+
+window.onload= e=>{
+
+
 /**
  * @module main 
  * @exports nothng - this runs directly under index.html
@@ -15,19 +25,9 @@ document.body.appendChild(app.view);
 
 
 /** 
-* * Visible version of the overpressure equation  (Sprite)
+* * Visible version of the overpressure equation and its  parts rendered in MathML
 */
-
-import  { newMath } from './math.js';
-
-
-
 const math=  newMath ().destruct();
-
-const equation  =new PIXI.Sprite.from( '/assets/equation.png');
-    equation.visible=false;
-    equation.position.set(60,180);
-    app.stage.addChild( equation )
 
 
 let chart =new PIXI.Container();
@@ -40,44 +40,39 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     
     
     
-    //********************* test the linechart ****************
-       
-    import  { newLineChart } from './linechart.js';
+    //********************* test the linechart *************
     let wavelength=25;
     let tZero=0;    
-    /*
-    const shockwave= (n, count=500)=>{
-      let buf =[];
-      for( let x=0; x<count; x++) 
-        buf[x]=  
-            x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n*(n-x))
-        :      0
-      return buf;
-    }
-*/
+
 
    
       const curves =[
-        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0   ,     // shock 
-//      (x,n )=>  x<n+wavelength?   .005                                          / (1+(n-x)**2)          :   0   ,     // pulse
-//      (x,n )=> (x<n+wavelength && x>n)?  .6 / ((x-n+wavelength/2)*(x-n+wavelength/2))                  :   0   ,     // pulse
-        (x,n )=>   .0036 / ((x-n+wavelength/2)*(x-n+wavelength/2)+.5)                   ,     // pulse
-        (x,n )=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.002        :   0   ,     // wavetrain
-//      (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (1+(n-x)**2*x**1.2 )  :   0   ,     // decay
-        (x,n )=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )     :   0   ,     // decay
-        (x,n )=>  x<n+wavelength?   1                                             / (5+x**1.2 )           :   0   ,     // prop
+        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
+        (x,n )=>  n<150? 0 : .005,                                                                                      // power constant - everywhere all at once
+        (x,n )=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
+//      (x,n )=>   .0036 / ((x-n+wavelength/2)*(x-n+wavelength/2)+.5)                   ,                             // pulse (spike)
+        (x,n )=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.002        :   0   ,   // wavetrain
+//      (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (1+(n-x)**2*x**1.2 )  :   0   ,   // decay
+        (x,n )=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )  :   0   ,     // decay
+        (x,n )=>  x<n+wavelength?   1                                             / (5+x**1.2 )           :   0   ,   // propagation
         ]
-      var curvenumber=0;
+        var curvenumber=0;
+        var curve= curves[0];
     
     
   
-  const buf=  Array.from(Array(500));
+    const buf=  Array.from(Array(500)); // this syntax creates an iterable, just 'Array(500)' will not.
 
-    const shockwave= (n, count=500)=>{
-    for( let x=0; x<count; x++)     buf[x]=  curves[ curvenumber ]( x,n);
-    return buf;
-    }
+    //const shockwave= (n, count=500)=>{
+    ///for( let x=0; x<count; x++)     buf[x]=  curves[ curvenumber ]( x,n);
+   // return buf;
+   // }
+
+    const shockwave= n=> buf.map( (b,i)=> curve(i,n) );
+  
     
+
+
     
     var synch=false, extra=false;
     
@@ -120,7 +115,6 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     
     
     //********************* test the reticle ********************
-    import  { newReticle } from './reticle.js';
     map.interactive=true;
     
     
@@ -184,20 +178,19 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
   
   const step=[
     {   
-      msg:`Overpressure Model and Decomposition: Demo for Dr Chad Rumchik
+      msg:`Overpressure Model and Decomposition:
 
-      All graphs and math operations in this demo are utterly FAKE.  
-
-
-      (Please referesh browser if demo freezes.)
-
-      Source of equation
-          Modeling of the whole process of shock wave overpressure of free-field air explosion,
-          Defence Technology,
-          Zai-qing Xue, Shunping Li, Chun-liang Xin, Li-ping Shi, Hong-bin Wu,
-          Volume 15, Issue 5,2019,
-          (https://www.sciencedirect.com/science/article/pii/S2214914719300753)
-      `, 
+      All formulae and graphs in this demo are utterly FAKE.  
+      
+      and there is a bug so please referesh browser if demo freezes.)
+      `,
+//      This is a MADEUP Source of equation
+//          Modeling of the whole process of shock wave overpressure of free-field air explosion,
+//          Defence Technology,
+//          Zai-qing Xue, Shunping Li, Chun-liang Xin, Li-ping Shi, Hong-bin Wu,
+//          Volume 15, Issue 5,2019,
+//          (https://www.sciencedirect.com/science/article/pii/S2214914719300753)
+//      `, 
         next: e=>{
           g.bounds();
           g.show();
@@ -217,7 +210,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
           math.full();
           tZero=Date.now();
           g.reset();
-          curvenumber=0;
+          curve=curves[0];
           plot = true; 
           p.step( step[2] );
       } },
@@ -226,18 +219,26 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
                 `, 
         next: e=>{
           g.reset();
-          math.pulse();
-          curvenumber=1;
+     //     math.power();
+          curve=curves[1];
           p.step( step[3] );
       } },
       {   
-        msg:`We might start the kids with a simple spike representing the impulse component
+        msg:`For starts- the pressure is a function of explosive power - everywhere at once
+                `, 
+        next: e=>{
+          g.reset();
+   ///       math.pulse();
+          curve=curves[2];
+          p.step( step[4] );
+      } },      {   
+        msg:`Then introduce a step function that shows the radius expanding at the speed of sound
                 `, 
         next: e=>{
           g.reset();
           math.wave();
-          curvenumber=2;
-          p.step( step[4] );
+          curve=curves[3];
+          p.step( step[5] );
       } },
       {   
         msg:`Then model the pressure as a wavetrain (cosine curve))
@@ -245,8 +246,8 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
         next: e=>{
           g.reset();
           math.decay();
-          curvenumber=3;
-          p.step( step[5] );
+          curve=curves[4];
+          p.step( step[6] );
       } },
       {   
         msg:`Then add a term to model the wave's decay 
@@ -254,8 +255,8 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
         next: e=>{
           g.reset();
           math.prop();
-          curvenumber=4;
-          p.step( step[6] );
+          curve=curves[5];
+          p.step( step[7] );
       } },
       {   
         msg:`Let's show (free-air) propagation in 3 dimensions: Peak pressure follows inverse cube of distance
@@ -263,8 +264,8 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
         next: e=>{
           g.reset();
           math.full();
-          curvenumber=0;
-          p.step( step[7] );
+          curve=curves[0];
+          p.step( step[8] );
       } },
       {   
         msg:`Finally we put it all together
@@ -277,18 +278,17 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
   var demo=true;
   const p= newPanel();
   
-  p.step( step[0] );
+ p.step( step[0] );
    
 
-
-
-
+///var p;
 
 
 
 document.addEventListener('keydown', e=>{
    switch(e.code){
      default: 
+      break;
         alert(`
             M:   map toggle
             E:   equation toggle
@@ -303,10 +303,12 @@ document.addEventListener('keydown', e=>{
         break;
 
 
+        case 'Digit0': math.power();  break;
         case 'Digit1': math.pulse();  break;
         case 'Digit2': math.wave();   break;
         case 'Digit3': math.decay();  break;
         case 'Digit4': math.prop();   break;
+        case 'Digit5': math.full();   break;
     
         case 'KeyE':
           newMath (  {  parent:document.body, x: 30, y:50} );
@@ -339,7 +341,7 @@ document.addEventListener('keydown', e=>{
         h.on("mousemove", trackit);
         break; 
     case 'KeyC':
-        curvenumber=++curvenumber % curves.length;
+        curve = curves[++curvenumber % curves.length];
         break; 
     case 'KeyS':
         synch= (synch=="max")? false : "max";
@@ -349,6 +351,11 @@ document.addEventListener('keydown', e=>{
         synch= (synch=="min")? false : "min";
         g.reset();
         break; 
+    case 'KeyD':
+  
+        p= newPanel();
+        p.step( step[0] );
+        break;        
     case 'KeyR':
         g.reset();
         break; 
@@ -360,11 +367,13 @@ helptext.innerHTML=`
     <li><b>E</b>:   equation toggle            </li>
     <li><b>G</b>:   graph toggle               </li>
     <li><b>P</b>:      plot travelling wave    </li>
+    <li><b>C</b>:          next curve          </li>
     <li><b>B</b>:      bounds (glass & steel)  </li>
     <li><b>T</b>:      trace peak ("scrub")    </li>
     <li><b>S</b>:          synch outer ring    </li>
     <li><b>X</b>:          synch inner ring    </li>
     <li><b>R</b>:   reset                      </li>
+    <li><b>D</b>:   demo sequence              </li>
     <li><b>Esc</b>: End demo                   </li>
     <li><b>any other key</b>: toggles this help</li>
 ` ;
@@ -389,4 +398,4 @@ const action={
         };
 document.addEventListener('keydown', e=> (action[e.code] || action.help) () );
  
- 
+ }
