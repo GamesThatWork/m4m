@@ -13,3 +13,9 @@ ul{
     top:  4vh;
     left: 12vw;
 }
+    
+.power{    color: rgb(204,  44,  44);         }
+.pulse{    color: rgb(255, 174,   0);        }
+.cosine{   color: rgb(217, 255,   0);        }
+.decay{    color: rgb(  0, 255,  13);        }
+.propa{    color: rgb(  0, 132, 255);        }
