@@ -39,11 +39,15 @@ export const newLineChart = cnfg => {
       hasEquation: false
     } 
     
-    const txt= (x,y, type, content )=>{
+    const txt= (x,y, type, content )=>{ 
+ console.log("txt", content,type)
       let style = textStyle[type] || textStyle.default;
-      let t = new PIXI.Text( content || grid[type].label, style);
-      if ( style.align=='right'  )  x-=t.width;
-      if ( style.align=='center' )  x-=t.width/2;
+      if( !content )  content =grid[type]?.label || "";
+      if( content==="0" )  content = "O";
+console.log("txt", content,style)
+      let t = new PIXI.Text(     content, style );
+      if( style.align=='right' ) x-=t.width;
+      if( style.align=='center') x-=t.width/2;
       t.position.set( x, y);
       gridLayer.addChild(t);
       return t;
@@ -142,16 +146,17 @@ const clipVal=.005;
 
         g.lineStyle(  grid.x.width, grid.x.color, 1);
         for(let i=0; i<grid.x.n; i++  ) {
-          let x = plotx( (i/(grid.x.n-1)) *data.length);          g.moveTo(   x, pad.top);
+          let x = plotx( (i/(grid.x.n-1)) *data.length);
+          g.moveTo(   x, pad.top);
           g.lineTo(   x, r.y.px-pad.bottom);
-          txt( x,r.y.px-pad.bottom*.80, "label", String(i) );
+          txt( x,r.y.px-pad.bottom*.80, "label", i );
           } 
         g.lineStyle(  grid.y.width, grid.y.color, 1);
         for(let i=0; i<grid.y.n; i++  ) {
           let y = ploty( (i/(grid.y.n-1)) *data.span + data.min);
           g.moveTo(   pad.left,         y);
           g.lineTo(   r.x.px-pad.right, y);
-          txt( pad.left-10, y-10, "label",  String(i) );
+          txt( pad.left-10, y-10, "label",  i );
           }
         txt( r.x.px/2, r.y.px-20, "x"    );
         txt(       20, r.y.px/2,  "y"    ).rotation=3*Math.PI/2;
