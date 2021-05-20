@@ -1,5 +1,6 @@
 
 
+import  { newMap   } from './map.js';
 import  { newMath } from './math.js';
 import  { newLineChart } from './linechart.js';
 import  { newReticle } from './reticle.js';
@@ -20,7 +21,12 @@ window.onload= e=>{
 /**
  * This is the central PIXI display and update object
  */
-const app = new PIXI.Application({width:1920, height:1080});
+const app = new PIXI.Application({
+	view: document.querySelector("canvas"), 
+	antialias: true, 
+	backgroundAlpha:0, 
+	width:1920, height:1080
+	});
 document.body.appendChild(app.view);
 
 
@@ -58,7 +64,18 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
         ]
         var curvenumber=0;
         var curve= curves[0];
-    
+	  const curveFunctions={
+		power: (x,n)=>  n<150? 0 : .005,                                                                                      // power constant - everywhere all at once
+		pulse: (x,n)=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
+		wave:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.002        :   0   ,   // wavetrain
+		decay: (x,n)=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )  :   0   ,     // decay
+		prop:  (x,n)=>  x<n+wavelength?   1                                             / (5+x**1.2 )           :   0   ,   // propagation
+		full:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
+		}	
+
+
+
+
     
   
     const buf=  Array.from(Array(500)); // this syntax creates an iterable, just 'Array(500)' will not.
@@ -180,7 +197,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     {   
       msg:`Overpressure Model and Decomposition:
 
-      All formulae and graphs in this demo are utterly FAKE.  
+      All formulae and graphs in this demo are utterly ~ FAKE.  
       
       and there is a bug so please referesh browser if demo freezes.)
       `,
@@ -275,16 +292,16 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
         } }
    ]
   
-  var demo=true;
-  const p= newPanel();
+  var demo=false;
+ // const p= newPanel();
   
- p.step( step[0] );
+ // p.step( step[0] );
    
 
 ///var p;
 
 
-
+/*
 document.addEventListener('keydown', e=>{
    switch(e.code){
      default: 
@@ -319,8 +336,9 @@ document.addEventListener('keydown', e=>{
 
 
 
-    case 'KeyM':
-        map.visible=!map.visible;
+    case 'KeyQ':
+		let map = newMap();
+//        map.visible=!map.visible;
         break; 
     case 'KeyG':
         g.show();
@@ -360,8 +378,9 @@ document.addEventListener('keydown', e=>{
         g.reset();
         break; 
     }});
-
+*/
 const helptext= document.createElement("ul");
+helptext.id= "help";
 helptext.innerHTML=`
     <li><b>M</b>:   map toggle                 </li>
     <li><b>E</b>:   equation toggle            </li>
@@ -379,7 +398,14 @@ helptext.innerHTML=`
 ` ;
 
 const action={      
-    KeyM: e=>   map.visible=!map.visible,
+//    KeyM: e=>   map.visible=!map.visible,
+    Digit0: math.power,
+    Digit1: math.pulse,
+    Digit2: math.wave,
+    Digit3: math.decay,
+    Digit4: math.prop,
+    Digit5: math.full,
+    KeyM:   newMap,
     KeyE: e=>   eq.visible=!eq.visible,
     KeyG:       g.show,
     KeyP: e=>{  tZero=Date.now();     g.reset();   plot=!plot; }, 
@@ -388,14 +414,14 @@ const action={
     KeyS: e=>{  synch= (synch=="max")? false : "max";     g.reset();     g.show(); }, 
     KeyX: e=>{  synch= (synch=="min")? false : "min";     g.reset();     g.show(); }, 
     KeyR:       g.reset,
-    help: e=>{  
-                let body = document.querySelector("body");
+    help: e=>{  console.log(e.code);
+	           let body = document.querySelector("body");
                 body.requestFullscreen();
                 if(       body.firstChild.isSameNode( helptext ))  body.removeChild(  helptext );
                 else if ( body.firstChild )                        body.insertBefore( helptext, body.firstChild)
                 else                                               body.appendChild(  helptext );
               }
         };
-document.addEventListener('keydown', e=> (action[e.code] || action.help) () );
+document.addEventListener('keydown', e=>(action[e.code] || action.help)( e ) );
  
  }
