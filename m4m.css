@@ -18,4 +18,11 @@ ul{
 .pulse{    color: rgb(255, 174,   0);        }
 .cosine{   color: rgb(217, 255,   0);        }
 .decay{    color: rgb(  0, 255,  13);        }
-.propa{    color: rgb(  0, 132, 255);        }
+.propa{    color: rgb(  0, 132, 255);        } 
+.map0 {    fill: rgb(204,  44,  44);        }
+.map1 {    fill: rgb(32, 13, 75);      stroke:white;   }
+.map2 {    fill: rgb(75, 3, 3);       stroke:rgb(228, 0, 0);  }
+.map3 {    fill: rgb(  0, 255,  13);      stroke:white;   }
+.map4 {    fill: rgb(  0, 132, 255);       stroke:white;  }
+
+ 
