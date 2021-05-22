@@ -40,11 +40,9 @@ export const newLineChart = cnfg => {
     } 
     
     const txt= (x,y, type, content )=>{ 
- console.log("txt", content,type)
       let style = textStyle[type] || textStyle.default;
       if( !content )  content =grid[type]?.label || "";
       if( content==="0" )  content = "O";
-console.log("txt", content,style)
       let t = new PIXI.Text(     content, style );
       if( style.align=='right' ) x-=t.width;
       if( style.align=='center') x-=t.width/2;
