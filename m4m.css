@@ -1,7 +1,30 @@
 body{
-    background-color: black;
-    color:chartreuse;
-}
+	background-color: black;
+	color:chartreuse;
+	margin:0; padding:0;
+	background-color:black; 
+	color:white; 
+	font-size:44px;
+	} 
+#container {  position: relative; }
+
+canvas,
+#panel,
+#map,#mapid,
+#math,#mathmenu,
+#help		  { position: absolute;  }
+
+#map          {  z-index:  0;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
+canvas        {  z-index:  1;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
+#mapid        {  z-index:  3;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
+#panel        {  z-index:  4;  top: 12px; left: 12px; width: 100vw; 
+				font-family: 'Lucida Sans', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+				font-size:    1.4vw;  padding: .5vw 2vw;  color:darkgoldenrod;    display:block; background-color: #222;     }
+#mathmenu     {  z-index:  5;  top:  250px; left: 60px;  border:darkred; min-height: 150px; width:100%;                             }
+#math         {  z-index:  5;  top: -175px; left:  0px;                              }
+#help         {  z-index:  6;  top:  40px; left:  40px;                              }
+button { background-color: rgb(170, 224, 19); margin: 20px;   }
+
 li {
     font-family: 'Share Tech Mono';
     font-size: 30px;
@@ -13,16 +36,24 @@ ul{
     top:  4vh;
     left: 12vw;
 }
-    
-.power{    color: rgb(204,  44,  44);         }
-.pulse{    color: rgb(255, 174,   0);        }
-.cosine{   color: rgb(217, 255,   0);        }
-.decay{    color: rgb(  0, 255,  13);        }
-.propa{    color: rgb(  0, 132, 255);        } 
+
+      .mathfunc        { width: 150px; height:150px; border-radius: 65px;                   }
+   div.mathfunc        { pointer-events: none; position:relative; left:  0px; top:  0px;  }
+button.mathfunc        { pointer-events: auto; position:absolute; left:-25px; top:-60px;
+						 background-color: rgba(55, 30, 4, 0.3); border: 5px solid rgb(82, 77, 9);}
+button.mathfunc:hover  {                                           border: 5px solid gold;}
+
+
+.power{    color: rgb(204,  44,  44);   font-size:90px;      }
+.pulse{    color: rgb(255, 174,   0);   font-size:36px;      }
+.wave {    color: rgb(217, 255,   0);   font-size:32px;      }
+.decay{    color: rgb(  0, 255,  13);   font-size:64px;      }
+.prop {    color: rgb(  0, 132, 255);   font-size:45px;      } 
+
 .map0 {    fill: rgb(204,  44,  44);        }
-.map1 {    fill: rgb(32, 13, 75);      stroke:white;   }
-.map2 {    fill: rgb(75, 3, 3);       stroke:rgb(228, 0, 0);  }
-.map3 {    fill: rgb(  0, 255,  13);      stroke:white;   }
-.map4 {    fill: rgb(  0, 132, 255);       stroke:white;  }
+.map1 {    fill: rgb(32, 13, 75);       stroke:white;   }
+.map2 {    fill: rgb(75, 3, 3);         stroke:rgb(228, 0, 0);  }
+.map3 {    fill: rgb(  0, 255,  13);    stroke:white;   }
+.map4 {    fill: rgb(  0, 132, 255);    stroke:white;  }
 
  
