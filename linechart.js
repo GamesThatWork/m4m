@@ -4,14 +4,15 @@ export const newLineChart = cnfg => {
     const blurFilter = new PIXI.filters.BlurFilter();
     var plotLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
     var markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
+    var lineLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
     var gridLayer=   new PIXI.Graphics();
     var boundsLayer=   new PIXI.Graphics();
     
     var allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
 
-    const width={data:[9,3]              , peak:[11,1]   };
+    const width={data:[9,3]              , peak:[11,1]             , line:[7,5]   };
 
-    const color={data:[0x770000,0x55FF00], peak:[0x000000,0x1F0000]};
+    const color={data:[0x770000,0x55FF00], peak:[0x000000,0x1F0000], line:[0x8F8800,0xFFFFFF]};
     
     const data={buf:r.data};
     const parent= new PIXI.Container();
@@ -95,7 +96,7 @@ const clipVal=.005;
         markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
         gridLayer=   new PIXI.Graphics();
         boundsLayer= new PIXI.Graphics();
-        allLayers= [ gridLayer, ...markLayers, ...plotLayers, boundsLayer ];
+        allLayers= [ gridLayer, ...markLayers, ...plotLayers, ...lineLayers, boundsLayer ];
         self.grid();
         if(data.buf) self.plot( data.buf );
         sound.construct();
@@ -112,9 +113,9 @@ const clipVal=.005;
 
         markLayers.forEach( (m, layer) =>{
           if( !layer ) m.filters = [blurFilter];    
-          m.lineStyle(  width.peak[ layer ], color.peak[ layer ], .40);
-          m.moveTo(     plotx( peak), ploty( data.min) );
-          m.lineTo(     plotx( peak), ploty( d[peak] ) );
+       //   m.lineStyle(  width.peak[ layer ], color.peak[ layer ], .40);
+       //   m.moveTo(     plotx( peak), ploty( data.min) );
+       //   m.lineTo(     plotx( peak), ploty( d[peak] ) );
           m.lineStyle(  0);
           m.beginFill(0x000000);
           m.drawCircle( plotx( peak), ploty( d[peak] ), 7 );
@@ -129,7 +130,25 @@ const clipVal=.005;
           d.forEach( (y,x) => p.lineTo( plotx(x), ploty(y)  ) );
           }); 
         return self;  
-        }, 
+        },
+      line: ( dOrig )=>{
+        blurFilter.blur = 20;     
+        let d= dOrig.map( v=> v>clipVal? clipVal:v )
+        let peak = d.reduce( (max,v,i,a)=> a[max]>a[i]? max:i, 0 );
+
+        lineLayers.forEach( (l, layer) =>{
+          l.clear();
+          if( !layer ) l.filters = [blurFilter];    
+		  if( d[peak] >0 ){
+			l.lineStyle(  width.line[ layer ], color.line[layer], 1);
+			l.moveTo(   plotx(0), ploty( d[0]) );
+			d.forEach( (y,x) => l.lineTo( plotx(x), ploty(y)  ) );
+			 }}); 
+        return self;  
+        },
+
+
+
       grid: ()=>{
         console.log( "PLOT: grid");
         let g = gridLayer;     
