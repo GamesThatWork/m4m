@@ -33,7 +33,7 @@ document.body.appendChild(app.view);
 /** 
 * * Visible version of the overpressure equation and its  parts rendered in MathML
 */
-const math=  newMath ().destruct();
+//const math=  newMath ().destruct();
 
 
 let chart =new PIXI.Container();
@@ -47,45 +47,47 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     
     
     //********************* test the linechart *************
-    let wavelength=25;
+    let wavelength=38;
     let tZero=0;    
 
 
    
-      const curves =[
-        (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
-        (x,n )=>  n<150? 0 : .005,                                                                                      // power constant - everywhere all at once
-        (x,n )=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
-//      (x,n )=>   .0036 / ((x-n+wavelength/2)*(x-n+wavelength/2)+.5)                   ,                             // pulse (spike)
-        (x,n )=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.002        :   0   ,   // wavetrain
-//      (x,n )=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (1+(n-x)**2*x**1.2 )  :   0   ,   // decay
-        (x,n )=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )  :   0   ,     // decay
-        (x,n )=>  x<n+wavelength?   1                                             / (5+x**1.2 )           :   0   ,   // propagation
-        ]
-        var curvenumber=0;
-        var curve= curves[0];
-	  const curveFunctions={
-		power: (x,n)=>  n<150? 0 : .005,                                                                                      // power constant - everywhere all at once
+	  const lineFunction={
+		none:  (x,n)=>  0,                    
+		power: (x,n)=>  .0045,                    
+		pulse: (x,n)=>  x<wavelength*3?   .0025 : 0, 
+		wave:  (x,n)=>  Math.sin( (x/wavelength) *Math.PI)/1000 +0.002, 
+		decay: (x,n)=>  (.01 / (505-x))**.75,
+		prop:  (x,n)=>  -.125 /  (n**2-n*x),  // (5+x**1.2 ),
+		full:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
+		}
+	  const areaFunction={
+		power: (x,n)=>  n>350? 0 : .005,                                                                                      // power constant - everywhere all at once
 		pulse: (x,n)=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
-		wave:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.002        :   0   ,   // wavetrain
+		wave:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.001        :   0   ,   // wavetrain
 		decay: (x,n)=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )  :   0   ,     // decay
-		prop:  (x,n)=>  x<n+wavelength?   1                                             / (5+x**1.2 )           :   0   ,   // propagation
+		prop:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // propagation
 		full:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
 		}	
+		  	
+		   
+      const curves =[ 
+			lineFunction.full, 
+			lineFunction.power,
+			lineFunction.pulse,
+			lineFunction.wave,
+			lineFunction.decay,
+			lineFunction.prop ];
+    	var curvenumber=0;
+        var curve= curves[0];
 
-
-
-
-    
-  
     const buf=  Array.from(Array(500)); // this syntax creates an iterable, just 'Array(500)' will not.
 
-    //const shockwave= (n, count=500)=>{
-    ///for( let x=0; x<count; x++)     buf[x]=  curves[ curvenumber ]( x,n);
-   // return buf;
-   // }
 
     const shockwave= n=> buf.map( (b,i)=> curve(i,n) );
+
+    const areaBuffer= (func, n)=> buf.map( (b,i)=> areaFunction[ func ](i,n) );
+    const lineBuffer= (func, n)=> buf.map( (b,i)=> lineFunction[ func ](i,n) );
   
     
 
@@ -99,8 +101,11 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
                             y:{  min:-.00081, max:.005,  px:500}, 
                               });
     
-    var plot=false, nLast=10000;
+    var plot=false, nLast=10000, areaFunc="full";
 
+
+	const plotArea = name=> areaFunc=name;
+	const plotLine = name=> g.line( lineBuffer( name,  1 ) ) ;
 
 
 //every frame
@@ -109,7 +114,8 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
         let n = Math.floor( ((Date.now()-tZero)/4) %500 );
         if (n<nLast)  g.replot();
         nLast=n;
-        g.plot( shockwave( n )); 
+//        g.plot( shockwave( n )); 
+        g.plot( areaBuffer( areaFunc,  n ) ); 
         }
       });
 
@@ -122,11 +128,25 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
       if( synch ) setRadius( synch, x*111+50);
       }
     
+    //********************* test the Math functions ********************
     
-
-
-
-
+	const mathButtons = e=> {
+		["power","pulse","wave","decay","prop"].forEach( name=>{
+			let m = newMath(name);
+			let d = document.createElement("div");
+			let b = document.createElement("button");
+			b.classList.add( "mathfunc" );
+			d.classList.add( "mathfunc" );
+			m.showExpression( d );
+			d.append(b);
+			//m.showEquation( );
+			b.addEventListener( "mouseover", e=> { plotLine( m.name ); m.showEquation(); } );
+			b.addEventListener( "mouseout" , e=> { plotLine( "none" ); m.hideEquation(); } );
+			b.addEventListener( "mousedown", e=>   plotArea( m.name )                      );
+			console.log( b );
+			document.querySelector("#mathmenu").append (  d );
+			})
+		};
     
 
     
@@ -192,6 +212,13 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
       }
   }
   
+
+
+
+
+
+
+
   
   const step=[
     {   
@@ -293,92 +320,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
    ]
   
   var demo=false;
- // const p= newPanel();
-  
- // p.step( step[0] );
-   
 
-///var p;
-
-
-/*
-document.addEventListener('keydown', e=>{
-   switch(e.code){
-     default: 
-      break;
-        alert(`
-            M:   map toggle
-            E:   equation toggle
-            G:   graph toggle
-            P:      plot travelling wave 
-            B:      bounds (glass & steel) 
-            T:      trace peak ("scrub")
-            S:          synch outer ring 
-            X:          synch inner ring 
-            R:   reset
-         ---?:---this-helpscreen---`) ;
-        break;
-
-
-        case 'Digit0': math.power();  break;
-        case 'Digit1': math.pulse();  break;
-        case 'Digit2': math.wave();   break;
-        case 'Digit3': math.decay();  break;
-        case 'Digit4': math.prop();   break;
-        case 'Digit5': math.full();   break;
-    
-        case 'KeyE':
-          newMath (  {  parent:document.body, x: 30, y:50} );
-          math.full();
-          math.toggle();
-          break
-
-
-
-
-    case 'KeyQ':
-		let map = newMap();
-//        map.visible=!map.visible;
-        break; 
-    case 'KeyG':
-        g.show();
-        break; 
-    case 'KeyP':
-        tZero=Date.now();
-        g.reset();
-        plot=!plot;
-        break; 
-    case 'KeyB':
-        g.bounds();
-        break; 
-    case 'KeyT':
-        plot=false;
-        let h = g.hitBox;
-        h.interactive=h.interactiveChildren=true;
-        console.log("HITBOX", h);
-        h.on("mousemove", trackit);
-        break; 
-    case 'KeyC':
-        curve = curves[++curvenumber % curves.length];
-        break; 
-    case 'KeyS':
-        synch= (synch=="max")? false : "max";
-        g.reset();
-        break; 
-    case 'KeyX':
-        synch= (synch=="min")? false : "min";
-        g.reset();
-        break; 
-    case 'KeyD':
-  
-        p= newPanel();
-        p.step( step[0] );
-        break;        
-    case 'KeyR':
-        g.reset();
-        break; 
-    }});
-*/
 const helptext= document.createElement("ul");
 helptext.id= "help";
 helptext.innerHTML=`
@@ -399,13 +341,13 @@ helptext.innerHTML=`
 
 const action={      
 //    KeyM: e=>   map.visible=!map.visible,
-    Digit0: math.power,
-    Digit1: math.pulse,
-    Digit2: math.wave,
-    Digit3: math.decay,
-    Digit4: math.prop,
-    Digit5: math.full,
-    KeyM:   newMap,
+    Digit0: e=>   newMath("full" ).showExpression(),
+    Digit1: e=>   newMath("power").showExpression(),
+    Digit2: e=>   newMath("pulse").showExpression(),
+    Digit3: e=>   newMath("wave" ).showExpression(),
+    Digit4: e=>   newMath("decay").showExpression(),
+    Digit5: e=>   newMath("prop" ).showExpression(),
+    KeyM:   mathButtons, // e=>  newMap,
     KeyE: e=>   eq.visible=!eq.visible,
     KeyG:       g.show,
     KeyP: e=>{  tZero=Date.now();     g.reset();   plot=!plot; }, 
@@ -413,7 +355,8 @@ const action={
     KeyT: e=>{  let h = g.hitBox;    h.interactive=h.interactiveChildren=true;   h.on("mousemove", trackit); },
     KeyS: e=>{  synch= (synch=="max")? false : "max";     g.reset();     g.show(); }, 
     KeyX: e=>{  synch= (synch=="min")? false : "min";     g.reset();     g.show(); }, 
-    KeyR:       g.reset,
+	KeyC: e=>   curve = curves[++curvenumber % curves.length],
+	KeyR:       g.reset,
     help: e=>{  console.log(e.code);
 	           let body = document.querySelector("body");
                 body.requestFullscreen();
