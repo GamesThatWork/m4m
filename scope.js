@@ -61,7 +61,7 @@ export const newScope = cnfg => {
       play: ()=> {
         if( sound.playOnce ){ 
           if( !sound.api) sound.construct();
-          console.log( "SOUND", sound);
+//          console.log( "SOUND", sound);
           sound.api.currentTime=0;
           sound.api.play();
           sound.playOnce=false;
@@ -95,12 +95,12 @@ const clipVal=.005;
     
     const self={
       get hitBox() {return gridLayer;},
-      setLineColor: newColor=> {console.log(" plotLineColor", newColor ); color.line[0]=color.line[1]=newColor;},
       construct: ()=>{
         r.parent.addChild( parent );
-        plotLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
-        markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
         gridLayer=   new PIXI.Graphics();
+        markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
+        plotLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
+        lineLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
         boundsLayer= new PIXI.Graphics();
         allLayers= [ gridLayer, ...markLayers, ...plotLayers, ...lineLayers, boundsLayer ];
 		allLayers.forEach( (g,i)=>g.name=["grid", "markfx","mark","plotfx","plot","linefx","line","bounds"][i] );
@@ -108,8 +108,8 @@ const clipVal=.005;
         if(data.buf) self.plot( data.buf );
         sound.construct();
         return self;
-
         },
+
       plot: d=>{
         sound.play();
         blurFilter.blur = 20;     
@@ -153,8 +153,12 @@ const clipVal=.005;
 			 }}); 
         return self;  
         },
-
-
+      
+	  setLineColor: newColor=> {
+	  	console.log(" plotLineColor", newColor ); 
+		//color.line[0]=color.line[1]=newColor;
+		return self;
+		},
 
       grid: ()=>{
         console.log( "PLOT: grid");
@@ -264,7 +268,7 @@ const clipVal=.005;
         return self;
         },
       replot: r =>{ 
-        console.log("PLOTTER replot");
+     //   console.log("PLOTTER replot");
         sound.replay();
         markLayers.forEach( m=>m.clear());
         return self;
