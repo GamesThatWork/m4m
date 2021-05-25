@@ -2,7 +2,7 @@
 
 import  { newMap   } from './map.js';
 import  { newMath } from './math.js';
-import  { newLineChart } from './linechart.js';
+import  { newScope } from './scope.js';
 import  { newReticle } from './reticle.js';
 
 
@@ -46,7 +46,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     
     
     
-    //********************* test the linechart *************
+    //********************* test the oscilloscope *************
     let wavelength=38;
     let tZero=0;    
 
@@ -89,14 +89,34 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     const areaBuffer= (func, n)=> buf.map( (b,i)=> areaFunction[ func ](i,n) );
     const lineBuffer= (func, n)=> buf.map( (b,i)=> lineFunction[ func ](i,n) );
   
-    
+    function getStyleSheetPropertyValue(selectorText, propertyName) {
+    // search backwards because the last match is more likely the right one
+    for (var s= document.styleSheets.length - 1; s >= 0; s--) {
+        var cssRules = document.styleSheets[s].cssRules ||
+                document.styleSheets[s].rules || []; // IE support
+        for (var c=0; c < cssRules.length; c++) {
+            if (cssRules[c].selectorText === selectorText) 
+                return cssRules[c].style[propertyName];
+        }
+    }
+    return null;
+}
+
+function rgb2Color( str ){
+	if( ! str ) return 0xFF0000;
+//	let rgb= str.match( /([0-9])*/g );
+	let rgb= str.match( /(?<r>[0-9])(?<g>[0-9])(?<b>[0-9])/ );
+	console.log( str, rgb );
+	return 0x010000*rgb[4] + 0x000100*rgb[7] + 0x0000001*rgb[10];
+}
+
 
 
     
     var synch=false, extra=false;
     
     
-    const g = newLineChart (  {  parent:chart, data: null,
+    const g = newScope (  {  parent:chart, data: null,
                             x:{  min:0.1, max:500,   px:1000}, 
                             y:{  min:-.00081, max:.005,  px:500}, 
                               });
@@ -105,7 +125,11 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
 
 
 	const plotArea = name=> areaFunc=name;
-	const plotLine = name=> g.line( lineBuffer( name,  1 ) ) ;
+	const plotLine = name=>{ 
+		console.log( "color", getStyleSheetPropertyValue( `.${name}`, "color" ), rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
+		g.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
+		g.line( lineBuffer( name,  1 ) );
+		};
 
 
 //every frame
@@ -124,12 +148,14 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
       let p= e.data.getLocalPosition( chart );  
       let x= (p.x-37)/923;
       if( x<0 || x>1) return;
-      g.plot( shockwave(x * 500) )
+      g.plot( areaBuffer( areaFunc,  x*500 ) ); 
+//      g.plot( shockwave(x * 500) )
       if( synch ) setRadius( synch, x*111+50);
       }
     
     //********************* test the Math functions ********************
     
+
 	const mathButtons = e=> {
 		["power","pulse","wave","decay","prop"].forEach( name=>{
 			let m = newMath(name);
