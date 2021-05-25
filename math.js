@@ -19,7 +19,7 @@ export const mathFunction={}, newMath = cnfg => {
 		return self;
 		},
 	showEquation:  newDom=>{
-		console.log("showEquation", newDom );
+		console.log("showEquation:  newDom = ",newDom );
 		if( newDom )	dom.equation=newDom;
 		dom.equation.innerHTML = self.equation;
 		setTimeout( MathJax.typeset, 500 );
@@ -31,18 +31,18 @@ export const mathFunction={}, newMath = cnfg => {
 		setTimeout( MathJax.typeset, 500 );
 		},
 
-	toggle: ()=>   parent.innerHTML? self.destruct() : self.construct(),
+	toggle: ()=>   dom.equation.innerHTML? self.destruct() : self.construct(),
 	destruct: ()=>{ 
 		dom.equation.innerHTML ="";
 		dom.expression.innerHTML ="";
 		return self;
         },
 	hide: ()=> {
-		parent.style.display="none";
+		dom.equation.style.display="none";
 		return self;
 		},
 	show: ()=> {
-		parent.style.display="block";
+		dom.equation.style.display="block";
 		return self;
 		},
 
