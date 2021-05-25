@@ -36,9 +36,9 @@ document.body.appendChild(app.view);
 //const math=  newMath ().destruct();
 
 
-let chart =new PIXI.Container();
-    chart.position.set(12,460);
-    app.stage.addChild( chart )
+let scope =new PIXI.Container();
+    scope.position.set(12,460);
+    app.stage.addChild( scope )
 let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     map.visible=false;
     map.position.set(1020,0);
@@ -47,7 +47,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     
     
     //********************* test the oscilloscope *************
-    let wavelength=38;
+    let wavelength=25;
     let tZero=0;    
 
 
@@ -116,7 +116,7 @@ function rgb2Color( str ){
     var synch=false, extra=false;
     
     
-    const g = newScope (  {  parent:chart, data: null,
+    const g = newScope (  {  parent:scope, data: null,
                             x:{  min:0.1, max:500,   px:1000}, 
                             y:{  min:-.00081, max:.005,  px:500}, 
                               });
@@ -138,25 +138,25 @@ function rgb2Color( str ){
         let n = Math.floor( ((Date.now()-tZero)/4) %500 );
         if (n<nLast)  g.replot();
         nLast=n;
-//        g.plot( shockwave( n )); 
         g.plot( areaBuffer( areaFunc,  n ) ); 
         }
       });
 
 //every mouse move    
     function trackit( e ){
-      let p= e.data.getLocalPosition( chart );  
+      let p= e.data.getLocalPosition( scope );  
       let x= (p.x-37)/923;
       if( x<0 || x>1) return;
       g.plot( areaBuffer( areaFunc,  x*500 ) ); 
-//      g.plot( shockwave(x * 500) )
       if( synch ) setRadius( synch, x*111+50);
       }
     
     //********************* test the Math functions ********************
     
 
+
 	const mathButtons = e=> {
+
 		["power","pulse","wave","decay","prop"].forEach( name=>{
 			let m = newMath(name);
 			let d = document.createElement("div");
@@ -165,12 +165,19 @@ function rgb2Color( str ){
 			d.classList.add( "mathfunc" );
 			m.showExpression( d );
 			d.append(b);
-			//m.showEquation( );
-			b.addEventListener( "mouseover", e=> { plotLine( m.name ); m.showEquation(); } );
-			b.addEventListener( "mouseout" , e=> { plotLine( "none" ); m.hideEquation(); } );
-			b.addEventListener( "mousedown", e=>   plotArea( m.name )                      );
-			console.log( b );
 			document.querySelector("#mathmenu").append (  d );
+			//m.showEquation( );
+			b.addEventListener( "mouseover", e=> {
+				plotLine( m.name );
+				m.showEquation(); 
+				});
+			b.addEventListener( "mouseout" , e=> {
+				plotLine( "none" ); 
+				m.hideEquation();
+				});
+			b.addEventListener( "mousedown", e=>   
+				plotArea( m.name )
+				);
 			})
 		};
     
