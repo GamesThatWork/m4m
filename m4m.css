@@ -37,11 +37,9 @@ ul{
     left: 12vw;
 }
 
-      .mathfunc        { width: 150px; height:150px; border-radius: 65px;                   }
-   div.mathfunc        { pointer-events: none; position:relative; left:  0px; top: 0px;  }
-button.mathfunc        { pointer-events: auto; position:absolute; left:-25px; top: 0px;
-						 background-color: rgba(55, 30, 4, 0.3); border: 5px solid rgb(106, 106, 106);}
-button.mathfunc:hover  {                                           border: 5px solid gold;}
+ button.mathfunc        { width: 150px; height:150px; border-radius: 65px;   background-color: black;                 
+ 						 background-color: rgba(55, 30, 4, 0.3); border: 5px solid rgb(106, 106, 106);}
+ button.mathfunc:hover {                                           border: 5px solid gold;}
 
 
 .power{    color: rgb(211,   9,   9);  stroke: #aa1212;   font-size:90px;      }

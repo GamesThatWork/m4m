@@ -105,9 +105,9 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
 function rgb2Color( str ){
 	if( ! str ) return 0xFF0000;
 //	let rgb= str.match( /([0-9])*/g );
-	let rgb= str.match( /(?<r>[0-9])(?<g>[0-9])(?<b>[0-9])/ );
+	let rgb= str.match( /rgb\((?<r>[0-9]*), (?<g>[0-9]*), (?<b>[0-9]*)\)/ );
 	console.log( str, rgb );
-	return 0x010000*rgb[4] + 0x000100*rgb[7] + 0x0000001*rgb[10];
+	return 0x010000*rgb.groups.r + 0x000100*rgb.groups.g + 0x0000001*rgb.groups.b;
 }
 
 
@@ -126,8 +126,8 @@ function rgb2Color( str ){
 
 	const plotArea = name=> areaFunc=name;
 	const plotLine = name=>{ 
-		console.log( "color", getStyleSheetPropertyValue( `.${name}`, "color" ), rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
-		g.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
+		console.log( name, "color", getStyleSheetPropertyValue( `.${name}`, "color" ), rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
+	//	g.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
 		g.line( lineBuffer( name,  1 ) );
 		};
 
@@ -159,14 +159,10 @@ function rgb2Color( str ){
 
 		["power","pulse","wave","decay","prop"].forEach( name=>{
 			let m = newMath(name);
-			let d = document.createElement("div");
 			let b = document.createElement("button");
 			b.classList.add( "mathfunc" );
-			d.classList.add( "mathfunc" );
-			m.showExpression( d );
-			d.append(b);
-			document.querySelector("#mathmenu").append (  d );
-			//m.showEquation( );
+		 	m.showExpression( b); 
+			document.querySelector("#mathmenu").append ( b);
 			b.addEventListener( "mouseover", e=> {
 				plotLine( m.name );
 				m.showEquation(); 
