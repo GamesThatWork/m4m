@@ -104,10 +104,8 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
 
 function rgb2Color( str ){
 	if( ! str ) return 0xFF0000;
-//	let rgb= str.match( /([0-9])*/g );
-	let rgb= str.match( /rgb\((?<r>[0-9]*), (?<g>[0-9]*), (?<b>[0-9]*)\)/ );
-	console.log( str, rgb );
-	return 0x010000*rgb.groups.r + 0x000100*rgb.groups.g + 0x0000001*rgb.groups.b;
+	let rgb= str.match( /rgb\((?<r>[0-9]*), (?<g>[0-9]*), (?<b>[0-9]*)\)/ ).groups;
+	return 0x010000*rgb.r + 0x000100*rgb.g + 0x0000001*rgb.b;
 }
 
 
