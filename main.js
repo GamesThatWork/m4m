@@ -5,6 +5,7 @@ import  { newMath } from './math.js';
 import  { newScope } from './scope.js';
 import  { newReticle } from './reticle.js';
 
+var wavelength=25.5;
 
 window.onload= e=>{
 
@@ -47,7 +48,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     
     
     //********************* test the oscilloscope *************
-    let wavelength=25;
+   // var wavelength=16;
     let tZero=0;    
 
 
@@ -124,8 +125,7 @@ function rgb2Color( str ){
 
 	const plotArea = name=> areaFunc=name;
 	const plotLine = name=>{ 
-		console.log( name, "color", getStyleSheetPropertyValue( `.${name}`, "color" ), rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
-	//	g.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
+	 	g.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
 		g.line( lineBuffer( name,  1 ) );
 		};
 
@@ -136,7 +136,7 @@ function rgb2Color( str ){
         let n = Math.floor( ((Date.now()-tZero)/4) %500 );
         if (n<nLast)  g.replot();
         nLast=n;
-        g.plot( areaBuffer( areaFunc,  n ) ); 
+        g.plot( areaBuffer( areaFunc,  n ), n/500 ); 
         }
       });
 
@@ -163,15 +163,15 @@ function rgb2Color( str ){
 			document.querySelector("#mathmenu").append ( b);
 			b.addEventListener( "mouseover", e=> {
 				plotLine( m.name );
-				m.showEquation(); 
+				//m.hideEquation();
 				});
 			b.addEventListener( "mouseout" , e=> {
 				plotLine( "none" ); 
-				m.hideEquation();
 				});
-			b.addEventListener( "mousedown", e=>   
+			b.addEventListener( "mousedown", e=> {  
+				m.showEquation(); 
 				plotArea( m.name )
-				);
+				});
 			})
 		};
     
