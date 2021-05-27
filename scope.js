@@ -1,6 +1,8 @@
 export const newScope = cnfg => {
     const r=cnfg ; 
     const blurFilter = new PIXI.filters.BlurFilter();
+          blurFilter.blur = 20;     
+
     var plotLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
     var markLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
     var lineLayers=[ new PIXI.Graphics(), new PIXI.Graphics()  ];
@@ -9,7 +11,7 @@ export const newScope = cnfg => {
     
     var allLayers= [ gridLayer, ...markLayers, ...plotLayers ];
 
-    const width={data:[9,3]              , peak:[11,1]             , line:[7,5]   };
+    const width={data:[9,3]              , peak:[11,1]             , line:[11,3]   };
     const color={data:[0x770000,0x55FF00], peak:[0x000000,0x1F0000], line:[0x8F8800,0xFFFFFF]};
     
     const data={buf:r.data};
@@ -71,14 +73,16 @@ export const newScope = cnfg => {
 
 function rgbToHex(R,G,B) {return toHex(R)+toHex(G)+toHex(B)}
 function toHex(n) {
- n = parseInt(n,10);
- if (isNaN(n)) return "00";
- n = Math.max(0,Math.min(n,255));
- return "0123456789ABCDEF".charAt((n-n%16)/16)
-      + "0123456789ABCDEF".charAt(n%16);
+ n = (parseInt(n,10)||0)  & 0xFF;
+ //if( isNaN(n) ) n=0;
+ //n = Math.max(0,Math.min(n,255));
+ return "0123456789ABCDEF".charAt( n>>4 )
+      + "0123456789ABCDEF".charAt( n&0xF);
+ //return "0123456789ABCDEF".charAt((n-n%16)/16)      + "0123456789ABCDEF".charAt(n%16);
 }
 
-const clipVal=.005;
+const maxVal= .005;
+const minVal=-.001;
 
     data.min    = r.y.min || data.buf.reduce( (min,d)=> min<d? min:d,  Infinity );
     data.max    = r.y.max || data.buf.reduce( (max,d)=> max>d? max:d, -Infinity );
@@ -91,6 +95,15 @@ const clipVal=.005;
     let my =-(r.y.px -pad.bottom -pad.top) / (data.span);
     let by =  r.y.px -pad.bottom;
     let ploty= y=> my*(y-data.min) + by;
+
+    let suppressed=false;
+    let suppressArea= (suppress=false) =>{
+		suppressed=suppress;	
+		plotLayers[1].alpha = suppressed? 0.3:1;
+		markLayers[0].alpha = suppressed? 0.3:1;
+		gridLayer    .alpha = suppressed? 0.4:1;
+		boundsLayer  .alpha = suppressed? 0.1:1;
+		}
 
     
     const self={
@@ -110,53 +123,77 @@ const clipVal=.005;
         return self;
         },
 
-      plot: d=>{
+      plot: (d,t=1)=>{
+
+	//  if( t>0.5 && t<0.51) console.log("databuffer",d);
         sound.play();
-        blurFilter.blur = 20;     
-        d= d.map( v=> v>clipVal? clipVal:v )
+        d= d.map( (v,i,d)=> isNaN(v)? d[i? i-1:1] : v  );
+        d= d.map(  v     => v>maxVal? maxVal : (v>minVal? v: minVal) );
+        //d= d.map( (v,i,d)=> isNaN(v)? d[i? i-1:1] : ( v>maxVal? maxVal : (v>minVal? v: minVal) ));
+
         let peak = d.reduce( (max,v,i,a)=> a[max]>a[i]? max:i, 0 );
 
-        overlay.alpha= d[peak]/data.max;  // visual blast effect 
+        overlay.alpha= suppressed? 0 : (1-t)**2.5; 		 // visual blast effect 
 
-        markLayers.forEach( (m, layer) =>{
-          if( !layer ) m.filters = [blurFilter];    
-       //   m.lineStyle(  width.peak[ layer ], color.peak[ layer ], .40);
-       //   m.moveTo(     plotx( peak), ploty( data.min) );
-       //   m.lineTo(     plotx( peak), ploty( d[peak] ) );
-          m.lineStyle(  0);
-          m.beginFill(0x106000);
-          m.drawCircle( plotx( peak), ploty( d[peak] ), 3 );
-          m.endFill();
-          }); 
+		markLayers.forEach( (m, layer) =>{
+		if( !layer ) {m.filters = [blurFilter];    
+		m.lineStyle(  0);
+		m.beginFill(0x0);
+		m.drawCircle( plotx( peak), ploty( d[peak] ), 12 );
+		m.endFill();}
+		}); 
+
+
+		let y0 =  r.y.px- pad.bottom;
+	
+		let poly=[];
+		poly.push(   plotx(  0 ) );
+		poly.push(           y0  );
+		d.forEach( (y,x) =>{ 
+		  poly.push( plotx(x) );
+		  poly.push( ploty(y) );
+		  });
+		poly.push(   plotx( d.length ) );
+		poly.push(            y0       );
 
         plotLayers.forEach( (p, layer) =>{
           p.clear();
-          if( !layer ) p.filters = [blurFilter];    
-          p.lineStyle(  width.data[ layer ], color.data[layer], 1);
-          p.moveTo(   plotx(0), ploty( d[0]) );
-          d.forEach( (y,x) => p.lineTo( plotx(x), ploty(y)  ) );
-          }); 
+          if( !layer ){ p.filters = [blurFilter];    
+		  //else {
+			p.beginFill(0x00FF80);
+			p.drawPolygon( poly );
+			p.endFill();
+			p.alpha= suppressed? 0.2:0.4;
+			}
+   		  p.lineStyle(  width.data[ layer ], color.data[layer], 1);
+		  p.moveTo(   plotx(0), ploty( d[0]) );
+		  d.forEach( (y,x) => p.lineTo( plotx(x), ploty(y)  ) );
+		  }); 
         return self;  
         },
       line:  d=>{
-        blurFilter.blur = 20;     
-        d= d.map( v=> Math.min(v, clipVal) )
+        d= d.map( v=> v>maxVal? maxVal: (v>minVal? v: minVal) );
         let peak = d.reduce( (iMax,v,i,a)=> a[iMax]>a[i]? iMax:i, 0 );
 
         lineLayers.forEach( (l, layer) =>{
           l.clear();
-          if( !layer ) l.filters = [blurFilter];    
-		  if( d[peak] >0 ){
+		  console.log(l.name);
+		  l.alpha=1;
+		  if( d[peak]==0 ) suppressArea(false);
+		  else{
+		  	suppressArea(true);
+			if( !layer ) l.filters = [blurFilter];    
 			l.lineStyle(  width.line[ layer ], color.line[layer], 1);
 			l.moveTo(   plotx(0), ploty( d[0]) );
 			d.forEach( (y,x) => l.lineTo( plotx(x), ploty(y)  ) );
-			 }}); 
+			}
+    	  });
         return self;  
         },
       
 	  setLineColor: newColor=> {
 	  	console.log(" plotLineColor", newColor ); 
-		//color.line[0]=color.line[1]=newColor;
+		color.line[0]=color.line[1]=newColor;
 		return self;
 		},
 
@@ -235,8 +272,9 @@ const clipVal=.005;
         allLayers.forEach( g =>console.log( "SHoW:  ", g.name, g, parent) );
         if( parent )
 			allLayers.forEach( (g,i) =>{
-				console.log( "SHOOW:  ", g.name)
-			 	if(g && i<5 ) parent.addChild(g);
+				console.log( "SHOW>>  ", g.name)
+			 	//if(g && i<5 )
+				  parent.addChild(g);
 			 	} );
 		else console.log( "SHoW no parent:  ", parent);
         
@@ -253,23 +291,23 @@ const clipVal=.005;
         },
       destruct: ()=>{ 
 	  	allLayers.forEach( g=>{
-    	    console.log( "Graphic Object:  ", g?.name);
+    	    console.log( "Destroy Graphic Object:  ", g?.name);
 			if( g && g.parent ) g.parent.removeChild(g);
-			else console.log( "SHOW Orphaned Graphic Object:  ", g?.name)
+			else console.log( "Found ORPHAN Graphic Object:  ", g?.name)
 			g.destroy( true ); 
 		 	} );
-		if( parent.parent ) parent.parent.removeChild(parent);
-/*        parent.children.forEach( g => {
-			 if(g) 
+       parent.children.forEach( g => {
+			 if( !g ) return;
+			 console.log( "Found LOST CHILD Graphic Object:  ", g?.name)
 			 parent.removeChild( g );
 			 g.destroy( true ); 
 			 });
-        r.parent.removeChild( parent );*/
+		if( parent.parent ) parent.parent.removeChild(parent);
         return self;
         },
       replot: r =>{ 
      //   console.log("PLOTTER replot");
-        sound.replay();
+        if( !suppressed )   sound.replay();
         markLayers.forEach( m=>m.clear());
         return self;
         },
