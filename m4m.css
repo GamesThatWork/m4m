@@ -37,16 +37,18 @@ ul{
     left: 12vw;
 }
 
- button.mathfunc        { width: 150px; height:150px; border-radius: 65px;   background-color: black;                 
- 						 background-color: rgba(55, 30, 4, 0.3); border: 5px solid rgb(106, 106, 106);}
- button.mathfunc:hover {                                           border: 5px solid gold;}
+ button.mathfunc  { width: 150px; height:150px; border-radius: 65px;   background-color: black;                 
+ 						 background-color: rgba(55, 30, 4, 0.3);     border: 5px solid rgb(118, 112, 31);}
+ button.mathfunc:hover:not(.chosen) {                                  border: 5px solid gold;}
+ button.mathfunc.right { background-color: rgba(76, 151, 21, 0.398);  border: 5px solid rgb(42, 148, 7);}
+ button.mathfunc.wrong { background-color: rgba(106, 32, 32, 0.398); border: 5px solid red; }
 
 
 .power{    color: rgb(211,   9,   9);  stroke: #aa1212;   font-size:90px;      }
-.pulse{    color: rgb(255, 174,   0);  stroke: #222;   font-size:36px;      }
-.wave {    color: rgb(217, 255,   0);  stroke: #255;   font-size:32px;      }
-.decay{    color: rgb(  0, 255,  13);  stroke: #213;   font-size:64px;      }
-.prop {    color: rgb(  0, 132, 255);  stroke: #333333rgb(  0, 132, 255);   font-size:45px;      } 
+.pulse{    color: rgb(255, 174,   0);  stroke: #222;      font-size:36px;      }
+.wave {    color: rgb(217, 255,   0);  stroke: #255;      font-size:32px;      }
+.decay{    color: rgb(12, 170, 128);  stroke: #213;      font-size:64px;      }
+.prop {    color: rgb(  0, 132, 255);  stroke: #333333;   font-size:45px;      } 
 
 .map0 {    fill: rgb(204,  44,  44);        }
 .map1 {    fill: rgb(32, 13, 75);       stroke:white;   }

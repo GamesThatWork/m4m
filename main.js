@@ -150,7 +150,11 @@ function rgb2Color( str ){
       }
     
     //********************* test the Math functions ********************
-    
+       
+
+
+
+
 
 
 	const mathButtons = e=> {
@@ -161,17 +165,19 @@ function rgb2Color( str ){
 			b.classList.add( "mathfunc" );
 		 	m.showExpression( b); 
 			document.querySelector("#mathmenu").append ( b);
-			b.addEventListener( "mouseover", e=> {
+    		const hover = () =>{
 				plotLine( m.name );
-				//m.hideEquation();
-				});
-			b.addEventListener( "mouseout" , e=> {
-				plotLine( "none" ); 
-				});
-			b.addEventListener( "mousedown", e=> {  
-				m.showEquation(); 
-				plotArea( m.name )
-				});
+				b.addEventListener( "mouseout" , e=> 
+					plotLine( "none" ), {once:true} );
+				b.addEventListener( "mousedown", e=> {  
+					plotLine("none");
+					plotArea( m.name );
+					m.showEquation(); 
+					b.classList.add( "chosen" );
+					b.removeEventListener( "mouseover", hover);
+					});
+				};
+			b.addEventListener( "mouseover", hover);
 			})
 		};
     
