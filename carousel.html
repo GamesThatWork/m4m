@@ -46,13 +46,10 @@ body {
   font-size: 80px;
   font-weight: bold;
   color: white;
+  transition: color .4s;
   text-align: center;
      user-select: none;
 	 background-color:rgb(116, 112, 112);
-}
-
-.carousel__cell:hover {
-  border: 2px solid white;
 }
 
 .carousel-options {
@@ -84,16 +81,22 @@ body {
 <script>
 
 const newSpinner = (elements, cfg) =>{
+	const mousepad	= cfg?.mousepad || document.body;
+	const root      = cfg?.root    || document.createElement("div");
+	const parent    = cfg?.parent  || mousepad;
+	const hover     = cfg?.hover   || (el=>el.style.color="white");
+	const unhover   = cfg?.unhover || (el=>el.style.color="grey");
+	const click     = cfg?.click   || (el=>console.log( el.innerText ));
+
+
 	const stepAngle = 360 / elements.length;
 	const stepSize  = 1.2 * elements.reduce( (size,e)=> size+e.getBoundingClientRect().height, 0)/elements.length;
 	const radius    = Math.round( ( stepSize / 2) / Math.tan( Math.PI / elements.length ) );
-	const mousepad	= cfg?.mousepad || document.body;
-	const root      = cfg?.root   || document.createElement("div");
-	const parent    = cfg?.parent || mousepad;
 	parent.append(root);
 	let spin =0;
 	let diff =0;
-	let oldTrig = false;
+	let trig=-1;
+	let oldTrig = trig;
 
 
 
@@ -105,24 +108,30 @@ const newSpinner = (elements, cfg) =>{
 	const spinScale = 360 /mousepad.getBoundingClientRect().height * 2;
 	console.log( mousepad.getBoundingClientRect().height);
 	mousepad.addEventListener( 'mousemove', mouseMove  );
+	mousepad.addEventListener( 'click', mouseClick  );
 	function mouseMove( e ) {
 		e.stopImmediatePropagation();
 		spin =  e.clientY*spinScale;
-
-
-		let offset = spin%stepAngle;
-		let trig = oldTrig;
-		if( Math.abs(offset)<(stepAngle/3) ) {
-			trig = (elements.length- Math.round( spin/stepAngle )% elements.length )% elements.length;
+		
+		trig = (elements.length- Math.round( spin/stepAngle )% elements.length )% elements.length;
+	//	console.log( trig );
+		if( Math.abs(spin%stepAngle)<(stepAngle/3) ) 
 			spin=  stepAngle * (elements.length-trig );
+		if( Math.abs(spin%stepAngle)>(stepAngle/8) ) 
+			trig=-1;
+		//if( oldTrig!=trig)	console.log(trig,oldTrig);//	elements.forEach( (e,i)=> ( i===trig? hover:unhover)(e) );
+		if( oldTrig!=trig)	{
+			console.log(trig,oldTrig);
+			if( elements[oldTrig])		unhover( elements[oldTrig]);
+			if( elements[   trig])		  hover( elements[   trig]);
+			oldTrig=trig;
 			}
-		else trig==false;
-		if( trig!=oldTrig ){
-			console.log( 1+(oldTrig=trig), elements[0].style.color );
-			elements.forEach( (e,i)=> e.style.color= i==trig? "white":"grey" );
-			}
-
 		root.style.transform = `translateZ(${-radius}px) rotateX(${spin+diff}deg)`;
+		}
+	function mouseClick( e ) {
+	console.log("clicked on "+trig)
+		if( elements[ trig ] )
+			click( elements[ trig ]);
 		}
 	const self ={	};
 	return self;
@@ -130,9 +139,10 @@ const newSpinner = (elements, cfg) =>{
 
 
 newSpinner( Array.from(document.querySelectorAll('.carousel__cell')), {
+	click: el=>el.style.backgroundColor ="red",
 	root:document.querySelector('.carousel'),
 	parent:document.querySelector('.scene'),
-	mousepad:document.body//querySelector('.scene')
+	mousepad:document.body,   //querySelector('.scene')
 	} );
 
 </script>
