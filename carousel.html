@@ -1,4 +1,6 @@
 <!--see https://codepen.io/desandro/pen/wjeBpp -->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,13 +14,13 @@
 * { box-sizing: border-box; }
 
 body {
-  font-family: sans-serif;
-  text-align: center;
+  height: 100vh;
+  margin:0;
+  border: 3px dotted rgb(87, 74, 74);;
 }
 
 .scene {
-  border: 1px solid #CCC;
-  margin: 40px 0;
+  border: 1px solid rgb(141, 255, 183);
   position: relative;
   width: 210px;
   height: 140px;
@@ -29,48 +31,29 @@ body {
 .carousel {
   width: 100%;
   height: 100%;
-  position: absolute;
-  transform: translateZ(-288px);
-  transform-style: preserve-3d;
-  transition: transform 1s;
 }
 
 .carousel__cell {
+  font-family: sans-serif;
+  text-align: center;
   position: absolute;
   width: 190px;
   height: 120px;
   left: 10px;
   top: 10px;
-  border: 2px solid black;
+  border: 2px solid rgb(28, 11, 11);
   line-height: 116px;
   font-size: 80px;
   font-weight: bold;
   color: white;
   text-align: center;
-  transition: transform 1s, opacity 1s;
+     user-select: none;
+	 background-color:rgb(116, 112, 112);
 }
 
-.carousel__cell:nth-child(9n+1) { background: hsla(  0, 100%, 50%, 0.8); }
-.carousel__cell:nth-child(9n+2) { background: hsla( 40, 100%, 50%, 0.8); }
-.carousel__cell:nth-child(9n+3) { background: hsla( 80, 100%, 50%, 0.8); }
-.carousel__cell:nth-child(9n+4) { background: hsla(120, 100%, 50%, 0.8); }
-.carousel__cell:nth-child(9n+5) { background: hsla(160, 100%, 50%, 0.8); }
-.carousel__cell:nth-child(9n+6) { background: hsla(200, 100%, 50%, 0.8); }
-.carousel__cell:nth-child(9n+7) { background: hsla(240, 100%, 50%, 0.8); }
-.carousel__cell:nth-child(9n+8) { background: hsla(280, 100%, 50%, 0.8); }
-.carousel__cell:nth-child(9n+0) { background: hsla(320, 100%, 50%, 0.8); }
-
-.carousel__cell:nth-child(1) { transform: rotateY(  0deg) translateZ(288px); }
-.carousel__cell:nth-child(2) { transform: rotateY( 40deg) translateZ(288px); }
-.carousel__cell:nth-child(3) { transform: rotateY( 80deg) translateZ(288px); }
-.carousel__cell:nth-child(4) { transform: rotateY(120deg) translateZ(288px); }
-.carousel__cell:nth-child(5) { transform: rotateY(160deg) translateZ(288px); }
-.carousel__cell:nth-child(6) { transform: rotateY(200deg) translateZ(288px); }
-.carousel__cell:nth-child(7) { transform: rotateY(240deg) translateZ(288px); }
-.carousel__cell:nth-child(8) { transform: rotateY(280deg) translateZ(288px); }
-.carousel__cell:nth-child(9) { transform: rotateY(320deg) translateZ(288px); }
-
-
+.carousel__cell:hover {
+  border: 2px solid white;
+}
 
 .carousel-options {
   text-align: center;
@@ -91,127 +74,66 @@ body {
     <div class="carousel__cell">4</div>
     <div class="carousel__cell">5</div>
     <div class="carousel__cell">6</div>
-    <div class="carousel__cell">7</div>
-    <div class="carousel__cell">8</div>
-    <div class="carousel__cell">9</div>
-    <div class="carousel__cell">10</div>
-    <div class="carousel__cell">11</div>
-    <div class="carousel__cell">12</div>
-    <div class="carousel__cell">13</div>
-    <div class="carousel__cell">14</div>
-    <div class="carousel__cell">15</div>
   </div>
 </div>
-
-<div class="carousel-options">
-  <p>
-    <label>
-      Cells
-      <input class="cells-range" type="range" min="3" max="15" value="9" />
-    </label>
-  </p>
-  <p>
-    <button class="previous-button">Previous</button>
-    <button class="next-button">Next</button>
-  </p>
-  <p>
-    Orientation:
-    <label>
-      <input type="radio" name="orientation" value="horizontal"  />
-      horizontal
-    </label>
-    <label>
-      <input type="radio" name="orientation" value="vertical" checked/>
-      vertical
-    </label>
-  </p>
-</div>
+>
 
 
 
 
 <script>
 
+const newSpinner = (elements, cfg) =>{
+	const stepAngle = 360 / elements.length;
+	const stepSize  = 1.2 * elements.reduce( (size,e)=> size+e.getBoundingClientRect().height, 0)/elements.length;
+	const radius    = Math.round( ( stepSize / 2) / Math.tan( Math.PI / elements.length ) );
+	const mousepad	= cfg?.mousepad || document.body;
+	const root      = cfg?.root   || document.createElement("div");
+	const parent    = cfg?.parent || mousepad;
+	parent.append(root);
+	let spin =0;
+	let diff =0;
+	let oldTrig = false;
 
 
-var carousel = document.querySelector('.carousel');
-var cells = carousel.querySelectorAll('.carousel__cell');
-var cellCount; // cellCount set from cells-range input value
-var selectedIndex = 0;
-var cellWidth = carousel.offsetWidth;
-var cellHeight = carousel.offsetHeight;
-var isHorizontal = true;
-var rotateFn = isHorizontal ? 'rotateY' : 'rotateX';
-var radius, theta;
-// console.log( cellWidth, cellHeight );
 
-function rotateCarousel() {
-  var angle = theta * selectedIndex * -1;
-  carousel.style.transform = 'translateZ(' + -radius + 'px) ' + 
-    rotateFn + '(' + angle + 'deg)';
+	root.style.position= "absolute";
+	root.style.transformStyle='preserve-3d';
+	elements.forEach( (element,step) =>
+			element.style.transform = `rotateX(${ step * stepAngle}deg) translateZ(${radius}px) `);
+
+	const spinScale = 360 /mousepad.getBoundingClientRect().height * 2;
+	console.log( mousepad.getBoundingClientRect().height);
+	mousepad.addEventListener( 'mousemove', mouseMove  );
+	function mouseMove( e ) {
+		e.stopImmediatePropagation();
+		spin =  e.clientY*spinScale;
+
+
+		let offset = spin%stepAngle;
+		let trig = oldTrig;
+		if( Math.abs(offset)<(stepAngle/3) ) {
+			trig = (elements.length- Math.round( spin/stepAngle )% elements.length )% elements.length;
+			spin=  stepAngle * (elements.length-trig );
+			}
+		else trig==false;
+		if( trig!=oldTrig ){
+			console.log( 1+(oldTrig=trig), elements[0].style.color );
+			elements.forEach( (e,i)=> e.style.color= i==trig? "white":"grey" );
+			}
+
+		root.style.transform = `translateZ(${-radius}px) rotateX(${spin+diff}deg)`;
+		}
+	const self ={	};
+	return self;
 }
 
 
-
- 
-var prevButton = document.querySelector('.previous-button');
-prevButton.addEventListener( 'click', function() {
-  selectedIndex--;
-  rotateCarousel();
-});
-
-var nextButton = document.querySelector('.next-button');
-nextButton.addEventListener( 'click', function() {
-  selectedIndex++;
-  rotateCarousel();
-});
-
-var cellsRange = document.querySelector('.cells-range');
-cellsRange.addEventListener( 'change', changeCarousel );
-cellsRange.addEventListener( 'input', changeCarousel );
-
-
-
-function changeCarousel() {
-  cellCount = cellsRange.value;
-  theta = 360 / cellCount;
-  var cellSize = isHorizontal ? cellWidth : cellHeight;
-  radius = Math.round( ( cellSize / 2) / Math.tan( Math.PI / cellCount ) );
-  for ( var i=0; i < cells.length; i++ ) {
-    var cell = cells[i];
-    if ( i < cellCount ) {
-      // visible cell
-      cell.style.opacity = 1;
-      var cellAngle = theta * i;
-      cell.style.transform = rotateFn + '(' + cellAngle + 'deg) translateZ(' + radius + 'px)';
-    } else {
-      // hidden cell
-      cell.style.opacity = 0;
-      cell.style.transform = 'none';
-    }
-  }
-
-  rotateCarousel();
-}
-
-var orientationRadios = document.querySelectorAll('input[name="orientation"]');
-( function() {
-  for ( var i=0; i < orientationRadios.length; i++ ) {
-    var radio = orientationRadios[i];
-    radio.addEventListener( 'change', onOrientationChange );
-  }
-})();
-
-function onOrientationChange() {
-  var checkedRadio = document.querySelector('input[name="orientation"]:checked');
-  isHorizontal = checkedRadio.value == 'horizontal';
-  rotateFn = isHorizontal ? 'rotateY' : 'rotateX';
-  changeCarousel();
-}
-
-// set initials
-onOrientationChange();
-
+newSpinner( Array.from(document.querySelectorAll('.carousel__cell')), {
+	root:document.querySelector('.carousel'),
+	parent:document.querySelector('.scene'),
+	mousepad:document.body//querySelector('.scene')
+	} );
 
 </script>
 
