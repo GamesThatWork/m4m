@@ -177,7 +177,7 @@ const minVal=-.001;
 
         lineLayers.forEach( (l, layer) =>{
           l.clear();
-		  console.log(l.name);
+		  //console.log(l.name);
 		  l.alpha=1;
 		  if( d[peak]==0 ) suppressArea(false);
 		  else{
@@ -192,7 +192,7 @@ const minVal=-.001;
         },
       
 	  setLineColor: newColor=> {
-	  	console.log(" plotLineColor", newColor ); 
+	  	//console.log(" plotLineColor", newColor ); 
 		color.line[0]=color.line[1]=newColor;
 		return self;
 		},
