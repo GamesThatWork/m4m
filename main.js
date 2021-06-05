@@ -153,6 +153,19 @@ function rgb2Color( str ){
        
 
 
+	const speak=  words=> {
+		speechSynthesis.speak( new SpeechSynthesisUtterance(words));
+		console.log(words);
+		};
+
+
+const answerKey={
+	power:{},
+	pulse:{},
+	wave:{},
+	decay:{ win:true},
+	prop:{},
+	}
 
 
 
@@ -166,16 +179,26 @@ function rgb2Color( str ){
 		 	m.showExpression( b); 
 			document.querySelector("#mathmenu").append ( b);
     		const hover = () =>{
+				b.removeEventListener( "mouseover", hover);
 				plotLine( m.name );
-				b.addEventListener( "mouseout" , e=> 
-					plotLine( "none" ), {once:true} );
-				b.addEventListener( "mousedown", e=> {  
-					plotLine("none");
-					plotArea( m.name );
-					m.showEquation(); 
-					b.classList.add( "chosen" );
-					b.removeEventListener( "mouseover", hover);
-					});
+				b.addEventListener( "mouseout" , e=> {
+					plotLine( "none" );
+					b.addEventListener( "mouseover", hover);
+					}, {once:true} );
+				b.addEventListener( "click", e=> {  
+					e.stopImmediatePropagation();
+				    console.log("click", e.target, e.currentTarget,e)
+					speak( answerKey[ m.name ].text ||( answerKey[ m.name ].win? "Good choice.":"Incorrect" ) )					
+					if(    answerKey[ m.name ].win ){
+						b.outerHTML=b.outerHTML;
+						plotLine("none");
+						plotArea( m.name );
+						m.showEquation(); 
+						b.classList.add( "right" );
+						b.removeEventListener( "mouseover", hover);
+						}
+					else b.classList.add( "wrong" );
+					}, {once:true});
 				};
 			b.addEventListener( "mouseover", hover);
 			})
