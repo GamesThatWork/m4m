@@ -1,8 +1,9 @@
 
 
-import  { newMap   } from './map.js';
-import  { newMath } from './math.js';
-import  { newScope } from './scope.js';
+import  { newMap     } from './map.js'    ;
+import  { newMath    } from './math.js'   ;
+import  { newSpinner } from './spinner.js';
+import  { newScope   } from './scope.js'  ;
 import  { newReticle } from './reticle.js';
 
 var wavelength=25.5;
@@ -172,9 +173,52 @@ const answerKey={
 
 	const mathButtons = e=> {
 
+		const maths={};
+		let parent = document.createElement("div");
+		parent.id  = "mathscene";
+		let root   = document.createElement("div");
+		root.id    = "mathspinner";
+		document.querySelector("#mathmenu").append ( parent );
+		parent.append( root );
+		let buttons=[];
+		let b = document.createElement("button");
+		buttons.push(b );
+		root.append( b ); 
+		b.classList.add( "mathfunc" );
+		b.innerText="start";
+		["power","pulse","wave","decay","prop"].forEach( name=>{
+			maths[ name ] = newMath(name);
+			let b = document.createElement("button");
+			b.classList.add( "mathfunc" );
+			b.dataset.name=name;
+			buttons.push(b );
+			root.append( b ); 
+		 	maths[ name ].showExpression( b); 
+			});
+    		
+		const   hover = target =>  plotLine(target.dataset.name ||"none" );
+		const unhover = target =>  plotLine( "none" );
+		const click =	target=> {  
+			let name = target.dataset.name;
+			if(!name)	return;	
+			speak( answerKey[ name ].text ||( answerKey[ name ].win? "Good choice.":"Incorrect" ) )					
+			if(    answerKey[ name ].win ){
+				plotLine("none");
+				plotArea( name );
+				maths[ name ].showEquation(); 
+				b.classList.add( "right" );
+				}
+			else b.classList.add( "wrong" );
+			};
+		newSpinner( root, { hover, unhover, click, mousepad:document.body} );
+		};
+
+/*
+
 		["power","pulse","wave","decay","prop"].forEach( name=>{
 			let m = newMath(name);
 			let b = document.createElement("button");
+			buttons.push(b);
 			b.classList.add( "mathfunc" );
 		 	m.showExpression( b); 
 			document.querySelector("#mathmenu").append ( b);
@@ -201,8 +245,9 @@ const answerKey={
 					}, {once:true});
 				};
 			b.addEventListener( "mouseover", hover);
+			newSpinner( buttons );
 			})
-		};
+		};*/
     
 
     

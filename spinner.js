@@ -1,17 +1,15 @@
-export const newSpinner = (elements, cfg) =>{
+export const newSpinner = ( root, cfg) =>{
 
 	const mousepad	= cfg?.mousepad || document.body;
-	const root      = cfg?.root    || document.createElement("div");
-	const parent    = cfg?.parent  || mousepad;
-	const hover     = cfg?.hover   || (el=>el.style.color="white");
-	const unhover   = cfg?.unhover || (el=>el.style.color="grey");
-	const click     = cfg?.click   || (el=>console.log( el.innerText ));
+	const hover     = cfg?.hover    || (el=>el.style.color="white");
+	const unhover   = cfg?.unhover  || (el=>el.style.color="grey");
+	const click     = cfg?.click    || (el=>console.log( el.innerText ));
+	const elements = Array.from( root.children);
 
-
+	console.log( root, mousepad);
 	const stepAngle = 360 / elements.length;
 	const stepSize  = 1.2 * elements.reduce( (size,e)=> size+e.getBoundingClientRect().height, 0)/elements.length;
 	const radius    = Math.round( ( stepSize / 2) / Math.tan( Math.PI / elements.length ) );
-	parent.append(root);
 	let spin =0;
 	let diff =0;
 	let trig=-1;
@@ -23,6 +21,7 @@ export const newSpinner = (elements, cfg) =>{
 	root.style.transformStyle='preserve-3d';
 	elements.forEach( (element,step) =>
 			element.style.transform = `rotateX(${ step * stepAngle}deg) translateZ(${radius}px) `);
+	elements.forEach( (element,step) =>	console.log( step, element));
 
 	const spinScale = 360 /mousepad.getBoundingClientRect().height * 2;
 	console.log( mousepad.getBoundingClientRect().height);
