@@ -163,7 +163,7 @@ const minVal=-.001;
 			p.beginFill(0x00FF80);
 			p.drawPolygon( poly );
 			p.endFill();
-			p.alpha= suppressed? 0.2:0.4;
+			p.alpha= suppressed? 0.1:0.4;
 			}
    		  p.lineStyle(  width.data[ layer ], color.data[layer], 1);
 		  p.moveTo(   plotx(0), ploty( d[0]) );
