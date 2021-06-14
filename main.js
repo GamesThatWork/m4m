@@ -56,6 +56,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
    
 	  const lineFunction={
 		none:  (x,n)=>  0,                    
+		start: (x,n)=>  0.0005*(x%10),                    
 		power: (x,n)=>  .0045,                    
 		pulse: (x,n)=>  x<wavelength*3?   .0025 : 0, 
 		wave:  (x,n)=>  Math.sin( (x/wavelength) *Math.PI)/1000 +0.002, 
@@ -174,44 +175,117 @@ const answerKey={
 	const mathButtons = e=> {
 
 		const maths={};
-		let parent = document.createElement("div");
-		parent.id  = "mathscene";
-		let root   = document.createElement("div");
+		const buttons=[];
+		const root   = document.createElement("div");
 		root.id    = "mathspinner";
-		document.querySelector("#mathmenu").append ( parent );
-		parent.append( root );
-		let buttons=[];
-		let b = document.createElement("button");
-		buttons.push(b );
-		root.append( b ); 
-		b.classList.add( "mathfunc" );
-		b.innerText="start";
-		["power","pulse","wave","decay","prop"].forEach( name=>{
-			maths[ name ] = newMath(name);
-			let b = document.createElement("button");
-			b.classList.add( "mathfunc" );
+		document.querySelector("#container").append ( root );
+		["start","power","pulse","wave","decay","prop"].forEach( (name,i)=>{
+			const b = document.createElement("button");
+			b.classList.add( "mathfunc");
+			b.classList.add( name );
 			b.dataset.name=name;
 			buttons.push(b );
 			root.append( b ); 
-		 	maths[ name ].showExpression( b); 
+			if( i ){
+				maths[ name ] = newMath(name);
+		 		maths[ name ].showExpression( b); 
+				}
+			else {	
+				b.innerText="⏵︎";
+				}
 			});
     		
-		const   hover = target =>  plotLine(target.dataset.name ||"none" );
-		const unhover = target =>  plotLine( "none" );
+		const   hover = target => { plotLine(target.dataset.name ||"none" ); target.classList.add(    target.dataset.name ); };
+		const unhover = target => { plotLine( "none" );                      target.classList.remove( target.dataset.name ); };
 		const click =	target=> {  
 			let name = target.dataset.name;
-			if(!name)	return;	
-			speak( answerKey[ name ].text ||( answerKey[ name ].win? "Good choice.":"Incorrect" ) )					
-			if(    answerKey[ name ].win ){
-				plotLine("none");
-				plotArea( name );
-				maths[ name ].showEquation(); 
-				b.classList.add( "right" );
+			if(!name==="start")	{  
+				plot=!plot;
+				b.innerText= plot?"⏸︎":"⏵︎";
 				}
-			else b.classList.add( "wrong" );
+			else	{
+				speak( answerKey[ name ].text ||( answerKey[ name ].win? "Good choice.":"Incorrect" ) )					
+				if(    answerKey[ name ].win ){
+					plotLine("none");
+					plotArea( name );
+					maths[ name ].showEquation(); 
+					b.classList.add( "right" );
+					}
+				else b.classList.add( "wrong" );
+				}
 			};
 		newSpinner( root, { hover, unhover, click, mousepad:document.body} );
 		};
+		
+
+
+
+
+
+const sequencer=document.body;
+const listeners=[];
+
+const perform = {
+	speak: words=> {
+		speechSynthesis.cancel( );
+		console.log( "  < speak >  ", words);
+		let u= new SpeechSynthesisUtterance(words);
+		u.onend= e=> sequencer.dispatchEvent( new Event("end"));
+		speechSynthesis.speak(  u );
+		},
+	respond: events=>{   // events is a map of event names and step numbers
+		console.log( "  < respond >  ", events);
+		while( listeners.length){
+			let o= listeners.pop();
+			sequencer.removeEventListener( o.event, o.handler );
+			}
+		Object.keys( events ).forEach( k=> {
+			let o={ event:k };
+			o.handler= (nextStep=>(e=>(sequence(nextStep))))( events[k] );
+			listeners.push(o);
+			sequencer.addEventListener( o.event, o.handler );
+			});
+		}
+	}
+
+const program=[
+	{ speak:"testing here",	    respond:{ end:1 }},
+	{ speak:"second phrase",	respond:{ end:2 }},
+	{ speak:"third phrase",		respond:{ end:0 }}
+	]
+
+
+function sequence(  i  ){
+	let s= program[ i ];
+	
+	Object.keys( s ).forEach( k=> {
+			console.log( k, s[k]);
+			perform[ k ](s[k]);
+			});
+	}
+
+document.body.onclick= e=>sequence( 0 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 
