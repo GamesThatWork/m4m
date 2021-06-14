@@ -8,7 +8,7 @@ export const newSpinner = ( root, cfg) =>{
 
 	console.log( root, mousepad);
 	const stepAngle = 360 / elements.length;
-	const stepSize  = 1.2 * elements.reduce( (size,e)=> size+e.getBoundingClientRect().height, 0)/elements.length;
+	const stepSize  = 1.0 * elements.reduce( (size,e)=> size+e.getBoundingClientRect().height, 0)/elements.length;
 	const radius    = Math.round( ( stepSize / 2) / Math.tan( Math.PI / elements.length ) );
 	let spin =0;
 	let diff =0;
@@ -17,8 +17,6 @@ export const newSpinner = ( root, cfg) =>{
 
 
 
-	root.style.position= "absolute";
-	root.style.transformStyle='preserve-3d';
 	elements.forEach( (element,step) =>
 			element.style.transform = `rotateX(${ step * stepAngle}deg) translateZ(${radius}px) `);
 	elements.forEach( (element,step) =>	console.log( step, element));
