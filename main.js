@@ -11,6 +11,7 @@ var wavelength=25.5;
 window.onload= e=>{
 
 
+
 /**
  * @module main 
  * @exports nothng - this runs directly under index.html
@@ -23,6 +24,21 @@ window.onload= e=>{
 /**
  * This is the central PIXI display and update object
  */
+
+
+const fire= signal=> document.querySelector("#eventBus").dispatchEvent( signal );
+//const sequencer=document.body;
+
+
+
+
+
+
+
+
+
+
+
 const app = new PIXI.Application({
 	view: document.querySelector("canvas"), 
 	antialias: true, 
@@ -172,13 +188,25 @@ const answerKey={
 
 
 
+
+
+
+
+
 	const mathButtons = e=> {
 
 		const maths={};
 		const buttons=[];
 		const root   = document.createElement("div");
 		root.id    = "mathspinner";
-		document.querySelector("#container").append ( root );
+		const frame  = document.createElement("div");
+		frame.id   = "spinnerwindow";
+		
+		
+		document.querySelector("#container").append ( frame );
+		frame.append ( root );
+
+
 		["start","power","pulse","wave","decay","prop"].forEach( (name,i)=>{
 			const b = document.createElement("button");
 			b.classList.add( "mathfunc");
@@ -186,20 +214,21 @@ const answerKey={
 			b.dataset.name=name;
 			buttons.push(b );
 			root.append( b ); 
-			if( i ){
-				maths[ name ] = newMath(name);
-		 		maths[ name ].showExpression( b); 
-				}
-			else {	
-				b.innerText="⏵︎";
-				}
+			maths[ name ] = newMath(name);
+	 		maths[ name ].showExpression( b); 
 			});
     		
-		const   hover = target => { plotLine(target.dataset.name ||"none" ); target.classList.add(    target.dataset.name ); };
-		const unhover = target => { plotLine( "none" );                      target.classList.remove( target.dataset.name ); };
+		const   hover = target => { plotLine(target.dataset.name ||"none" ); 
+//								target.classList.add(  target.dataset.name ); 
+								target.classList.remove(  "dull" ); 
+									};
+		const unhover = target => { plotLine( "none" );
+//								target.classList.remove( target.dataset.name ); 
+								target.classList.add( "dull"); 
+								};
 		const click =	target=> {  
 			let name = target.dataset.name;
-			if(!name==="start")	{  
+			if( name!=="start")	{  
 				plot=!plot;
 				b.innerText= plot?"⏸︎":"⏵︎";
 				}
@@ -221,18 +250,54 @@ const answerKey={
 
 
 
+const grfx={ root:document.querySelector("#grfx"), url:"/assets/" };
 
 const sequencer=document.body;
 const listeners=[];
 
 const perform = {
+	end: ()=> sequencer.dispatchEvent( new Event("end")), //mostly internal use
+	wait: seconds=> setTimeout( perform.end, seconds*1000 ),
 	speak: words=> {
 		speechSynthesis.cancel( );
 		console.log( "  < speak >  ", words);
 		let u= new SpeechSynthesisUtterance(words);
-		u.onend= e=> sequencer.dispatchEvent( new Event("end"));
+		u.onend= perform.end;
 		speechSynthesis.speak(  u );
 		},
+	sprite: s=>{
+		let key =  s.name || "default";
+		if(!grfx.sprites ) 		 grfx.sprites=[];
+
+		if( s.filename ){	
+			if( grfx.sprites[ key ]) grfx.sprites[key].remove();
+			grfx.sprites[ key ]= document.createElement("img");
+			grfx.sprites[ key ].id = key;
+			grfx.sprites[ key ].setAttribute("src", grfx.url + s.filename);
+			grfx.sprites[ key ].style.position= "absolute";
+			grfx.sprites[ key ].style.top     = 0;
+			grfx.sprites[ key ].style.left    = 0;
+			grfx.root.append( grfx.sprites[ key ] );
+			}	
+		let xfrm = ( s.move? `translate3D( ${s.move[0]}px, ${s.move[1]}px, ${s.move[2]||0}px )` : "" )
+				+  ( s.turn? `     rotate( ${s.turn}turn )`                                   : "" )
+				+  ( s.size? `      scale( ${s.size} )`                                       : "" );
+		if( xfrm   ) grfx.sprites[ key ].style.transform= xfrm;
+		if( s.time ) grfx.sprites[ key ].style.transition= `transform ${c.time}s` 
+		},
+
+
+	camera: c=>{
+		if( c.move || c.turn || c.size )
+			grfx.root.style.transform=
+			   ( c.move? `translate3D( ${-c.move[0]}px, ${-c.move[1]}px, ${-c.move[2]||0}px )` : "" )
+			+  ( c.turn? `   rotate(   ${-c.turn}turn )`                                       : "" )
+			+  ( c.size? `    scale(   ${-c.size} )`                                           : "" );
+		if( c.time ) grfx.root.style.transition= `transform ${c.time}s` 
+		},
+
+
+
 	respond: events=>{   // events is a map of event names and step numbers
 		console.log( "  < respond >  ", events);
 		while( listeners.length){
@@ -249,23 +314,47 @@ const perform = {
 	}
 
 const program=[
-	{ speak:"testing here",	    respond:{ end:1 }},
+/*	{ speak:"testing here",	    respond:{ end:1 }},
 	{ speak:"second phrase",	respond:{ end:2 }},
-	{ speak:"third phrase",		respond:{ end:0 }}
+	{ speak:"here comes a picture --  2 seconds after I finish talking",		respond:{ end:3 }},
+	{ wait: 2, 	respond:{ end:4 } },
+	{ speak:"here I am", sprite: {filename:"romad.jpg",move:[200,100,0], size:0.3, turn:0.02, name:"popup"}, respond:{ end:5 }},
+	{ wait: 2, 	respond:{ end:6 } },
+	{ speak:"here I am", sprite: {filename:"base.jpg", move:[-600,-70,-1000], size:4,  name:"xg"}, respond:{ end:"next"}},
+	{ wait: 2, 	respond:{ end:"next" } },
+	{ speak:"camera move", camera: { move:[1000,220,0] }, respond:{ end:"next"} },
+	{ wait: 2, 	respond:{ end:"next" } },
+	{ speak:"camera move", camera: { move:[-100,-220,700] }, respond:{} }*/
+
+	{ speak:"this is the environment",     sprite: {name:"bg",  filename:"lecturehall.webp", move:[   0, 0,   0]}, respond:{ end:"next"}},
+	{ speak:"this is sid and his mom",     sprite: {name:"sid", filename:    "mom&sid.webp", move:[   0, 0,-100]}, respond:{ end:"next"}},
+	{ speak:"this is professor angstrom",  sprite: {name:"ang", filename:   "angstrom.webp", move:[ 300, 0, 500]}, respond:{ end:"next"}},
+	{ speak:"lets start the camera here",  camera: {move:[  850,  500,  -300] },                                   respond:{ end:"next"}},
+	{ speak:"and move angstrom over some", sprite: {name:"ang", move:[-700, -200, 800] },                          respond:{ end:"next"}},
+	{ speak:"and do a slow parallax move", camera: {move:[ -400,  -20,  1200], time:10 },                          respond:{ end:"next"}},
+	
+
 	]
 
 
+
+var lastStep=0;
 function sequence(  i  ){
+	if( i==="next" ) i=lastStep+1;
+	if( i>=program.length )	return;
+	lastStep=i;
 	let s= program[ i ];
 	
 	Object.keys( s ).forEach( k=> {
+		if (!s[k])// &(typeof s[k] !== 'function') 
+			console.error( k+" is not a valid action. Not yet, anyway.")
+		else{
 			console.log( k, s[k]);
 			perform[ k ](s[k]);
-			});
+			}});
 	}
 
-document.body.onclick= e=>sequence( 0 );
-
+//document.body.onclick= e=>sequence( 0 );
 
 
 
@@ -530,7 +619,8 @@ const action={
     KeyT: e=>{  let h = g.hitBox;    h.interactive=h.interactiveChildren=true;   h.on("mousemove", trackit); },
     KeyS: e=>{  synch= (synch=="max")? false : "max";     g.reset();     g.show(); }, 
     KeyX: e=>{  synch= (synch=="min")? false : "min";     g.reset();     g.show(); }, 
-	KeyC: e=>   curve = curves[++curvenumber % curves.length],
+//	KeyC: e=>   curve = curves[++curvenumber % curves.length],
+	KeyC: e=>   document.querySelector("#pix").appendChild( randopix(claropix)),
 	KeyR:       g.reset,
     help: e=>{  console.log(e.code);
 	           let body = document.querySelector("body");

@@ -8,7 +8,7 @@ body{
 	height: 100vh;
   	border: 3px dotted rgb(87, 74, 74);;
 	} 
-#container {  position: relative; 	perspective-origin: center;  perspective: 1800px;}
+#container {  position: relative; }
 
 canvas,
 #panel,
@@ -23,9 +23,10 @@ canvas        {  z-index:  1;  top:  0px; left:  0px; width: 100vw; height: 100v
 #panel        {  z-index:  4;  top: 12px; left: 12px; width: 100vw; 
 				font-family: 'Lucida Sans', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 				font-size:    1.4vw;  padding: .5vw 2vw;  color:darkgoldenrod;    display:block; background-color: #222;     }
-#grfx         {  z-index:  5;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
-#mathmenu     {  z-index:  6;  top:  0px; left:  0px; width: 100vw; height: 100vh;  }/*   {  z-index:  5;  top:  200px; left: 60px;  border:darkred; min-height: 150px; width:100%;  display:flex;         }*/
-#help         {  z-index:  7;  top:  40px; left:  40px;                              }
+#grfx         {  z-index:  5;  top:  0px; left:  0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
+#pix          {  z-index:  6;  top:  0px; left:  0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
+#mathmenu     {  z-index:  7;  top:  0px; left:  0px; width: 100vw; height: 100vh;  }/*   {  z-index:  5;  top:  200px; left: 60px;  border:darkred; min-height: 150px; width:100%;  display:flex;         }*/
+#help         {  z-index:  8;  top:  40px; left:  40px;                              }
 button { background-color: rgb(170, 224, 19); margin: 20px;   }
 
 li {
@@ -40,6 +41,17 @@ ul{
     left: 12vw;
 }
 
+
+
+#claro {
+	position:absolute;
+    width: 1000px;
+    height: 666px;
+	left:25vw;
+	top: 9vw;
+	border: thick solid gold;
+	transition: background-image 2s;
+	}
  
 /* 
 .mathscene {
@@ -73,36 +85,73 @@ ul{
 	 background-color:rgb(116, 112, 112);
 }
 */
+#spinnerwindow {
+	perspective-origin: center;  
+	perspective: 900px;
+	position:absolute;
+	left: 1000px;
+	top:  6661px;
+
+	transform-style: preserve-3d;
+    width:  345px;
+    height: 160px;
+ /*	overflow:hidden;
+    border: 2px dotted red;*/ 
+}
+
+
+
+
 #mathspinner {
 	position:absolute;
     width: 100%;
     height: 100%;
-	top:   720px;
-	left: 1100px;
 	transform-style: preserve-3d;
-
 	}
- 
- button.mathfunc  { width: 150px; height:150px; border-radius: 12px;   background-color: black; 
+
+
+
+
+ button.mathfunc  { width: 300px; height:150px; border-radius: 30px;   background-color: black; 
 					transform-style: preserve-3d; 
 					position: absolute;
-					left: -75px;
-					top:  -75px;
+			/*		left: -75px;
+					top:  -75px;*/
 					transition: color .4s;
      				user-select: none;
-					position:absolute;
-     				background-color: rgba(112, 64, 12, 0.87);     border: 5px solid rgb(118, 112, 31);}
+				/*	position:absolute;*/
+     				background-color: rgba(3, 84, 4, 0.481);     border: 2px solid rgb(14, 174, 75);}
  button.mathfunc:hover:not(.right) {                                   border: 5px solid gold;}
  button.mathfunc.right { background-color: rgba(76, 151, 21, 0.398); border: 5px solid rgb(42, 148, 7);}
  button.mathfunc.wrong { background-color: rgba(106, 32, 32, 0.398); border: 5px solid red; }
 
 
-.start{    color: rgb(211, 255, 255);  stroke: #aa1212;   font-size:99px;      }
-.power{    color: rgb(211,   9,   9);  stroke: #aa1212;   font-size:90px;      }
-.pulse{    color: rgb(255, 174,   0);  stroke: #222;      font-size:36px;      }
-.wave {    color: rgb(217, 255,   0);  stroke: #255;      font-size:32px;      }
-.decay{    color: rgb( 12, 170, 128);  stroke: #213;      font-size:64px;      }
-.prop {    color: rgb(  0, 132, 255);  stroke: #333333;   font-size:45px;      } 
+.start{    color: rgb(211, 255, 255);  stroke: #f5d8d8; 
+  font-size:1px;      }
+.power{    color: rgb(26, 211, 9);  stroke: #15d11c;
+  font-size:200px; }
+.pulse{    color: rgb(255, 174,   0);  stroke: #222;   
+  font-size:55px;      }
+.wave {    color: rgb(217, 255,   0);  stroke: #255; 
+  font-size:52px;      }
+.decay{    color: rgb( 12, 170, 128);  stroke: #213;     
+ font-size:100px;      }
+.prop {    color: rgb(  0, 132, 255);  stroke: #333333; 
+ font-size:55px;    font-weight:800;  } 
+
+.dull {    color: rgb(107, 114, 121); opacity:0.3;      } 
+.power mjx-container { top:-210px; }
+.pulse mjx-container { top:-55px; }
+.wave  mjx-container { top:-55px; }
+.decay mjx-container { top:-95px; }
+.prop  mjx-container { top:-58px;  }
+/*
+button.power{    line-height: 80px ;}
+button.pulse{    color: inherit;  font-size:36px;      }
+button.wave {    color: rgb(217, 255,   0);  font-size:32px;      }
+button.decay{    color: rgb( 12, 170, 128);  font-size:64px;      }
+button.prop {    color: rgb(  0, 132, 255);  font-size:45px;      } 
+
 
 button.power{    color: inherit;      }
 button.pulse{    color: inherit;  font-size:36px;      }
@@ -110,7 +159,7 @@ button.wave {    color: rgb(217, 255,   0);  font-size:32px;      }
 button.decay{    color: rgb( 12, 170, 128);  font-size:64px;      }
 button.prop {    color: rgb(  0, 132, 255);  font-size:45px;      } 
 
-/*
+
 
 
 .color.start{    color: rgb(255, 255, 200); }
