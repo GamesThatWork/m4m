@@ -5,6 +5,7 @@ import  { newMath    } from './math.js'   ;
 import  { newSpinner } from './spinner.js';
 import  { newScope   } from './scope.js'  ;
 import  { newReticle } from './reticle.js';
+import  { pic        } from './pic.js';
 
 var wavelength=25.5;
 
@@ -612,6 +613,11 @@ const action={
     Digit4: e=>   newMath("decay").showExpression(),
     Digit5: e=>   newMath("prop" ).showExpression(),
     KeyM:   mathButtons, // e=>  newMap,
+	KeyQ: e=>	pic("crew").scan(),	
+	KeyZ: e=>	pic("crew").position(200,200),	
+	KeyN: e=>	pic("crew").zoom(),	
+	KeyC: e=>	pic("claro").rando(),	
+	KeyV: e=>	pic("romeo").rando(),	
     KeyE: e=>   eq.visible=!eq.visible,
     KeyG:       g.show,
     KeyP: e=>{  tZero=Date.now();     g.reset();   plot=!plot; }, 
@@ -620,7 +626,6 @@ const action={
     KeyS: e=>{  synch= (synch=="max")? false : "max";     g.reset();     g.show(); }, 
     KeyX: e=>{  synch= (synch=="min")? false : "min";     g.reset();     g.show(); }, 
 //	KeyC: e=>   curve = curves[++curvenumber % curves.length],
-	KeyC: e=>   document.querySelector("#pix").appendChild( randopix(claropix)),
 	KeyR:       g.reset,
     help: e=>{  console.log(e.code);
 	           let body = document.querySelector("body");

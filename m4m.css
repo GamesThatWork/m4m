@@ -1,4 +1,7 @@
+* { box-sizing: border-box; }
+
 body{
+	overflow: hidden;
 	background-color: black;
 	margin:0;
 	padding:0;
@@ -8,7 +11,7 @@ body{
 	height: 100vh;
   	border: 3px dotted rgb(87, 74, 74);;
 	} 
-#container {  position: relative; }
+#container {  position: relative; overflow: hidden; }
 
 canvas,
 #panel,
@@ -42,17 +45,22 @@ ul{
 }
 
 
-
-#claro {
+.pic
+{
 	position:absolute;
-    width: 1000px;
-    height: 666px;
-	left:25vw;
-	top: 9vw;
-	border: thick solid gold;
-	transition: background-image 2s;
+    width:  960px;
+    height: 540px;
+	left:0px;
+	top: 0px;
+	border: thick solid rgba(0, 141, 146, 0.72);
+	background-size: cover;
 	}
- 
+#claro {	width: 1000px;	height: 666px;	left:25vw;	top: 9vw;	}
+
+#romeo {	width: 360px;	height: 405px;	left:3vw;	top: 3vw;	}
+
+
+
 /* 
 .mathscene {
   display: block;
@@ -90,7 +98,7 @@ ul{
 	perspective: 900px;
 	position:absolute;
 	left: 1000px;
-	top:  6661px;
+	top:  666px;
 
 	transform-style: preserve-3d;
     width:  345px;
@@ -145,6 +153,9 @@ ul{
 .wave  mjx-container { top:-55px; }
 .decay mjx-container { top:-95px; }
 .prop  mjx-container { top:-58px;  }
+
+
+
 /*
 button.power{    line-height: 80px ;}
 button.pulse{    color: inherit;  font-size:36px;      }

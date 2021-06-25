@@ -56,7 +56,7 @@ export const newScope = cnfg => {
       dom: null,
       playOnce: true,
       construct: ()=> {
-        sound.api= new Audio("assets/exploslow.ogg");
+        sound.api= new Audio("assets/sfx/exploslow.ogg");
         sound.api.volume=.1;
         },
       replay: ()=> sound.playOnce=true,
