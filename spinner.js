@@ -1,6 +1,7 @@
 export const newSpinner = ( root, cfg) =>{
 
-	const mousepad	= cfg?.mousepad || document.body;
+//	const mousepad	= cfg?.mousepad || document.body;
+	const mousepad	=                   document.body;
 	const hover     = cfg?.hover    || (el=>el.style.color="white");
 	const unhover   = cfg?.unhover  || (el=>el.style.color="grey");
 	const click     = cfg?.click    || (el=>console.log( el.innerText ));
@@ -15,7 +16,7 @@ export const newSpinner = ( root, cfg) =>{
 	let trig=-1;
 	let oldTrig = trig;
 
-
+	let momentum=0, rotation=0;
 
  const sound = {
       dom: null,
@@ -51,23 +52,36 @@ root.style.transformOrigin= `0px ${.5*radius}px ${-radius}px`
 			  `);
 	elements.forEach( (element,step) =>	console.log( step, element));
 
-	const spinScale = 360 /mousepad.getBoundingClientRect().height * 2;
+	const spinScale = .004;//   360 /mousepad.getBoundingClientRect().height * 2;
 	console.log( mousepad.getBoundingClientRect().height);
 	mousepad.addEventListener( 'mousemove', mouseMove  );
 	mousepad.addEventListener( 'click', mouseClick  );
 	function mouseMove( e ) {
 		e.stopImmediatePropagation();
-		spin =  e.clientY*spinScale;
 		
+	//	momentum +=e.movementY;
+//		rotation += momentum;
+
+
+		rotation +=e.movementY * spinScale;
+
+
+
+/*		spin = document.pointerLockElement? (spin+e.movementY) : (e.clientY*spinScale);
 		trig = (elements.length- Math.round( spin/stepAngle )% elements.length )% elements.length;
 		if( Math.abs(spin%stepAngle)<(stepAngle/3) ) 
 			spin=  stepAngle * (elements.length-trig );
 		if( Math.abs(spin%stepAngle)>(stepAngle/8) ) 
-			trig=-1;
+			trig=-1;*/
 	//	root.style.transform = ` rotateX(${spin+diff}deg)`;
+	
+	
+
+	
+	
 	root.style.transform = `
 		translateZ(${-radius}px)
-		rotateX(${spin+diff}deg)
+		rotateX(${ rotation }turn)
 		translateZ(${-radius}px)
 		
 		`;
@@ -83,6 +97,7 @@ root.style.transformOrigin= `0px ${.5*radius}px ${-radius}px`
 		}
 	function mouseClick( e ) {	
 		console.log("clicked on "+trig)
+		document.exitPointerLock();
 		if( elements[ trig ] ){
 			sound.play();
 			click( elements[ trig ]);

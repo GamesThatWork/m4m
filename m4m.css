@@ -58,7 +58,7 @@ ul{
 #claro {	width: 1000px;	height: 666px;	left:25vw;	top: 9vw;	}
 
 #romeo {	width: 360px;	height: 405px;	left:3vw;	top: 3vw;	}
-
+#crew { border-top: 480px;  border-right: 270px;  border-bottom: 480px;  border-left: 270px; border-color: red;    }
 
 
 /* 
