@@ -229,9 +229,13 @@ const answerKey={
 								};
 		const click =	target=> {  
 			let name = target.dataset.name;
-			if( name!=="start")	{  
+			if( name==="start")	{  
+				document.querySelector( ".play" ).setAttribute( "visibility",  plot? "hidden":"visible" );
+				document.querySelector( ".pause").setAttribute( "visibility", !plot? "hidden":"visible" );
+				console.log(  document.querySelector( ".play" ), document.querySelector( ".pause" ))
+				//document.querySelector( ".pause").style.display=!plot?"none":"block";
 				plot=!plot;
-				b.innerText= plot?"⏸︎":"⏵︎";
+				//target.innerText= plot?"⏸︎":"⏵︎";
 				}
 			else	{
 				speak( answerKey[ name ].text ||( answerKey[ name ].win? "Good choice.":"Incorrect" ) )					
@@ -630,6 +634,8 @@ const action={
     help: e=>{  console.log(e.code);
 	           let body = document.querySelector("body");
                 body.requestFullscreen();
+				body.requestPointerLock = body.requestPointerLock || body.mozRequestPointerLock;
+				body.requestPointerLock()
                 if(       body.firstChild.isSameNode( helptext ))  body.removeChild(  helptext );
                 else if ( body.firstChild )                        body.insertBefore( helptext, body.firstChild)
                 else                                               body.appendChild(  helptext );
