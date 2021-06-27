@@ -220,12 +220,15 @@ const answerKey={
 			});
     		
 		const   hover = target => { plotLine(target.dataset.name ||"none" ); 
-//								target.classList.add(  target.dataset.name ); 
+ 								target.classList.add(  target.dataset.name ); 
+								target.classList.add(  "undull"  ); 
 								target.classList.remove(  "dull" ); 
+
 									};
 		const unhover = target => { plotLine( "none" );
-//								target.classList.remove( target.dataset.name ); 
-								target.classList.add( "dull"); 
+ 								target.classList.remove( target.dataset.name ); 
+								target.classList.remove(  "undull"  ); 
+								target.classList.add(       "dull"); 
 								};
 		const click =	target=> {  
 			let name = target.dataset.name;
@@ -632,9 +635,8 @@ const action={
 //	KeyC: e=>   curve = curves[++curvenumber % curves.length],
 	KeyR:       g.reset,
     help: e=>{  console.log(e.code);
-	           let body = document.querySelector("body");
+	            let body = document.querySelector("body");
                 body.requestFullscreen();
-				body.requestPointerLock = body.requestPointerLock || body.mozRequestPointerLock;
 				body.requestPointerLock()
                 if(       body.firstChild.isSameNode( helptext ))  body.removeChild(  helptext );
                 else if ( body.firstChild )                        body.insertBefore( helptext, body.firstChild)

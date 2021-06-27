@@ -123,31 +123,32 @@ ul{
  button.mathfunc  { width: 300px; height:150px; border-radius: 30px;   background-color: black; 
 					transform-style: preserve-3d; 
 					position: absolute;
-			/*		left: -75px;
-					top:  -75px;*/
-					transition: color .4s;
-     				user-select: none;
-				/*	position:absolute;*/
-     				background-color: rgba(3, 84, 4, 0.481);     border: 2px solid rgb(14, 174, 75);}
+					transition: opacity .4s;
+					user-select: none;
+					}
  button.mathfunc:hover:not(.right) {                                   border: 5px solid gold;}
  button.mathfunc.right { background-color: rgba(76, 151, 21, 0.398); border: 5px solid rgb(42, 148, 7);}
  button.mathfunc.wrong { background-color: rgba(106, 32, 32, 0.398); border: 5px solid red; }
 
 
-.start{    color: rgb(211, 255, 255);  stroke: #f5d8d8; 
-  font-size:1px;      }
-.power{    color: rgb(26, 211, 9);  stroke: #15d11c;
-  font-size:200px; }
-.pulse{    color: rgb(255, 174,   0);  stroke: #222;   
-  font-size:55px;      }
-.wave {    color: rgb(217, 255,   0);  stroke: #255; 
-  font-size:52px;      }
-.decay{    color: rgb( 12, 170, 128);  stroke: #213;     
- font-size:100px;      }
-.prop {    color: rgb(  0, 132, 255);  stroke: #333333; 
- font-size:55px;    font-weight:800;  } 
 
-.dull {    color: rgb(107, 114, 121); opacity:0.3;      } 
+
+
+.start{    color: rgb(211, 255, 255);  stroke: #f5d8d8;  font-size:1px;    }
+.power{    color: rgb(26, 211, 9);     stroke: #15d11c;  font-size:200px;  }
+.pulse{    color: rgb(255, 174,   0);  stroke: #222;     font-size:55px;   }
+.wave {    color: rgb(217, 255,   0);  stroke: #255;     font-size:52px;   }
+.decay{    color: rgb( 12, 170, 128);  stroke: #213;     font-size:100px;  }
+.prop {    color: rgb(  0, 132, 255);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
+
+
+  .dull {  opacity:0.35; color:  rgb(89,91,94); border-color: rgb(14, 220, 93);   background-color: rgba(21, 73, 21, 0.686);
+   filter:blur(2px)}
+.undull {  opacity:0.85; 			  			  border-color: rgb(143, 196, 163); background-color: rgb(189, 128, 36);}
+
+
+
+
 .power mjx-container { top:-210px; }
 .pulse mjx-container { top:-55px; }
 .wave  mjx-container { top:-55px; }
