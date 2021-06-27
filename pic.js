@@ -21,7 +21,7 @@
 			"./assets/claro/6.png",
 			"./assets/claro/7.png"
 			],
-		bg:	"./assets/bigmap.GIF"
+		bg:	"./assets/bigmap.svg"
 
 		};
 
@@ -44,12 +44,20 @@ export const pic= (name, cfg) => {
 			show:  ()=> { dom[ name ].style.display="block";                      return self;    },
 			hide:  ()=> { dom[ name ].style.display="none"; 	                   return self;    },
 			scan:  ()=> {	
+					const zoom =4;
 					if( !self._scan ){   
-						self._scan=	( target=> e=>target.position( e.x*4-2400, e.y*4-1350, 4 ))( self );
+						dom[ name ].style.transition="transform 0s";
+						self._scan=	( target=> e=>target.position( 
+								Math.min(Math.max(0,e.x*4-2400), 3840/zoom), 
+								Math.min(Math.max(0,e.y*4-1350), 2160/zoom),
+								zoom ))( self );
 						document.body.addEventListener( "mousemove", self._scan );
+						document.body.addEventListener( "click",     self.scan );
+						self._scan( {target:dom[ name ], x:960,y:490});
 						}
 					else{
 						document.body.removeEventListener( "mousemove", self._scan );
+						dom[ name ].style.transition="transform 1s erase-in ease-out 1.5s";
 						dom[ name ].style.transform="translate( 975px,0px) scale(.9) "; 
 						self._scan= null;
 						}},
