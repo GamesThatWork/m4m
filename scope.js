@@ -18,14 +18,17 @@ export const newScope = cnfg => {
     const parent= new PIXI.Container();
     var overlay;
     let  steelcolor=0xFF1100;
+    let  stonecolor=0xBB1100;
     let  glasscolor=0xDDAA00;
 
     const textStyle={ 
-      default:{  fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center'},
-      label:{    fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center'},
-      glass:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: glasscolor,   align: 'right'},
-      steel:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: steelcolor,   align: 'right'},
-      title:{    fontFamily: 'Share Tech Mono',  fontSize: 26,  fill: 'lightblue',  align: 'center'}
+      default:{  fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center' },
+      label:{    fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center' },
+      glass:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: glasscolor,   align: 'right'  },
+      steel:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: steelcolor,   align: 'right'  },
+      stone:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: stonecolor,   align: 'right'  },
+      title:{    fontFamily: 'Share Tech Mono',  fontSize: 26,  fill: 'lightblue',  align: 'center' },
+      cover:{    fontFamily: 'Share Tech Mono',  fontSize: 90,  fill: 'black',      align: 'center' },
       };
 
  
@@ -33,7 +36,9 @@ export const newScope = cnfg => {
     const grid = {
       glass:{   color:glasscolor, width:3, label:"GLASS BREAKS" }, 
       steel:{   color:steelcolor, width:3, label:"STEEL BREAKS" }, 
+      stone:{   color:stonecolor, width:3, label:"STONE BREAKS" }, 
       title:{   color:0x448844,            label:"OVERPRESSURE" }, 
+      cover:{   color:0x448844,            label:"RUN SIMULATION"  }, 
       x:{ n:15, color:0x448844,   width:1, label:"KILOMETERS", scale:30}, 
       y:{ n:8,  color:0x888888,   width:1, label:"MPa", scale:30},
       hasBounds: false,
@@ -48,7 +53,9 @@ export const newScope = cnfg => {
       if( style.align=='right' ) x-=t.width;
       if( style.align=='center') x-=t.width/2;
       t.position.set( x, y);
-      gridLayer.addChild(t);
+	  let layer = style.layer || gridLayer;
+	  console.log( layer  );
+	  layer.addChild(t);
       return t;
       }
 
@@ -74,8 +81,6 @@ export const newScope = cnfg => {
 function rgbToHex(R,G,B) {return toHex(R)+toHex(G)+toHex(B)}
 function toHex(n) {
  n = (parseInt(n,10)||0)  & 0xFF;
- //if( isNaN(n) ) n=0;
- //n = Math.max(0,Math.min(n,255));
  return "0123456789ABCDEF".charAt( n>>4 )
       + "0123456789ABCDEF".charAt( n&0xF);
  //return "0123456789ABCDEF".charAt((n-n%16)/16)      + "0123456789ABCDEF".charAt(n%16);
@@ -101,7 +106,7 @@ const minVal=-.001;
 		suppressed=suppress;	
 		plotLayers[1].alpha = suppressed? 0.3:1;
 		markLayers[0].alpha = suppressed? 0.3:1;
-		gridLayer    .alpha = suppressed? 0.4:1;
+		gridLayer    .alpha = suppressed? 0.9:1;
 		boundsLayer  .alpha = suppressed? 0.1:1;
 		}
 
@@ -172,6 +177,7 @@ const minVal=-.001;
         return self;  
         },
       line:  d=>{
+	  	let cover = d[0]===-1;
         d= d.map( v=> v>maxVal? maxVal: (v>minVal? v: minVal) );
         let peak = d.reduce( (iMax,v,i,a)=> a[iMax]>a[i]? iMax:i, 0 );
 
@@ -179,6 +185,10 @@ const minVal=-.001;
           l.clear();
 		  //console.log(l.name);
 		  l.alpha=1;
+		  console.log(d[0]);
+		  if(cover)     self.cover = self.cover || txt( 510,220, "cover" );
+		
+		   else     if( self.cover ){ self.cover.destroy(); self.cover=false;}
 		  if( d[peak]==0 ) suppressArea(false);
 		  else{
 		  	suppressArea(true);
@@ -239,23 +249,50 @@ const minVal=-.001;
 //console.log( g,gridLayer );
         return self;
         },
-      bounds: ()=>{
-        console.log( "PLOT: bounds");
-
-        grid.hasBounds = true;
+      bounds: elements=>{
+        console.log( "PLOT: bounds", elements );
+		grid.hasBounds = true;
         let g= boundsLayer;
-        g.lineStyle(  grid.glass.width, grid.glass.color );
-        let y = 0.80* (r.y.px-pad.bottom-pad.top)+pad.top;
-        g.moveTo(   pad.left,         y);
-        g.lineTo(   r.x.px-pad.right, y);
-        txt( r.x.px-pad.left-10, y-17, "glass");
-        g.lineStyle(  grid.steel.width, grid.steel.color );
-        y = 0.10* (r.y.px-pad.bottom-pad.top)+pad.top;
-        g.moveTo(   pad.left,         y);
-        g.lineTo(   r.x.px-pad.right, y);
-        txt( r.x.px-pad.left-10, y-17, "steel" );
+        elements=typeof elements=="string" ? String( elements ) : "glass stone";
+		let y;
+
+		let threshhold = { glass:0.8, steel:0.1, stone:0.2 };
+		Object.keys( threshhold ).forEach( material =>{
+			if( !elements.includes( material )) return;
+			textStyle[ material ].layer=boundsLayer;
+			g.lineStyle(  grid[ material ].width, grid[ material ].color );
+			y = threshhold[ material ] * (r.y.px-pad.bottom-pad.top)+pad.top;
+			g.moveTo(   pad.left,         y);
+			g.lineTo(   r.x.px-pad.right, y);
+			txt( r.x.px-pad.left-10, y-17, material );
+			});
+/*
+		if( elements.includes( "glass")){
+			textStyle[ "glass" ].layer=boundsLayer;
+			g.lineStyle(  grid.glass.width, grid.glass.color );
+			y = 0.80* (r.y.px-pad.bottom-pad.top)+pad.top;
+			g.moveTo(   pad.left,         y);
+			g.lineTo(   r.x.px-pad.right, y);
+			txt( r.x.px-pad.left-10, y-17, "glass" );
+			}
+		if( elements.includes("steel")){
+			g.lineStyle(  grid.steel.width, grid.steel.color );
+			y = 0.10* (r.y.px-pad.bottom-pad.top)+pad.top;
+			g.moveTo(   pad.left,         y);
+			g.lineTo(   r.x.px-pad.right, y);
+			txt( r.x.px-pad.left-10, y-17, "steel" );
+		    }
+		if( elements.includes("stone")){
+			g.lineStyle(  grid.stone.width, grid.stone.color );
+			y = 0.18* (r.y.px-pad.bottom-pad.top)+pad.top;
+			g.moveTo(   pad.left,         y);
+			g.lineTo(   r.x.px-pad.right, y);
+			txt( r.x.px-pad.left-10, y-17, "stone" );
+			}
+			*/
         return self;
         }, 
+
       equation: ()=>{
         grid.hasEquation = true;
         let texture = PIXI.Texture.from('/assets/equation.png');
