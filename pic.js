@@ -13,20 +13,20 @@
 			"./assets/romeo/5.jpg"
 			],
 		claro: [
-			"./assets/claro/1.png",
-			"./assets/claro/2.png",
-			"./assets/claro/3.png",
-			"./assets/claro/4.png",
-			"./assets/claro/5.png",
-			"./assets/claro/6.png",
-			"./assets/claro/7.png"
+			"./assets/claro/1.webp",
+		//	"./assets/claro/2.webp", not wearing (or holding) glasses
+			"./assets/claro/3.webp",
+			"./assets/claro/4.webp",
+			"./assets/claro/5.webp",
+			"./assets/claro/6.webp",
+			"./assets/claro/7.webp"
 			],
-		bg:	"./assets/bigmap.svg"
+		bg:	"./assets/claro/lab.jpg"
 
 		};
 
 
-const cadence = {	claro: { mean: 3.5, dev:2 },	romeo: { mean: 1, dev:.75 } };
+const cadence = {	claro: { mean: 2.5, dev:2 },	romeo: { mean: 1, dev:.75 } };
 
 
 const selfs={};
@@ -40,9 +40,12 @@ export const pic= (name, cfg) => {
 			}
 		const self ={ 
 			position: (x,y,z=1)=>
-						{ dom[ name ].style.transform=`translate(${x}px,${y}px) scale(${z})`; return self;	   },
-			show:  ()=> { dom[ name ].style.display="block";                      return self;    },
-			hide:  ()=> { dom[ name ].style.display="none"; 	                   return self;    },
+						{ dom[ name ].style.transform=`translate(${x}px,${y}px) scale(${z})`; return self;	  },
+			big:   ()=> { dom[ name ].style.classList.remove( "small" );                      return self;    },
+			small: ()=> { dom[ name ].style.classList.add(    "small" );                      return self;    },
+			show:  ()=> { dom[ name ].style.display="block";                                  return self;    },
+			show:  ()=> { dom[ name ].style.display="block";                                  return self;    },
+			hide:  ()=> { dom[ name ].style.display="none"; 	                              return self;    },
 			scan:  ()=> {	
 					const zoom =4;
 					if( !self._scan ){   
