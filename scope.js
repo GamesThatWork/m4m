@@ -183,7 +183,6 @@ const minVal=-.001;
 
         lineLayers.forEach( (l, layer) =>{
           l.clear();
-		  //console.log(l.name);
 		  l.alpha=1;
 		  console.log(d[0]);
 		  if(cover)     self.cover = self.cover || txt( 510,220, "cover" );
@@ -254,42 +253,16 @@ const minVal=-.001;
 		grid.hasBounds = true;
         let g= boundsLayer;
         elements=typeof elements=="string" ? String( elements ) : "glass stone";
-		let y;
-
 		let threshhold = { glass:0.8, steel:0.1, stone:0.2 };
 		Object.keys( threshhold ).forEach( material =>{
 			if( !elements.includes( material )) return;
 			textStyle[ material ].layer=boundsLayer;
 			g.lineStyle(  grid[ material ].width, grid[ material ].color );
-			y = threshhold[ material ] * (r.y.px-pad.bottom-pad.top)+pad.top;
+			let y = threshhold[ material ] * (r.y.px-pad.bottom-pad.top)+pad.top;
 			g.moveTo(   pad.left,         y);
 			g.lineTo(   r.x.px-pad.right, y);
 			txt( r.x.px-pad.left-10, y-17, material );
 			});
-/*
-		if( elements.includes( "glass")){
-			textStyle[ "glass" ].layer=boundsLayer;
-			g.lineStyle(  grid.glass.width, grid.glass.color );
-			y = 0.80* (r.y.px-pad.bottom-pad.top)+pad.top;
-			g.moveTo(   pad.left,         y);
-			g.lineTo(   r.x.px-pad.right, y);
-			txt( r.x.px-pad.left-10, y-17, "glass" );
-			}
-		if( elements.includes("steel")){
-			g.lineStyle(  grid.steel.width, grid.steel.color );
-			y = 0.10* (r.y.px-pad.bottom-pad.top)+pad.top;
-			g.moveTo(   pad.left,         y);
-			g.lineTo(   r.x.px-pad.right, y);
-			txt( r.x.px-pad.left-10, y-17, "steel" );
-		    }
-		if( elements.includes("stone")){
-			g.lineStyle(  grid.stone.width, grid.stone.color );
-			y = 0.18* (r.y.px-pad.bottom-pad.top)+pad.top;
-			g.moveTo(   pad.left,         y);
-			g.lineTo(   r.x.px-pad.right, y);
-			txt( r.x.px-pad.left-10, y-17, "stone" );
-			}
-			*/
         return self;
         }, 
 

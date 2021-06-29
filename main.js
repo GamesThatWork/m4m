@@ -5,6 +5,7 @@ import  { newMath    } from './math.js'   ;
 import  { newSpinner } from './spinner.js';
 import  { newScope   } from './scope.js'  ;
 import  { newReticle } from './reticle.js';
+import  { newVoice   } from './voice.js';
 import  { pic        } from './pic.js';
 
 var wavelength=25.5;
@@ -27,7 +28,14 @@ window.onload= e=>{
  */
 
 
-const fire= signal=> document.querySelector("#eventBus").dispatchEvent( signal );
+const signal={
+	bus:	document.querySelector("#bus"),
+	list:	[],
+	fire: 	event=> signal.bus.dispatchEvent( event ),
+	on:   	(event, handler) => signal.bus.addEventListener( event, handler ),
+	clear:  ()=>   signal.bus.parentNode.replaceChild( signal.bus.cloneNode(true), signal.bus),
+	}
+
 //const sequencer=document.body;
 
 
@@ -56,7 +64,7 @@ document.body.appendChild(app.view);
 
 
 let scope =new PIXI.Container();
-    scope.position.set(12,460);
+    scope.position.set( 320,420);
     app.stage.addChild( scope )
 let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     map.visible=false;
@@ -73,7 +81,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
    
 	  const lineFunction={
 		none:  (x,n)=>  0,                    
-		start: (x,n)=>  0.0005*(x%10),                    
+		start: (x,n)=>  -1,//(((x/n)/30)&1)? .01:-.01,//  .008 * (.5 - .5*Math.random()),//0.0005*(x%10),                    
 		power: (x,n)=>  .0045,                    
 		pulse: (x,n)=>  x<wavelength*3?   .0025 : 0, 
 		wave:  (x,n)=>  Math.sin( (x/wavelength) *Math.PI)/1000 +0.002, 
@@ -624,7 +632,7 @@ const action={
 	KeyZ: e=>	pic("crew").position(200,200),	
 	KeyN: e=>	pic("crew").zoom(),	
 	KeyC: e=>	pic("claro").rando(),	
-	KeyV: e=>	pic("romeo").rando(),	
+	KeyV: e=>	newVoice("claro", {caption:document.querySelector("#caption")} ).say( "pressure" ),	
     KeyE: e=>   eq.visible=!eq.visible,
     KeyG:       g.show,
     KeyP: e=>{  tZero=Date.now();     g.reset();   plot=!plot; }, 
