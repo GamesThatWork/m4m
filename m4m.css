@@ -17,20 +17,27 @@ canvas,
 #panel,
 #map,#mapid,
 #math,#mathmenu,
-#grfx,
+#grfx,#caption,
 #help		  { position: absolute;  }
 
-#map          {  z-index:  0;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
-canvas        {  z-index:  1;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
-#mapid        {  z-index:  3;  top:  0px; left:  0px; width: 100vw; height: 100vh; }
-#panel        {  z-index:  4;  top: 12px; left: 12px; width: 100vw; 
+#map          {  z-index:  0;    top:  0px; left:   0px; width: 100vw; height: 100vh; }
+canvas        {  z-index:  1;    top:  0px; left:   0px; width: 100vw; height: 100vh; }
+#mapid        {  z-index:  2;    top:  0px; left:   0px; width: 100vw; height: 100vh; }
+#panel        {  z-index:  3;    top: 12px; left:  12px; width: 100vw; 
 				font-family: 'Lucida Sans', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 				font-size:    1.4vw;  padding: .5vw 2vw;  color:darkgoldenrod;    display:block; background-color: #222;     }
-#grfx         {  z-index:  5;  top:  0px; left:  0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
-#pix          {  z-index:  6;  top:  0px; left:  0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
-#mathmenu     {  z-index:  7;  top:  0px; left:  0px; width: 100vw; height: 100vh;  }/*   {  z-index:  5;  top:  200px; left: 60px;  border:darkred; min-height: 150px; width:100%;  display:flex;         }*/
-#help         {  z-index:  8;  top:  40px; left:  40px;                              }
+#grfx         {  z-index:  4;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
+#pix          {  z-index:  5;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
+#mathmenu     {  z-index:  6;    top:  0px; left:   0px; width: 100vw; height: 100vh;  }
+#math         {  z-index:  6;    top:120px; left: 560px;  }
+#caption      {  z-index:  7; bottom: 20px; left: 260px; width:1400px; 
+				font-family: 'Lucida Sans', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; 	font-size:    1.1vw;  color:darkgoldenrod;     }
+#help         {  z-index:  8;    top:  40px; left:  40px;                              }
 button { background-color: rgb(170, 224, 19); margin: 20px;   }
+
+
+
+
 
 li {
     font-family: 'Share Tech Mono';
@@ -55,7 +62,8 @@ ul{
 	border: thick solid rgba(0, 141, 146, 0.72);
 	background-size: cover;
 	}
-#claro {	width: 1000px;	height: 666px;	left:25vw;	top: 9vw;	}
+#claro   /*   {	width: 1000px;	height: 666px;	left:25vw;	top: 9vw;	}
+#clar.small*/ {	width:  420px;	height: 240px;	left:1440px;	top: 60px;	}
 
 #romeo {	width: 360px;	height: 405px;	left:3vw;	top: 3vw;	}
 #crew { border-top: 480px;  border-right: 270px;  border-bottom: 480px;  border-left: 270px; border-color: red;    }
@@ -97,8 +105,8 @@ ul{
 	perspective-origin: center;  
 	perspective: 900px;
 	position:absolute;
-	left: 1000px;
-	top:  666px;
+	left: 1330px;
+	top:  600px;
 
 	transform-style: preserve-3d;
     width:  345px;
@@ -120,11 +128,12 @@ ul{
 
 
 
- button.mathfunc  { width: 300px; height:150px; border-radius: 30px;   background-color: black; 
+ button.mathfunc  { width: 300px; height:150px; border-radius: 30px; 
 					transform-style: preserve-3d; 
 					position: absolute;
 					transition: opacity .4s;
 					user-select: none;
+					border-width: 3px;
 					}
  button.mathfunc:hover:not(.right) {                                   border: 5px solid gold;}
  button.mathfunc.right { background-color: rgba(76, 151, 21, 0.398); border: 5px solid rgb(42, 148, 7);}
@@ -142,13 +151,12 @@ ul{
 .prop {    color: rgb(  0, 132, 255);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
 
 
-  .dull {  opacity:0.35; color:  rgb(89,91,94); border-color: rgb(14, 220, 93);   background-color: rgba(21, 73, 21, 0.686);
-   filter:blur(2px)}
-.undull {  opacity:0.85; 			  			  border-color: rgb(143, 196, 163); background-color: rgb(189, 128, 36);}
+  .dull {  opacity:0.35; color:  rgb(89,91,94); border-color: rgb(14, 220, 93);   background-color: rgba(21, 73, 21, 0.686);}
+.undull {  opacity:0.85; 			  			  border-color: rgb(143, 196, 163); background-color: rgba(18, 73, 29, 0.734);}
 
 
 
-
+.dull  mjx-container { filter:blur(3px) }
 .power mjx-container { top:-210px; }
 .pulse mjx-container { top:-55px; }
 .wave  mjx-container { top:-55px; }
