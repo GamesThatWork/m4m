@@ -104,10 +104,10 @@ const minVal=-.001;
     let suppressed=false;
     let suppressArea= (suppress=false) =>{
 		suppressed=suppress;	
-		plotLayers[1].alpha = suppressed? 0.3:1;
-		markLayers[0].alpha = suppressed? 0.3:1;
-		gridLayer    .alpha = suppressed? 0.9:1;
-		boundsLayer  .alpha = suppressed? 0.1:1;
+		plotLayers[1].alpha = suppressed?  0.1 : 1  ;
+		markLayers[0].alpha = suppressed?  0.1 : 1  ;
+		gridLayer    .alpha = suppressed?  0.9 : 1  ;
+		boundsLayer  .alpha = suppressed? 0.05 : 0.5;
 		}
 
     
