@@ -43,9 +43,9 @@ const spin = time=>{
 
 	//trig = Math.floor( rot*6 +.1);
 	
-	trig = (segment %4)==1? -1 : Math.floor(((24-segment)/4)%6);
+	trig = (segment %4)==1? -2 : Math.floor(((24-segment)/4)%6);
 
-
+	if( trig>-1 ) 	rot= 1-  trig/6;
 
 
 	//let nudge = Math.cos( 6 * 2* Math.PI * rot );
@@ -74,7 +74,7 @@ const spin = time=>{
 		console.log( oldTrig, Math.floor(100* rot)+"%" , trig, elements[trig]?.dataset?.name  )	;
 		if( elements[oldTrig])		unhover( elements[oldTrig]);
 		if( elements[   trig])		  hover( elements[   trig]);
-		if( trig>-1 )	sound.play();
+		if( trig>-1 )	sfxJog.play();
 		oldTrig=trig;
 		}
 	
@@ -82,8 +82,36 @@ const spin = time=>{
 
 
 
+ const sfxcfg={
+	root:  { url: "./assets/sfx/" },
+	jog:   { url: "tok.wav", volume:0.1 },
+	press: { url: "tik.wav", volume:0.2 },
+ }
 
 
+
+ const newSFX = sfx=> {
+	
+	sfx = typeof sfx=="string" ? sfxcfg[ sfx ] : sfx;
+ 
+	const self= {
+		api:      new Audio(     sfxcfg.root.url    + sfx.url ),
+		volume:   sfx.volume ||  sfxcfg.root.volume || 1,
+	  	playOnce: true,
+
+		replay: ()=> self.playOnce=true,
+	  	play: ()=> {
+			if( !self.playOnce ) return; 
+			self.api.currentTime=0;
+			self.api.play();
+			self.playOnce=true;
+			}
+		}
+	return self;
+	}
+
+
+/*
  const sound = {
       dom: null,
       playOnce: true,
@@ -95,15 +123,14 @@ const spin = time=>{
       play: ()=> {
         if( sound.playOnce ){ 
           if( !sound.api) sound.construct();
-//          console.log( "SOUND", sound);
           sound.api.currentTime=0;
           sound.api.play();
-  //       sound.playOnce=false;
           }
         }
       }
-console.log(sound);
-	  sound.construct();
+*/
+	const sfxPress = newSFX("press")
+	const sfxJog   = newSFX("jog")
 
 //let axis= document.createElement("div");
 //root.append( axis );
@@ -160,7 +187,7 @@ function mouseClick( e ) {
 		console.log("clicked on "+trig)
 		document.exitPointerLock();
 		if( elements[ trig ] ){
-			sound.play();
+			sfxPress.play();
 			click( elements[ trig ]);
 			}
 		}
