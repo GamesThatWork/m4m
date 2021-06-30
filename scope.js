@@ -38,7 +38,8 @@ export const newScope = cnfg => {
       steel:{   color:steelcolor, width:3, label:"STEEL BREAKS" }, 
       stone:{   color:stonecolor, width:3, label:"STONE BREAKS" }, 
       title:{   color:0x448844,            label:"OVERPRESSURE" }, 
-      cover:{   color:0x448844,            label:"RUN SIMULATION"  }, 
+      cover:{   color:0x448844,            label:"  RUN SIMULATION" }, 
+      uncover:{ color:0x448844,            label:"PAUSE SIMULATION" }, 
       x:{ n:15, color:0x448844,   width:1, label:"KILOMETERS", scale:30}, 
       y:{ n:8,  color:0x888888,   width:1, label:"MPa", scale:30},
       hasBounds: false,
@@ -177,7 +178,9 @@ const minVal=-.001;
         return self;  
         },
       line:  d=>{
+	  console.log( "do=", d[0]);
 	  	let cover = d[0]===-1;
+        d= d.map( (v,i,d)=> isNaN(v)? d[i? i-1:28] : v  );
         d= d.map( v=> v>maxVal? maxVal: (v>minVal? v: minVal) );
         let peak = d.reduce( (iMax,v,i,a)=> a[iMax]>a[i]? iMax:i, 0 );
 
@@ -185,9 +188,8 @@ const minVal=-.001;
           l.clear();
 		  l.alpha=1;
 		  console.log(d[0]);
-		  if(cover)     self.cover = self.cover || txt( 510,220, "cover" );
-		
-		   else     if( self.cover ){ self.cover.destroy(); self.cover=false;}
+		  if(cover)    self.cover = self.cover || txt( 510,220, plot? "uncover" : "cover" );
+		  else     if( self.cover ){ self.cover.destroy(); self.cover=false;}
 		  if( d[peak]==0 ) suppressArea(false);
 		  else{
 		  	suppressArea(true);
