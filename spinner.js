@@ -74,7 +74,7 @@ const spin = time=>{
 		console.log( oldTrig, Math.floor(100* rot)+"%" , trig, elements[trig]?.dataset?.name  )	;
 		if( elements[oldTrig])		unhover( elements[oldTrig]);
 		if( elements[   trig])		  hover( elements[   trig]);
-		if( trig>-1 )	sfxJog.play();
+		if( trig>-1 )	sfx.jog.play();
 		oldTrig=trig;
 		}
 	
@@ -83,12 +83,13 @@ const spin = time=>{
 
 
  const sfxcfg={
-	root:  { url: "./assets/sfx/" },
-	jog:   { url: "tok.wav", volume:0.1 },
-	press: { url: "tik.wav", volume:0.2 },
- }
-
-
+	root:  			{ url: "./assets/sfx/" 					},
+	jog:  			{ url: "tok.wav", 			volume:0.1	},
+	click:			{ url: "click.wav",    		volume:0.2	},
+	clickoff:   	{ url: "clickoff.wav", 		volume:0.2	},
+	clicksoft: 		{ url: "clicksoft.wav",    	volume:0.4	},
+	clickoffsoft:   { url: "clickoffsoft.wav", 	volume:0.4	},
+	}
 
  const newSFX = sfx=> {
 	
@@ -129,8 +130,17 @@ const spin = time=>{
         }
       }
 */
-	const sfxPress = newSFX("press")
-	const sfxJog   = newSFX("jog")
+	const sfx = {
+		jog: newSFX("jog"),
+		button:{
+			down: 	newSFX("click"),
+			up: 	newSFX("clickoff"),
+			disabled:{
+				down:	newSFX("clicksoft"),
+				up: 	newSFX("clickoffsoft")
+				}
+			}
+		}
 
 //let axis= document.createElement("div");
 //root.append( axis );
@@ -144,7 +154,8 @@ root.style.transformOrigin= `0px ${.5*radius}px ${-radius}px`
 	const spinScale = .004;//   360 /mousepad.getBoundingClientRect().height * 2;
 	console.log( mousepad.getBoundingClientRect().height);
 	mousepad.addEventListener( 'mousemove', mouseMove  );
-	mousepad.addEventListener( 'click', mouseClick  );
+	mousepad.addEventListener( 'mousedown', mouseDown  );
+	mousepad.addEventListener( 'mouseup',   mouseUp    );
 
 
 
@@ -182,15 +193,23 @@ root.style.transformOrigin= `0px ${.5*radius}px ${-radius}px`
 			}
 */
 		}
-function mouseClick( e ) {	
-		
+function mouseDown( e ) {	
 		console.log("clicked on "+trig)
 		document.exitPointerLock();
-		if( elements[ trig ] ){
-			sfxPress.play();
-			click( elements[ trig ]);
-			}
+		if(  elements[ trig ] ){
+			 click( elements[ trig ]);
+			 sfx.button.down.play();
+   		 	 }
+		else sfx.button.disabled.down.play();
+
 		}
+function mouseUp( e ) {	
+		if(  elements[ trig ] )	sfx.button.up.play();
+		else 					sfx.button.disabled.up.play();
+		}
+
+
+
 
 	const self ={	};
 	return self;
