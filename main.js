@@ -86,7 +86,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
 		pulse: (x,n)=>  x<wavelength*3?   .0025 : 0, 
 		wave:  (x,n)=>  Math.sin( (x/wavelength) *Math.PI)/1000 +0.002, 
 		decay: (x,n)=>  (.01 / (505-x))**.75,
-		prop:  (x,n)=>  -.125 /  (n**2-n*x),  // (5+x**1.2 ),
+		prop:  (x,n)=>  -.125 /  (n**2-n*(x+3)),  // (5+x**1.2 ),
 		full:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
 		}
 	  const areaFunction={
@@ -241,22 +241,20 @@ const answerKey={
 		const click =	target=> {  
 			let name = target.dataset.name;
 			if( name==="start")	{  
+				plot=!plot;
 				document.querySelector( ".play" ).setAttribute( "visibility",  plot? "hidden":"visible" );
 				document.querySelector( ".pause").setAttribute( "visibility", !plot? "hidden":"visible" );
-				console.log(  document.querySelector( ".play" ), document.querySelector( ".pause" ))
-				//document.querySelector( ".pause").style.display=!plot?"none":"block";
-				plot=!plot;
 				//target.innerText= plot?"⏸︎":"⏵︎";
 				}
 			else	{
 				speak( answerKey[ name ].text ||( answerKey[ name ].win? "Good choice.":"Incorrect" ) )					
 				if(    answerKey[ name ].win ){
-					plotLine("none");
-					plotArea( name );
-					maths[ name ].showEquation(); 
-					b.classList.add( "right" );
-					}
-				else b.classList.add( "wrong" );
+					 plotLine("none");
+					 plotArea( name );
+					 maths[ name ].showEquation(); 
+					 target.classList.add( "right" );
+					 }
+				else target.classList.add( "wrong" );
 				}
 			};
 		newSpinner( root, { hover, unhover, click, mousepad:document.body} );
@@ -281,6 +279,16 @@ const perform = {
 		u.onend= perform.end;
 		speechSynthesis.speak(  u );
 		},
+	
+	voice: script=>	
+		Object.keys( script ).forEach( speaker=>
+			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
+			),
+	
+	
+	
+	
+	
 	sprite: s=>{
 		let key =  s.name || "default";
 		if(!grfx.sprites ) 		 grfx.sprites=[];
@@ -340,7 +348,7 @@ const program=[
 	{ wait: 2, 	respond:{ end:"next" } },
 	{ speak:"camera move", camera: { move:[1000,220,0] }, respond:{ end:"next"} },
 	{ wait: 2, 	respond:{ end:"next" } },
-	{ speak:"camera move", camera: { move:[-100,-220,700] }, respond:{} }*/
+	{ speak:"camera move", camera: { move:[-100,-220,700] }, respond:{} }
 
 	{ speak:"this is the environment",     sprite: {name:"bg",  filename:"lecturehall.webp", move:[   0, 0,   0]}, respond:{ end:"next"}},
 	{ speak:"this is sid and his mom",     sprite: {name:"sid", filename:    "mom&sid.webp", move:[   0, 0,-100]}, respond:{ end:"next"}},
@@ -348,7 +356,9 @@ const program=[
 	{ speak:"lets start the camera here",  camera: {move:[  850,  500,  -300] },                                   respond:{ end:"next"}},
 	{ speak:"and move angstrom over some", sprite: {name:"ang", move:[-700, -200, 800] },                          respond:{ end:"next"}},
 	{ speak:"and do a slow parallax move", camera: {move:[ -400,  -20,  1200], time:10 },                          respond:{ end:"next"}},
-	
+	*/
+
+	{ id:"", voice:{ claro:"intro" } }
 
 	]
 
@@ -642,6 +652,7 @@ const action={
     KeyX: e=>{  synch= (synch=="min")? false : "min";     g.reset();     g.show(); }, 
 //	KeyC: e=>   curve = curves[++curvenumber % curves.length],
 	KeyR:       g.reset,
+	KeyA: e=>	sequence( 0 ),
     help: e=>{  console.log(e.code);
 	            let body = document.querySelector("body");
                 body.requestFullscreen();
