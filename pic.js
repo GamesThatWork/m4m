@@ -31,7 +31,7 @@ const cadence = {	claro: { mean: 2.5, dev:2 },	romeo: { mean: 1, dev:.75 } };
 
 const selfs={};
 
-export const pic= (name, cfg) => {
+export const newPic= (name, cfg) => {
 
 		if( selfs[ name ] )	return selfs[name];
 
@@ -43,7 +43,6 @@ export const pic= (name, cfg) => {
 						{ dom[ name ].style.transform=`translate(${x}px,${y}px) scale(${z})`; return self;	  },
 			big:   ()=> { dom[ name ].style.classList.remove( "small" );                      return self;    },
 			small: ()=> { dom[ name ].style.classList.add(    "small" );                      return self;    },
-			show:  ()=> { dom[ name ].style.display="block";                                  return self;    },
 			show:  ()=> { dom[ name ].style.display="block";                                  return self;    },
 			hide:  ()=> { dom[ name ].style.display="none"; 	                              return self;    },
 			scan:  ()=> {	
@@ -86,16 +85,18 @@ export const pic= (name, cfg) => {
 			
 				const next= ()=>{
 					let t = basis+variation*Math.random();
+					setTimeout( next, 1000*t+250 );
 					console.log("rando", name, t);
+					if( self.paused )	return;
 					dom[ name ].style.transition=`background-image ${t}s`;
 					dom[ name ].style.backgroundImage=
 					   `url("${url[ name ][Math.floor(Math.random()*url[ name ].length)]}"),
 					    url("${url.bg}`;
-					setTimeout( next, 1000*t+250 );
 					}  
 				next();
 				return self;
-				}
+				},
+			pause: (pausing=true) => { self.paused=pausing; return self; }
 			/*trans: (start, end)=>{
 			
 				const next= ()=>{
@@ -114,7 +115,7 @@ export const pic= (name, cfg) => {
 		dom[ name ].id= name;
 		dom[ name ].classList.add("pic");
 //		dom[ name ].style.backgroundImage=	`url("${Array.isArray( url[ name ])? url[ name ][0] : url[ name ]}")`;
-		dom[ name ].style.backgroundImage=	`url("${url[ name ]}")`;
+		dom[ name ].style.backgroundImage=	`url("${typeof url[ name ]=="string"?url[ name ] : url[ name ][0] )`;
 		dom.root.appendChild( dom[ name ] )
 		return selfs[ name ]=self;
 	}
