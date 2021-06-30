@@ -1,25 +1,31 @@
 
+const selfs={};
+
+
+
 export const newVoice= (speaker, cfg={})=> {
+
+	if( selfs[ speaker ]	)	return selfs[ speaker ];
 	let self = 	{
-	
-	name:	 speaker,
-	script:	 script[ speaker ] || {},
-	audio:	 audio [ speaker ] || {},
-	caption: cfg.caption,
-	say:	 line=>{
-		if( caption )	caption.innerText= self?.script[ line ] || "";
-		console.log( "VOICE SAYS: " + line );
-		if( 	 self?.audio[  line ] )	self.audio[line].play()
-		else if( self?.script[ line ] )	self.speak( self.script[ line ] );
-		},
-	speak:	words=>{
-		speechSynthesis.cancel( );
-		console.log( "  < speak >  ", words);
-		let utterance = new SpeechSynthesisUtterance(words);
-		utterance.onend= e=> document.querySelector("#bus").dispatchEvent( new Event("end") );
-		speechSynthesis.speak(  utterance );
-		}	
-	}
+		name:	 speaker,
+		script:	 script[ speaker ] || {},
+		audio:	 audio [ speaker ] || {},
+		caption: cfg.caption,
+		say:	 line=>{
+			if( caption )	caption.innerText= self?.script[ line ] || "";
+			console.log( "VOICE SAYS: " + line );
+			if( 	 self?.audio[  line ] )	self.audio[line].play()
+			else if( self?.script[ line ] )	self.speak( self.script[ line ] );
+			},
+		speak:	words=>{
+			speechSynthesis.cancel( );
+			console.log( "  < speak >  ", words);
+			let utterance = new SpeechSynthesisUtterance(words);
+			utterance.onend= e=> document.querySelector("#bus").dispatchEvent( new Event("end") );
+			speechSynthesis.speak(  utterance );
+			}	
+		}
+	selfs[ speaker ] = self;
 	return self;
 }
 
@@ -108,7 +114,7 @@ claro:{
 	scrub_right: `Good work`,
 
 	mission:`
-		You mnition model is ready... just in time.
+		Your munition model is ready... just in time.
 		We have an urgent call from our allies in the Rumini Conflict. 
 		They’re in trouble and need you to rescue them.
 		`,
