@@ -18,8 +18,9 @@ export const newScope = cnfg => {
     const parent= new PIXI.Container();
     var overlay;
     let  steelcolor=0xFF1100;
-    let  stonecolor=0xBB1100;
+    let  stonecolor=0xEE5500;
     let  glasscolor=0xDDAA00;
+	let  hg760color=0x22BB22;
 
     const textStyle={ 
       default:{  fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center' },
@@ -27,6 +28,7 @@ export const newScope = cnfg => {
       edges:{    fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'white',      align: 'center' },
       glass:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: glasscolor,   align: 'right'  },
       steel:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: steelcolor,   align: 'right'  },
+      hg760:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: hg760color,   align: 'right'  },
       stone:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: stonecolor,   align: 'right'  },
       title:{    fontFamily: 'Share Tech Mono',  fontSize: 26,  fill: 'lightblue',  align: 'center' },
       cover:{    fontFamily: 'Share Tech Mono',  fontSize: 90,  fill: 'black',      align: 'center' },
@@ -38,6 +40,7 @@ export const newScope = cnfg => {
       glass:{   color:glasscolor, width:3, label:"GLASS BREAKS"             }, 
       steel:{   color:steelcolor, width:3, label:"STEEL BREAKS"             }, 
       stone:{   color:stonecolor, width:3, label:"STONE BREAKS"             }, 
+      hg760:{   color:hg760color, width:3, label:"NORMAL AIR PRESSURE"      }, 
       title:{   color:0x448844,            label:"OVERPRESSURE"             }, 
       cover:{   color:0x448844,            label:"  RUN SIMULATION"         }, 
       uncover:{ color:0x448844,            label:"PAUSE SIMULATION"         }, 
@@ -261,7 +264,7 @@ const minVal=-.001;
 			 g.removeChild( c );
 			 c.destroy( true ); 
 			 });
-        elements=typeof elements=="string" ? String( elements ) : "glass stone left right";
+        elements=typeof elements=="string" ? String( elements ) : "glass stone left right hg760 steel";
 		let edges = { left:0, right:1 };
 		Object.keys( edges ).forEach( edge =>{
 			if( !elements.includes( edge )) return;
@@ -273,7 +276,7 @@ const minVal=-.001;
 			g.lineTo(   x,   r.y.px-pad.bottom );
 			txt(        x+6, r.y.px-17, "edges", [ "Ground Zero","5 Mile" ][edges[ edge ]] );
 			});
-		let threshhold = { glass:0.8, steel:0.1, stone:0.2 };
+		let threshhold = { hg760:0.86, glass:0.78, steel:0.1, stone:0.2 };
 		Object.keys( threshhold ).forEach( material =>{
 			if( !elements.includes( material )) return;
 			textStyle[ material ].layer=boundsLayer;
