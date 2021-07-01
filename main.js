@@ -389,8 +389,10 @@ const program=[
 	{ id:"", say:{ claro:"instrument" },  scope: { show: true},  pic: {claro:"small"},  respond:{ complete:5} },
 	{ id:"", say:{ claro:"left"   },  scope: { bounds: "left" },                        respond:{ complete:6} },
 	{ id:"", say:{ claro:"right"  },  scope: { bounds: "right left" },                  respond:{ complete:7} },
-	{ id:"", say:{ claro:"steel"  },  scope: { bounds: "steel right left" },            respond:{ complete:8} },
-	{ id:"", say:{ claro:"glass"  },  scope: { bounds: "glass steel right left" },      respond:{ complete:9} },
+	{ id:"", say:{ claro:"normal" },  scope: { bounds: "hg760 right left" },                        respond:{ complete:8} },
+	{ id:"", say:{ claro:"glass"  },  scope: { bounds: "glass hg760 right left" },      respond:{ complete:9} },
+	{ id:"", say:{ claro:"steel"  },  scope: { bounds: "steel glass hg760 right left" },            respond:{ complete:10} },
+	{ id:"", say:{ claro:"stone"  },  scope: { bounds: "stone steel glass hg760 right left" },            respond:{ complete:6} },
 
 	]
 

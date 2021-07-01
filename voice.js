@@ -61,16 +61,20 @@ claro:{
 		
 	instrument:	
 		`Munitions create a lot of pressure when they explode.
-		This instrument shows pressure across a distance of 5 miles.`,
+		This instrument shows air pressure across distance.`,
 	left:
 		`The left edge is the munition’s ground zero.`,
 	right:
 		`The right edge is 5 miles away from ground zero.`,
-	steel:
-		`When pressure builds, it breaks things.
-		Pressure can break steel when it reaches the level of this red line.`,
+	normal:
+		`The green line shows normal air pressure.
+		When the pressure is greater, it can break things.`,
 	glass:
-		`The yellow line shows where it breaks glass.`,
+		`The yellow line shows where the pressure can break glass.`,
+	steel:
+		`Pressure can break steel when it reaches the level of this red line.`,
+	stone:
+		`Or break up stone at this level.`,
 	power:
 		`The more explosives you load into your munition, the more power your munition has to build pressure and break things.
 		Explosive power will be the first feature of our shockwave model. 
