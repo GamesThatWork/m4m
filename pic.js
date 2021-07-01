@@ -26,14 +26,16 @@
 		};
 
 
-const cadence = {	claro: { mean: 2.5, dev:2 },	romeo: { mean: 1, dev:.75 } };
+const cadence = {	claro: { mean: 1.5, dev:.25 },	romeo: { mean: 1, dev:.75 } };
 
 
 const selfs={};
 
 export const newPic= (name, cfg) => {
 
+	console.log("pic", name );
 		if( selfs[ name ] )	return selfs[name];
+	console.log("= new Pic", name );
 
 		const dom={
 			root: document.querySelector("#pix")
@@ -41,8 +43,8 @@ export const newPic= (name, cfg) => {
 		const self ={ 
 			position: (x,y,z=1)=>
 						{ dom[ name ].style.transform=`translate(${x}px,${y}px) scale(${z})`; return self;	  },
-			big:   ()=> { dom[ name ].style.classList.remove( "small" );                      return self;    },
-			small: ()=> { dom[ name ].style.classList.add(    "small" );                      return self;    },
+			big:   ()=> { dom[ name ].classList.remove( "small" );                      return self;    },
+			small: ()=> { dom[ name ].classList.add(    "small" );                      return self;    },
 			show:  ()=> { dom[ name ].style.display="block";                                  return self;    },
 			hide:  ()=> { dom[ name ].style.display="none"; 	                              return self;    },
 			scan:  ()=> {	
@@ -78,16 +80,16 @@ export const newPic= (name, cfg) => {
 				return self;
 				},
 
-			rando: ()=>{	
+			rando: (run=true) =>{	
 				let basis     =   cadence[ name ].mean -cadence[ name ].dev;
 				let variation = 2*cadence[ name ].dev;
-				 
+				self.paused   = !run; 
 			
-				const next= ()=>{
+				let next= !run? ()=>{} : ()=>{
 					let t = basis+variation*Math.random();
+					if( self.paused )	return;
 					setTimeout( next, 1000*t+250 );
 					console.log("rando", name, t);
-					if( self.paused )	return;
 					dom[ name ].style.transition=`background-image ${t}s`;
 					dom[ name ].style.backgroundImage=
 					   `url("${url[ name ][Math.floor(Math.random()*url[ name ].length)]}"),
@@ -96,7 +98,7 @@ export const newPic= (name, cfg) => {
 				next();
 				return self;
 				},
-			pause: (pausing=true) => { self.paused=pausing; return self; }
+			pause: (pausing=true) => self.rando( !pausing )
 			/*trans: (start, end)=>{
 			
 				const next= ()=>{
@@ -115,7 +117,7 @@ export const newPic= (name, cfg) => {
 		dom[ name ].id= name;
 		dom[ name ].classList.add("pic");
 //		dom[ name ].style.backgroundImage=	`url("${Array.isArray( url[ name ])? url[ name ][0] : url[ name ]}")`;
-		dom[ name ].style.backgroundImage=	`url("${typeof url[ name ]=="string"?url[ name ] : url[ name ][0] )`;
+		dom[ name ].style.backgroundImage=	`url("${typeof url[ name ]=="string"?url[ name ] : url[ name ][0]} )`;
 		dom.root.appendChild( dom[ name ] )
 		return selfs[ name ]=self;
 	}
