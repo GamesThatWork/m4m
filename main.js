@@ -6,7 +6,7 @@ import  { newSpinner } from './spinner.js';
 import  { newScope   } from './scope.js'  ;
 import  { newReticle } from './reticle.js';
 import  { newVoice   } from './voice.js';
-import  { pic        } from './pic.js';
+import  { newPic     } from './pic.js';
 
 var wavelength=25.5;
 
@@ -63,9 +63,9 @@ document.body.appendChild(app.view);
 //const math=  newMath ().destruct();
 
 
-let scope =new PIXI.Container();
-    scope.position.set( 320,420);
-    app.stage.addChild( scope )
+let scopeScreen =new PIXI.Container();
+    scopeScreen.position.set( 320,420);
+    app.stage.addChild( scopeScreen )
 let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     map.visible=false;
     map.position.set(1020,0);
@@ -142,7 +142,7 @@ function rgb2Color( str ){
     var synch=false, extra=false;
     
     
-    const g = newScope (  {  parent:scope, data: null,
+    const scope = newScope (  {  parent:scopeScreen, data: null,
                             x:{  min:0.1, max:500,   px:1000}, 
                             y:{  min:-.00081, max:.005,  px:500}, 
                               });
@@ -150,10 +150,14 @@ function rgb2Color( str ){
     var plot=false, nLast=10000, areaFunc="full";
 
 
-	const plotArea = name=> areaFunc=name;
+	const plotArea = name=> {
+		scope.sim(  true );
+		areaFunc=name;
+		}
 	const plotLine = name=>{ 
-	 	g.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
-		g.line( lineBuffer( name,  1 ) );
+		scope.sim( false );
+	 	scope.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
+		scope.line( lineBuffer( name,  1 ) );
 		};
 
 
@@ -161,18 +165,18 @@ function rgb2Color( str ){
     app.ticker.add( t=> {
       if( plot ){
         let n = Math.floor( ((Date.now()-tZero)/4) %500 );
-        if (n<nLast)  g.replot();
+        if (n<nLast)  scope.replot();
         nLast=n;
-        g.plot( areaBuffer( areaFunc,  n ), n/500 ); 
+        scope.plot( areaBuffer( areaFunc,  n ), n/500 ); 
         }
       });
 
 //every mouse move    
     function trackit( e ){
-      let p= e.data.getLocalPosition( scope );  
+      let p= e.data.getLocalPosition( scopeScreen );  
       let x= (p.x-37)/923;
       if( x<0 || x>1) return;
-      g.plot( areaBuffer( areaFunc,  x*500 ) ); 
+      scope.plot( areaBuffer( areaFunc,  x*500 ) ); 
       if( synch ) setRadius( synch, x*111+50);
       }
     
@@ -266,7 +270,7 @@ const answerKey={
 
 const grfx={ root:document.querySelector("#grfx"), url:"/assets/" };
 
-const sequencer=document.body;
+const sequencer=document.querySelector("#bus");//document.body;
 const listeners=[];
 
 const perform = {
@@ -285,10 +289,25 @@ const perform = {
 			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
 			),
 	
+	say: 	script=>	
+				Object.keys( script ).forEach( speaker=>{
+					let pic = newPic( speaker );
+					console.log( "say starts", speaker );
+					pic.rando();
+					newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
+					sequencer.addEventListener("end", e=>	{
+						console.log( "say ends", speaker );
+						pic.pause();
+						document.body.addEventListener( "mousemove", e=> {
+							console.log( "user says more", speaker );
+							sequencer.dispatchEvent( new Event("complete") );
+							}, {once:true} );
+						}, {once:true} );
+					}),
+	pic: 	script=> Object.keys( script ).forEach( speaker=> newPic( speaker )[ script[speaker] ]() ),
 	
-	
-	
-	
+	scope: 	script=> Object.keys( script ).forEach( command=> scope[  command ]( script[command] ) ),
+		
 	sprite: s=>{
 		let key =  s.name || "default";
 		if(!grfx.sprites ) 		 grfx.sprites=[];
@@ -309,8 +328,7 @@ const perform = {
 		if( xfrm   ) grfx.sprites[ key ].style.transform= xfrm;
 		if( s.time ) grfx.sprites[ key ].style.transition= `transform ${c.time}s` 
 		},
-
-
+ 
 	camera: c=>{
 		if( c.move || c.turn || c.size )
 			grfx.root.style.transform=
@@ -330,7 +348,13 @@ const perform = {
 			}
 		Object.keys( events ).forEach( k=> {
 			let o={ event:k };
-			o.handler= (nextStep=>(e=>(sequence(nextStep))))( events[k] );
+			o.handler= (nextStep=>{
+				console.log("composing response ", nextStep );
+				return	e=>{
+					sequence(nextStep);
+					console.log("responding ", nextStep, e );
+					}
+				})( events[k] );
 			listeners.push(o);
 			sequencer.addEventListener( o.event, o.handler );
 			});
@@ -358,7 +382,15 @@ const program=[
 	{ speak:"and do a slow parallax move", camera: {move:[ -400,  -20,  1200], time:10 },                          respond:{ end:"next"}},
 	*/
 
-	{ id:"", voice:{ claro:"intro" } }
+	{ id:"", say:{ claro:"welcome"    },  respond:{ complete:3} },
+	{ id:"", say:{ claro:"challenge"  },  respond:{ complete:2} },
+	{ id:"", say:{ claro:"intro"      },  respond:{ complete:3} },
+	{ id:"", say:{ claro:"model"      },  respond:{ complete:4} },
+	{ id:"", say:{ claro:"instrument" },  scope: { show: true},  pic: {claro:"small"},  respond:{ complete:5} },
+	{ id:"", say:{ claro:"left"   },  scope: { bounds: "left" },                        respond:{ complete:6} },
+	{ id:"", say:{ claro:"right"  },  scope: { bounds: "right left" },                  respond:{ complete:7} },
+	{ id:"", say:{ claro:"steel"  },  scope: { bounds: "steel right left" },            respond:{ complete:8} },
+	{ id:"", say:{ claro:"glass"  },  scope: { bounds: "glass steel right left" },      respond:{ complete:9} },
 
 	]
 
@@ -526,8 +558,8 @@ function sequence(  i  ){
 //          (https://www.sciencedirect.com/science/article/pii/S2214914719300753)
 //      `, 
         next: e=>{
-          g.bounds();
-          g.show();
+          scope.bounds();
+          scope.show();
           p.step( step[1] );
       } },
       {   
@@ -543,7 +575,7 @@ function sequence(  i  ){
         //  math= newMath (  {  parent:document.body, x: 30, y:50} );
           math.full();
           tZero=Date.now();
-          g.reset();
+          scope.reset();
           curve=curves[0];
           plot = true; 
           p.step( step[2] );
@@ -552,7 +584,7 @@ function sequence(  i  ){
         msg:`The result we are aiming for is a full model of the moving shockwave
                 `, 
         next: e=>{
-          g.reset();
+          scope.reset();
      //     math.power();
           curve=curves[1];
           p.step( step[3] );
@@ -561,7 +593,7 @@ function sequence(  i  ){
         msg:`For starts- the pressure is a function of explosive power - everywhere at once
                 `, 
         next: e=>{
-          g.reset();
+          scope.reset();
    ///       math.pulse();
           curve=curves[2];
           p.step( step[4] );
@@ -569,7 +601,7 @@ function sequence(  i  ){
         msg:`Then introduce a step function that shows the radius expanding at the speed of sound
                 `, 
         next: e=>{
-          g.reset();
+          scope.reset();
           math.wave();
           curve=curves[3];
           p.step( step[5] );
@@ -578,7 +610,7 @@ function sequence(  i  ){
         msg:`Then model the pressure as a wavetrain (cosine curve))
                 `, 
         next: e=>{
-          g.reset();
+          scope.reset();
           math.decay();
           curve=curves[4];
           p.step( step[6] );
@@ -587,7 +619,7 @@ function sequence(  i  ){
         msg:`Then add a term to model the wave's decay 
                 `, 
         next: e=>{
-          g.reset();
+          scope.reset();
           math.prop();
           curve=curves[5];
           p.step( step[7] );
@@ -596,7 +628,7 @@ function sequence(  i  ){
         msg:`Let's show (free-air) propagation in 3 dimensions: Peak pressure follows inverse cube of distance
                 `, 
         next: e=>{
-          g.reset();
+          scope.reset();
           math.full();
           curve=curves[0];
           p.step( step[8] );
@@ -643,14 +675,14 @@ const action={
 	KeyC: e=>	newPic("claro").rando(),	
 	KeyV: e=>	newVoice("claro", {caption:document.querySelector("#caption")} ).say( "pressure" ),	
     KeyE: e=>   eq.visible=!eq.visible,
-    KeyG:       g.show,
-    KeyP: e=>{  tZero=Date.now();     g.reset();   plot=!plot; }, 
-    KeyB:       g.bounds, 
-    KeyT: e=>{  let h = g.hitBox;    h.interactive=h.interactiveChildren=true;   h.on("mousemove", trackit); },
-    KeyS: e=>{  synch= (synch=="max")? false : "max";     g.reset();     g.show(); }, 
-    KeyX: e=>{  synch= (synch=="min")? false : "min";     g.reset();     g.show(); }, 
+    KeyG:       scope.show,
+    KeyP: e=>{  tZero=Date.now();     scope.reset();   plot=!plot; }, 
+    KeyB:       scope.bounds, 
+    KeyT: e=>{  let h = scope.hitBox;    h.interactive=h.interactiveChildren=true;   h.on("mousemove", trackit); },
+    KeyS: e=>{  synch= (synch=="max")? false : "max";     scope.reset();     scope.show(); }, 
+    KeyX: e=>{  synch= (synch=="min")? false : "min";     scope.reset();     scope.show(); }, 
 //	KeyC: e=>   curve = curves[++curvenumber % curves.length],
-	KeyR:       g.reset,
+	KeyR:       scope.reset,
 	KeyA: e=>	sequence( 0 ),
     help: e=>{  console.log(e.code);
 	            let body = document.querySelector("body");
