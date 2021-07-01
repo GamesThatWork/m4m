@@ -24,6 +24,7 @@ export const newScope = cnfg => {
     const textStyle={ 
       default:{  fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center' },
       label:{    fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'grey',       align: 'center' },
+      edges:{    fontFamily: 'Share Tech Mono',  fontSize: 13,  fill: 'white',      align: 'center' },
       glass:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: glasscolor,   align: 'right'  },
       steel:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: steelcolor,   align: 'right'  },
       stone:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: stonecolor,   align: 'right'  },
@@ -34,14 +35,15 @@ export const newScope = cnfg => {
  
 
     const grid = {
-      glass:{   color:glasscolor, width:3, label:"GLASS BREAKS" }, 
-      steel:{   color:steelcolor, width:3, label:"STEEL BREAKS" }, 
-      stone:{   color:stonecolor, width:3, label:"STONE BREAKS" }, 
-      title:{   color:0x448844,            label:"OVERPRESSURE" }, 
-      cover:{   color:0x448844,            label:"  RUN SIMULATION" }, 
-      uncover:{ color:0x448844,            label:"PAUSE SIMULATION" }, 
-      x:{ n:15, color:0x448844,   width:1, label:"KILOMETERS", scale:30}, 
-      y:{ n:8,  color:0x888888,   width:1, label:"MPa", scale:30},
+      glass:{   color:glasscolor, width:3, label:"GLASS BREAKS"             }, 
+      steel:{   color:steelcolor, width:3, label:"STEEL BREAKS"             }, 
+      stone:{   color:stonecolor, width:3, label:"STONE BREAKS"             }, 
+      title:{   color:0x448844,            label:"OVERPRESSURE"             }, 
+      cover:{   color:0x448844,            label:"  RUN SIMULATION"         }, 
+      uncover:{ color:0x448844,            label:"PAUSE SIMULATION"         }, 
+      x:{ n:17, color:0x448844,   width:1, label:"KILOMETERS",      scale:30}, 
+      y:{ n:8,  color:0x888888,   width:1, label:"MPa",             scale:30},
+	  edges:{   color:0xBBBBBB,   width:5                                   },
       hasBounds: false,
       hasEquation: false
     } 
@@ -129,6 +131,8 @@ const minVal=-.001;
         return self;
         },
 
+	  sim: on=> self.simulationRunning = on ?? !self.simulationRunning, 
+
       plot: (d,t=1)=>{
 
 	//  if( t>0.5 && t<0.51) console.log("databuffer",d);
@@ -178,7 +182,6 @@ const minVal=-.001;
         return self;  
         },
       line:  d=>{
-	  console.log( "do=", d[0]);
 	  	let cover = d[0]===-1;
         d= d.map( (v,i,d)=> isNaN(v)? d[i? i-1:28] : v  );
         d= d.map( v=> v>maxVal? maxVal: (v>minVal? v: minVal) );
@@ -188,7 +191,7 @@ const minVal=-.001;
           l.clear();
 		  l.alpha=1;
 		  console.log(d[0]);
-		  if(cover)    self.cover = self.cover || txt( 510,220, plot? "uncover" : "cover" );
+		  if(cover)    self.cover = self.cover || txt( 510,220, self?.simulationRunning? "uncover" : "cover" );
 		  else     if( self.cover ){ self.cover.destroy(); self.cover=false;}
 		  if( d[peak]==0 ) suppressArea(false);
 		  else{
@@ -225,7 +228,7 @@ const minVal=-.001;
           let x = plotx( (i/(grid.x.n-1)) *data.length);
           g.moveTo(   x, pad.top);
           g.lineTo(   x, r.y.px-pad.bottom);
-          txt( x,r.y.px-pad.bottom*.80, "label", i );
+          if(!(i%2)) txt( x,r.y.px-pad.bottom*.80, "label", i/2 );
           } 
         g.lineStyle(  grid.y.width, grid.y.color, 1);
         for(let i=0; i<grid.y.n; i++  ) {
@@ -252,9 +255,24 @@ const minVal=-.001;
         },
       bounds: elements=>{
         console.log( "PLOT: bounds", elements );
-		grid.hasBounds = true;
+		grid.hasBounds = !!elements;
         let g= boundsLayer;
-        elements=typeof elements=="string" ? String( elements ) : "glass stone";
+       	g.children.forEach( c => {
+			 g.removeChild( c );
+			 c.destroy( true ); 
+			 });
+        elements=typeof elements=="string" ? String( elements ) : "glass stone left right";
+		let edges = { left:0, right:1 };
+		Object.keys( edges ).forEach( edge =>{
+			if( !elements.includes( edge )) return;
+			textStyle.edges.layer=boundsLayer;
+			g.lineStyle(  grid.edges.width, grid.edges.color );
+			let x = [ pad.left, r.x.px-pad.right][edges[ edge ]]
+			
+			g.moveTo(   x,   pad.top           );
+			g.lineTo(   x,   r.y.px-pad.bottom );
+			txt(        x+6, r.y.px-17, "edges", [ "Ground Zero","5 Mile" ][edges[ edge ]] );
+			});
 		let threshhold = { glass:0.8, steel:0.1, stone:0.2 };
 		Object.keys( threshhold ).forEach( material =>{
 			if( !elements.includes( material )) return;
