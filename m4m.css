@@ -9,7 +9,8 @@ body{
 	font-size:44px;
 	width: 100vw;
 	height: 100vh;
-  	border: 3px dotted rgb(87, 74, 74);;
+  	border: 3px dotted rgb(87, 74, 74);
+	user-select: none;
 	} 
 #container {  position: relative; overflow: hidden; }
 
@@ -30,8 +31,9 @@ canvas        {  z-index:  1;    top:  0px; left:   0px; width: 100vw; height: 1
 #pix          {  z-index:  5;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
 #mathmenu     {  z-index:  6;    top:  0px; left:   0px; width: 100vw; height: 100vh;  }
 #math         {  z-index:  6;    top:120px; left: 560px;  }
-#caption      {  z-index:  7; bottom: 20px; left: 260px; width:1400px; 
-				font-family: 'Lucida Sans', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; 	font-size:    1.1vw;  color:darkgoldenrod;     }
+#caption      {  z-index:  7; bottom: 20px; left: 260px; width:1400px; padding: 12px; margin:4px;
+					background-color: rgb(19, 13, 0);  border: 1px dotted rgb(63, 47, 5);   color:darkgoldenrod;    
+					font-family: 'Lucida Sans', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; 	font-size:32px; }
 #help         {  z-index:  8;    top:  40px; left:  40px;                              }
 button { background-color: rgb(170, 224, 19); margin: 20px;   }
 
@@ -62,8 +64,8 @@ ul{
 	border: thick solid rgba(0, 141, 146, 0.72);
 	background-size: cover;
 	}
-#claro   /*   {	width: 1000px;	height: 666px;	left:25vw;	top: 9vw;	}
-#clar.small*/ {	width:  420px;	height: 240px;	left:1440px;	top: 60px;	}
+#claro      {	width: 1000px;	height: 666px;	left:25vw;	  top: 9vw;	}
+#claro.small {	width:  420px;	height: 240px;	left:1440px;  top: 60px;	}
 
 #romeo {	width: 360px;	height: 405px;	left:3vw;	top: 3vw;	}
 #crew { border-top: 480px;  border-right: 270px;  border-bottom: 480px;  border-left: 270px; border-color: red;    }
