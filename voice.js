@@ -63,9 +63,11 @@ claro:{
 		`Munitions create a lot of pressure when they explode.
 		This instrument shows air pressure across distance.`,
 	left:
-		`The left edge is the munition’s ground zero.`,
+		`The left edge is Ground Zero.
+		This is where the shockwave starts.`,
 	right:
-		`The right edge is 5 miles away from ground zero.`,
+		`The right edge is 5 miles away from ground zero.
+		We care about all the area in between zero and five miles.`,
 	normal:
 		`The green line shows normal air pressure.
 		When the pressure is greater, it can break things.`,
@@ -75,12 +77,17 @@ claro:{
 		`Pressure can break steel when it reaches the level of this red line.`,
 	stone:
 		`Or break up stone at this level.`,
+	wheel:
+		`Lets build a mathematical model to study air pressure in action.
+		Use this Math Wheel to add elements to the model. 
+		Turn the wheel to the Start position and press the button.`,
+	wheel_wrong: `No. That’s not the start button.`,
+	wheel_right: `Right. Let's get started.`,
 	power:
-		`The more explosives you load into your munition, the more power your munition has to build pressure and break things.
-		Explosive power will be the first feature of our shockwave model. 
+		`To get higher pressure, you use more explosives.
+		So explosive power is the first feature of our shockwave model. 
 		The symbol for explosive power is omega - it looks like a “w”.
-		`/*Higher omega creates more pressure.*/+
-		`Start the expression by picking “omega”.`,
+		Start building the model by finding “omega”.`,
 		
 	power_wrong: `No. That’s not it. It looks like a little “w”.`,
 	power_right: `Right. Omega means explosive power.`,

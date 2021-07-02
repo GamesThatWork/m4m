@@ -361,6 +361,8 @@ const perform = {
 		}
 	}
 
+
+
 const program=[
 /*	{ speak:"testing here",	    respond:{ end:1 }},
 	{ speak:"second phrase",	respond:{ end:2 }},
@@ -381,32 +383,36 @@ const program=[
 	{ speak:"and move angstrom over some", sprite: {name:"ang", move:[-700, -200, 800] },                          respond:{ end:"next"}},
 	{ speak:"and do a slow parallax move", camera: {move:[ -400,  -20,  1200], time:10 },                          respond:{ end:"next"}},
 	*/
-
-	{ id:"", say:{ claro:"welcome"    },  respond:{ complete:3} },
-	{ id:"", say:{ claro:"challenge"  },  respond:{ complete:2} },
-	{ id:"", say:{ claro:"intro"      },  respond:{ complete:3} },
-	{ id:"", say:{ claro:"model"      },  respond:{ complete:4} },
-	{ id:"", say:{ claro:"instrument" },  scope: { show: true},  pic: {claro:"small"},  respond:{ complete:5} },
-	{ id:"", say:{ claro:"left"   },  scope: { bounds: "left" },                        respond:{ complete:6} },
-	{ id:"", say:{ claro:"right"  },  scope: { bounds: "right left" },                  respond:{ complete:7} },
-	{ id:"", say:{ claro:"normal" },  scope: { bounds: "hg760 right left" },                        respond:{ complete:8} },
-	{ id:"", say:{ claro:"glass"  },  scope: { bounds: "glass hg760 right left" },      respond:{ complete:9} },
-	{ id:"", say:{ claro:"steel"  },  scope: { bounds: "steel glass hg760 right left" },            respond:{ complete:10} },
-	{ id:"", say:{ claro:"stone"  },  scope: { bounds: "stone steel glass hg760 right left" },            respond:{ complete:6} },
+	{ id:"init", say:{ claro:"welcome" }, then:"jumphere"     },
+	{ id:"", say:{ claro:"challenge"  }  },
+	{ id:"", say:{ claro:"intro"      }  },
+	{ id:"", say:{ claro:"model"      }  },
+	{ id:"jumphere", say:{ claro:"instrument" },  scope: { show: true},  pic: {claro:"small"},    },
+	{ id:"", say:{ claro:"left"   },  scope: { bounds: "                              left" },    },
+	{ id:"", say:{ claro:"right"  },  scope: { bounds: "                        right left" },    },
+	{ id:"", say:{ claro:"normal" },  scope: { bounds: "                  hg760 right left" },    },
+	{ id:"", say:{ claro:"glass"  },  scope: { bounds: "            glass hg760 right left" },    },
+	{ id:"", say:{ claro:"steel"  },  scope: { bounds: "      steel glass hg760 right left" },    },
+	{ id:"", say:{ claro:"stone"  },  scope: { bounds: "stone steel glass hg760 right left" },   },
+	{ id:"", say:{ claro:"wheel"  },  scope: { bounds: "      steel                       " },    },
 
 	]
-
-
-
 var lastStep=0;
 function sequence(  i  ){
 	if( i==="next" ) i=lastStep+1;
+	else if (typeof i  === "string") i=  program.findIndex ( step=> step.id===i );
 	if( i>=program.length )	return;
 	lastStep=i;
+
 	let s= program[ i ];
-	
+
+	if(  s.then    )	s.respond= { complete: s.then } 
+	if( !s.respond )	s.respond= { complete:"next"  } 
+
+
+
 	Object.keys( s ).forEach( k=> {
-		if (!s[k])// &(typeof s[k] !== 'function') 
+		if (!perform[k])// &(typeof s[k] !== 'function') 
 			console.error( k+" is not a valid action. Not yet, anyway.")
 		else{
 			console.log( k, s[k]);
