@@ -130,7 +130,7 @@ const expression ={
 				</msup>
 				</mrow>
 			</mfrac>
-		</mfenced>`
+		</mfenced>`,
 	};
 
 const eq={}
@@ -141,3 +141,7 @@ const eq={}
 	eq.decay= `<mfrac> ${eq.wave}                  ${expression.decay}   </mfrac> `;
 	eq.prop = `<mrow>  ${eq.decay}                 ${expression.prop}    </mrow>  `;
 	eq.full= eq.prop;
+
+
+for( let i=0; i<5; i++)
+	 eq[ "xp"+i ]=  expression[ "xp"+i ] = `<mi>&omega;</mi><mo>=</mo><mn>${2**i}</mn>`;
