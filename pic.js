@@ -70,12 +70,12 @@ export const newPic= (name, cfg) => {
 			zoom:  ()=> {
 				dom[ name ].style.transform="scale(7) translate(245px,135px)"; 
 				dom[ name ].style.opacity="0"; 
-				console.log( dom[ name ].style );	
+//				console.log( dom[ name ].style );	
 				setTimeout( e=>{
 					dom[ name ].style.transition="transform 1s erase-in ease-out .5s, opacity 1s ease-out ";
 					dom[ name ].style.transform="translate( 975px,0px) scale(.9) "; 
 					dom[ name ].style.opacity="1"; 
-					console.log( dom[ name ].style );	
+//					console.log( dom[ name ].style );	
 					}, 100);
 				return self;
 				},
@@ -89,7 +89,7 @@ export const newPic= (name, cfg) => {
 					let t = basis+variation*Math.random();
 					if( self.paused )	return;
 					setTimeout( next, 1000*t+250 );
-					console.log("rando", name, t);
+//					console.log("rando", name, t);
 					dom[ name ].style.transition=`background-image ${t}s`;
 					dom[ name ].style.backgroundImage=
 					   `url("${url[ name ][Math.floor(Math.random()*url[ name ].length)]}"),

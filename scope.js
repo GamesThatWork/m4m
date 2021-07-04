@@ -31,7 +31,8 @@ export const newScope = cnfg => {
       hg760:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: hg760color,   align: 'right'  },
       stone:{    fontFamily: 'Share Tech Mono',  fontSize: 17,  fill: stonecolor,   align: 'right'  },
       title:{    fontFamily: 'Share Tech Mono',  fontSize: 26,  fill: 'lightblue',  align: 'center' },
-      cover:{    fontFamily: 'Share Tech Mono',  fontSize: 90,  fill: 'black',      align: 'center' },
+      cover:{    fontFamily: 'Share Tech Mono',  fontSize: 90,  fill: 'green',      align: 'center' },
+      uncover:{  fontFamily: 'Share Tech Mono',  fontSize: 90,  fill: 'grey',      align: 'center' },
       };
 
  
@@ -60,7 +61,6 @@ export const newScope = cnfg => {
       if( style.align=='center') x-=t.width/2;
       t.position.set( x, y);
 	  let layer = style.layer || gridLayer;
-	  console.log( layer  );
 	  layer.addChild(t);
       return t;
       }
@@ -134,7 +134,7 @@ const minVal=-.001;
         return self;
         },
 
-	  sim: on=> self.simulationRunning = on ?? !self.simulationRunning, 
+	  simulating: yes => self.simulationRunning = yes ?? !self.simulationRunning, 
 
       plot: (d,t=1)=>{
 
@@ -191,19 +191,19 @@ const minVal=-.001;
         let peak = d.reduce( (iMax,v,i,a)=> a[iMax]>a[i]? iMax:i, 0 );
 
         lineLayers.forEach( (l, layer) =>{
-          l.clear();
-		  l.alpha=1;
-		  console.log(d[0]);
-		  if(cover)    self.cover = self.cover || txt( 510,220, self?.simulationRunning? "uncover" : "cover" );
-		  else     if( self.cover ){ self.cover.destroy(); self.cover=false;}
-		  if( d[peak]==0 ) suppressArea(false);
-		  else{
-		  	suppressArea(true);
-			if( !layer ) l.filters = [blurFilter];    
-			l.lineStyle(  width.line[ layer ], color.line[layer], 1);
-			l.moveTo(   plotx(0), ploty( d[0]) );
-			d.forEach( (y,x) => l.lineTo( plotx(x), ploty(y)  ) );
-			}
+			l.clear();
+			l.alpha=1;
+			if( self.cover ) self.cover.destroy();
+			self.cover= false;
+			if( cover )    self.cover = txt( 510,220, self?.simulationRunning? "uncover" : "cover" );
+			if( d[peak]==0 ) suppressArea(false);
+			else{
+				suppressArea(true);
+				if( !layer ) l.filters = [blurFilter];    
+				l.lineStyle(  width.line[ layer ], color.line[layer], 1);
+				l.moveTo(   plotx(0), ploty( d[0]) );
+				d.forEach( (y,x) => l.lineTo( plotx(x), ploty(y)  ) );
+				}
     	  });
         return self;  
         },
