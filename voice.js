@@ -40,6 +40,8 @@ export const newVoice= (speaker, cfg={})=> {
 
 const script ={
 claro:{
+	null: 
+	`	`,
 	welcome: 
 	`	Welcome.
 		We need help here at the Air Force Research Lab.
@@ -77,58 +79,65 @@ claro:{
 		`Pressure can break steel when it reaches the level of this red line.`,
 	stone:
 		`Or break up stone at this level.`,
-	wheel:
-		`Lets build a mathematical model to study air pressure in action.
-		Use this Math Wheel to add elements to the model. 
-		Turn the wheel to the Start position and press the button.`,
-	wheel_wrong: `No. That’s not the start button.`,
-	wheel_right: `Right. Let's get started.`,
+
+	start:
+		`Now we build a mathematical model of air pressure in action.
+	  	Build the model using this wheel.
+		This Math Wheel is a tool for building complex expressions. `,
+	start_ask:   `Turn the wheel to the Start position and press the button.`,
+	start_wrong: `No. That’s not the start button.`,
+	start_right: `Right. Let's get started.`,
+
 	power:
-		`To get higher pressure, you use more explosives.
-		So explosive power is the first feature of our shockwave model. 
-		The symbol for explosive power is omega - it looks like a “w”.
+		`To get high pressure, you use high explosives.
+		Explosive power is the first feature of our shockwave model. 
 		Start building the model by finding “omega”.`,
-		
+	power_ask:	`Find omega. It means explosive power and looks like a “w”.`,
 	power_wrong: `No. That’s not it. It looks like a little “w”.`,
-	power_right: `Right. Omega means explosive power.`,
+	power_close: `Almost right - but completely wrong.`,
+	power_right: `Right. Omega means explosive power.
+				Each time the simulator detonates, we see the power.
+				Our model shows all the pressure everywhere instantly.
+				But that's not right. Let's model the speed of change.`,
 
 	pulse: 
-		`There is a problem with this model though- it shows pressure everywhere all at once.
-		Let’s show that it takes time for the pressure to expand. 
-		We need an expression with a “t” for time, a “d” for distance, 
-		and a “s” for speed - for how fast the wave travels.`,
-	pulse_wrong: `No- - - look for a little t that stands for time.`,
-	pulse_close: `Close, but you need the s for speed`,
-	pulse_right: `That’s it. The H function is like a switch. It returns one or zero depending on speed, distance and time.`,
+		`We need an expression with “t” for time, “d” for distance, 
+		and “s” for speed - for how fast the wave travels.`,
+	pulse_ask:   `Find "d" for distance, "t" for time and "s" for speed.`,
+	pulse_wrong: `No- - - look for a little "t" for time.`,
+	pulse_close: `Close, but you need the "s" for speed`,
+	pulse_right: `That’s it. "H" is like a switch, so it's all or nothing.
+				 Our model shows a wall of pressure moving at supersonic speed.
+				 But real pressure moves in waves, like ripples on a pond.`,
 
 	wave:
-		`The moving model is better, but it doesn’t show how pressure really moves- in waves, like ripples on a pond.
-		The sin function traces the shape of a wave.
-		Add the sin function to our equation.`,
-	wave_wrong: `Try again,   we need the sin function.`,
-	wave_close: `Not that one, choose the sin function.`,
-	wave_right: `Perfect.`,
+		`The shape of a natural wave is described by the sine function.`,
+	wave_ask:   `Add the sine wave function to our equation.`,
+	wave_wrong: `Try again,   we need the sine function.`,
+	wave_close: `Not that one, choose the sine function.`,
+	wave_right: `Perfect. Now we see the waves expand outward. 
+		But these waves continue forever full strength.
+		Real waves lose strength as they age. They decay.`,
 
 	decay: 
-		`Now we see waves traveling out from the munition, 
-		but in our model, it looks like the waves continue forever.
-		In real life, the waves decay, or stop, over time.
-		Find the expression that shows the decay of this wave.`,
-	decay_wrong: `Not that one, choose the one with “D” for Decay.`,
-	decay_right: `You’ve got it.`,
+		`We want math that models how waves decay.
+		We can call this the "D" function.`,
+	decay_ask:   `Use "D" to represent the wave Decay function.`,
+	decay_wrong: `Not that one, choose the big “D” for Decay.`,
+	decay_right: `Bingo! Our model is looking great.
+		Our pressure wave expands outward - never changing shape.
+		But real waves lose power as they expand in three dimensions.`,
 
 	prop: 
-		`The model is looking much better, but it still has a problem.
-		A powerful wave moves right across the field.
-		But remember, the wave is expanding outward in all directions.
-		We have to show how the power is dispersed all the way around the munition.
-		One final expression shows how the pressure peak drops exponentially with distance.`,
+		`The cube root shows models spreading out in three dimensione.`,
+	prop_ask:  `Find the term for power expanding in three dimensions.`,
 	prop_wrong:  `Keep looking.`,
-	prop_right:  `Very good!`,
+	prop_right:  `Very good! You built a very useful shockwave model.
+				We can use it to predict the power of any munition.
+				We can see its effect at any distance.`,
 
 	scrub:
-		`You have created a useful model of the munition’s shockwave. 
-		Now - roll left and right.
+		`Now - roll left and right.
 		Move the shockwave in slow motion
 		and see the pressure at any distance.`,
 	scrub_wrong: `Roll the ball slowly left and right.`,
