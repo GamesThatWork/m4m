@@ -3,6 +3,7 @@
 import  { newMap     } from './map.js'    ;
 import  { newMath    } from './math.js'   ;
 import  { newSpinner } from './spinner.js';
+import  { newSFX	 } from './sfx.js';
 import  { newScope   } from './scope.js'  ;
 import  { newReticle } from './reticle.js';
 import  { newVoice   } from './voice.js';
@@ -76,10 +77,12 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     //********************* test the oscilloscope *************
    // var wavelength=16;
     let tZero=0;    
-
-
-   
-	  const lineFunction={
+    
+		const b=2*wavelength;
+		const m= .7;	
+		const s = .7;
+    
+	const lineFunction={
 		none:  (x,n)=>  0,                    
 		start: (x,n)=>  -1,//(((x/n)/30)&1)? .01:-.01,//  .008 * (.5 - .5*Math.random()),//0.0005*(x%10),                    
 		power: (x,n)=>  .0045,                    
@@ -87,17 +90,31 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
 		wave:  (x,n)=>  Math.sin( (x/wavelength) *Math.PI)/1000 +0.002, 
 		decay: (x,n)=>  (.01 / (505-x))**.75,
 		prop:  (x,n)=>  -.125 /  (n**2-n*(x+3)),  // (5+x**1.2 ),
-		full:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
+		full:  (x,n)=>      (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,     // full featured shockwave 
+		xp0:   (x,n)=>   1* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
+		xp1:   (x,n)=>   2* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
+		xp2:   (x,n)=>   4* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
+		xp3:   (x,n)=>   8* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
+		xp4:   (x,n)=>  16* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
 		}
-	  const areaFunction={
+	const areaFunction={
 		power: (x,n)=>  n>350? 0 : .005,                                                                                      // power constant - everywhere all at once
 		pulse: (x,n)=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
 		wave:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.001        :   0   ,   // wavetrain
 		decay: (x,n)=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )  :   0   ,     // decay
 		prop:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // propagation
 		full:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
+		xp0:   (x,n)=>      (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp1:   (x,n)=> 0.2* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp2:   (x,n)=> 0.4* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp3:   (x,n)=> 0.8* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp4:   (x,n)=> 1.6* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
 		}	
-		  	
+	
+
+
+
+
 		   
       const curves =[ 
 			lineFunction.full, 
@@ -151,13 +168,15 @@ function rgb2Color( str ){
 
 
 	const plotArea = name=> {
-		scope.sim(  true );
+		scope.simulating(  true );
 		areaFunc=name;
+		console.log( "plotArea: "+name, areaFunction[ name ]  );
 		}
 	const plotLine = name=>{ 
-		scope.sim( false );
+		scope.simulating( false );
 	 	scope.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
 		scope.line( lineBuffer( name,  1 ) );
+//		console.log( "plotLine: "+name, lineFunction[ name ]  );
 		};
 
 
@@ -180,6 +199,31 @@ function rgb2Color( str ){
       if( synch ) setRadius( synch, x*111+50);
       }
     
+
+//every mouse move  // pointerlocked  
+    const trace= e=>{
+		var km=0;
+		const kmScale   = 1/300; // trackball movemant to km
+		const scopeScale= 500/8; // km to scope display units
+		
+
+		const self={
+			mouseMove: e=>{
+				if( Math.abs( e.movementX)< Math.abs( e.movementY)  )	return;
+				e.stopImmediatePropagation();
+				km += e.movementX * kmScale;
+				scope.plot( areaBuffer( areaFunc,  km* scopeScale ) ); 
+				},
+	    	remove: e=> document.body.removeEventListener("mousemove", self.mouseMove ),
+			}
+		document.body.addEventListener("mousemove", self.mouseMove );
+		return self;
+		}
+ 
+    
+
+
+	
     //********************* test the Math functions ********************
        
 
@@ -189,59 +233,77 @@ function rgb2Color( str ){
 		console.log(words);
 		};
 
+/*
+(domain="math", answerKey={
+											power:{},
+											pulse:{},
+											wave:{},
+											decay:{ },
+											prop:{win:true}
+											} )*/
+ 
 
-const answerKey={
-	power:{},
-	pulse:{},
-	wave:{},
-	decay:{ win:true},
-	prop:{},
-	}
+	var oldSpinner;
+
+	const makeSpinner = cfg=> {
+
+		const domain  = cfg.domain  || "math";
+		const answers = cfg.answers || {error: "answers not supplied"};//--fix
+	
+		const allFacets={
+						math:  ["start","power","pulse","wave","decay","prop"],
+						xplo:  ["start",  "xp0",  "xp1", "xp2",  "xp3", "xp4"]
+						};
+		const facets=allFacets[ domain ];
+
+		console.log( cfg, facets, answers );
+
+		facets.forEach( f => answers[f] = answers[f] || {}   );
 
 
-
-
-
-
-
-
-
-	const mathButtons = e=> {
-
-		const maths={};
+			
+		const maths= (domain=="math")? {} : null;
 		const buttons=[];
-		const root   = document.createElement("div");
-		root.id    = "mathspinner";
-		const frame  = document.createElement("div");
+		
+		const oldFrame = document.querySelector("#spinnerwindow");
+		if( oldSpinner )	oldSpinner.remove();
+		if( oldFrame   )	oldFrame.remove();
+
+
+
+		const frame    = document.createElement("div");
 		frame.id   = "spinnerwindow";
-		
-		
+		frame.classList.add( new Date().toLocaleTimeString().replace(' ',''));
 		document.querySelector("#container").append ( frame );
+		const root   = document.createElement("div");
+		root.id    = "spinner";
 		frame.append ( root );
+		facets.forEach( (name,i)=>{
 
-
-		["start","power","pulse","wave","decay","prop"].forEach( (name,i)=>{
-			const b = document.createElement("button");
-			b.classList.add( "mathfunc");
-			b.classList.add( name );
-			b.dataset.name=name;
-			buttons.push(b );
-			root.append( b ); 
-			maths[ name ] = newMath(name);
-	 		maths[ name ].showExpression( b); 
-			});
+		const b = document.createElement("button");
+		b.classList.add( "spinfacet");
+		b.classList.add( name );
+		b.dataset.name=name;
+		buttons.push(b );
+		root.append( b ); 
+		if( maths ){
+			maths[ name ] = newMath(name);		// create math element
+			maths[ name ].showExpression( b); 	// render symbol on facet
+			}
+		});
     		
-		const   hover = target => { plotLine(target.dataset.name ||"none" ); 
- 								target.classList.add(  target.dataset.name ); 
-								target.classList.add(  "undull"  ); 
-								target.classList.remove(  "dull" ); 
-
-									};
-		const unhover = target => { plotLine( "none" );
- 								target.classList.remove( target.dataset.name ); 
-								target.classList.remove(  "undull"  ); 
-								target.classList.add(       "dull"); 
-								};
+		const   hover = target => {
+					plotLine(target.dataset.name ||"none" ); 
+					target.classList.add(  target.dataset.name ); 
+					target.classList.add(    "undull"     ); 
+					target.classList.remove(  "dull"      ); 
+					};
+		const unhover = target => { 
+					plotLine( "none" );
+				//	target.classList.remove( target.dataset.name ); 
+					target.classList.remove(  "undull"    ); 
+					target.classList.add(       "dull"    ); 
+					};
 		const click =	target=> {  
 			let name = target.dataset.name;
 			if( name==="start")	{  
@@ -250,20 +312,21 @@ const answerKey={
 				document.querySelector( ".pause").setAttribute( "visibility", !plot? "hidden":"visible" );
 				//target.innerText= plot?"⏸︎":"⏵︎";
 				}
-			else	{
-				speak( answerKey[ name ].text ||( answerKey[ name ].win? "Good choice.":"Incorrect" ) )					
-				if(    answerKey[ name ].win ){
-					 plotLine("none");
-					 plotArea( name );
-					 maths[ name ].showEquation(); 
-					 target.classList.add( "right" );
-					 }
-				else target.classList.add( "wrong" );
+			else if( answers[ name ].win ){
+				plotLine("none");
+				plotArea( name );
+				maths[ name ].showEquation(); 
 				}
+			let score = answers[ name ].win ? "right":"wrong";
+			target.classList.add( score );
+			console.log("debug:: ima dispatch an event", score )
+			sequencer.dispatchEvent( new Event( score  ));
+			console.log("debug:: i just dispatched an event", score )
 			};
-		newSpinner( root, { hover, unhover, click, mousepad:document.body} );
+		oldSpinner = newSpinner( root, { hover, unhover, click, mousepad:document.body} );
+		return facets;
 		};
-		
+			
 
 
 
@@ -304,6 +367,10 @@ const perform = {
 							}, {once:true} );
 						}, {once:true} );
 					}),
+	
+	
+	
+	
 	pic: 	script=> Object.keys( script ).forEach( speaker=> newPic( speaker )[ script[speaker] ]() ),
 	
 	scope: 	script=> Object.keys( script ).forEach( command=> scope[  command ]( script[command] ) ),
@@ -338,10 +405,15 @@ const perform = {
 		if( c.time ) grfx.root.style.transition= `transform ${c.time}s` 
 		},
 
+	spin: cfg =>{
+	console.log( "spin", cfg)
+			makeSpinner( cfg )	},
+
 
 
 	respond: events=>{   // events is a map of event names and step numbers
 		console.log( "  < respond >  ", events);
+		console.log( "  < listeners >  ", listeners);
 		while( listeners.length){
 			let o= listeners.pop();
 			sequencer.removeEventListener( o.event, o.handler );
@@ -358,6 +430,7 @@ const perform = {
 			listeners.push(o);
 			sequencer.addEventListener( o.event, o.handler );
 			});
+		console.log( "  < listeners >  ", listeners);
 		}
 	}
 
@@ -383,22 +456,67 @@ const program=[
 	{ speak:"and move angstrom over some", sprite: {name:"ang", move:[-700, -200, 800] },                          respond:{ end:"next"}},
 	{ speak:"and do a slow parallax move", camera: {move:[ -400,  -20,  1200], time:10 },                          respond:{ end:"next"}},
 	*/
-	{ id:"init", say:{ claro:"welcome" }, then:"jumphere"     },
+	{ id:"cheat", say:{ claro:"null" }, then:"jumphere"     },
+	{ id:"init", say:{ claro:"welcome" }  },
 	{ id:"", say:{ claro:"challenge"  }  },
 	{ id:"", say:{ claro:"intro"      }  },
 	{ id:"", say:{ claro:"model"      }  },
-	{ id:"jumphere", say:{ claro:"instrument" },  scope: { show: true},  pic: {claro:"small"},    },
+	{ id:"", say:{ claro:"instrument" },  scope: { show: true},  pic: {claro:"small"},    },
 	{ id:"", say:{ claro:"left"   },  scope: { bounds: "                              left" },    },
 	{ id:"", say:{ claro:"right"  },  scope: { bounds: "                        right left" },    },
 	{ id:"", say:{ claro:"normal" },  scope: { bounds: "                  hg760 right left" },    },
 	{ id:"", say:{ claro:"glass"  },  scope: { bounds: "            glass hg760 right left" },    },
 	{ id:"", say:{ claro:"steel"  },  scope: { bounds: "      steel glass hg760 right left" },    },
-	{ id:"", say:{ claro:"stone"  },  scope: { bounds: "stone steel glass hg760 right left" },   },
-	{ id:"", say:{ claro:"wheel"  },  scope: { bounds: "      steel                       " },    },
+	{ id:"", say:{ claro:"stone"  },  scope: { bounds: "stone steel glass hg760 right left" },    },
+	{ id:"", say:{ claro:"null"   },  scope: { bounds: "      steel                       " },    },
+	{ id:"jumphere", say:{ claro:"null"  },   scope: { show: true},  pic: {claro:"small"},        },
+
+	{ id:"start",       say:{ claro:"start"  }, spin:{ domain:"math", answers:{ start:{win:true}}}  },
+	{ id:"start_ask"  , say:{ claro:"start_ask"    }, respond: { right:"start_right", wrong:"start_wrong"  }  },
+	{ id:"start_wrong", say:{ claro:"start_wrong"  }, then:"start_ask"  },
+	{ id:"start_close", say:{ claro:"start_close"  }, then:"start_ask"  },
+	{ id:"start_right", say:{ claro:"start_right"  }, then:"next"   },
+	
+	{ id:"power",       say:{ claro:"power"  }, spin:{ domain:"math", answers:{ power:{win:true}}}  },
+	{ id:"power_ask"  , say:{ claro:"power_ask"    }, respond: { right:"power_right", wrong:"power_wrong"  }  },
+	{ id:"power_wrong", say:{ claro:"power_wrong"  }, then:"power_ask"  },
+	{ id:"power_close", say:{ claro:"power_close"  }, then:"power_ask"  },
+	{ id:"power_right", say:{ claro:"power_right"  }, then:"next"   },
+
+
+	{ id:"pulse",       say:{ claro:"pulse"  }, spin:{ domain:"math", answers:{ pulse:{win:true}}}  },
+	{ id:"pulse_ask"  , say:{ claro:"pulse_ask"    }, respond: { right:"pulse_right", wrong:"pulse_wrong"  }  },
+	{ id:"pulse_wrong", say:{ claro:"pulse_wrong"  }, then:"pulse_ask"  },
+	{ id:"pulse_close", say:{ claro:"pulse_close"  }, then:"pulse_ask"  },
+	{ id:"pulse_right", say:{ claro:"pulse_right"  }, then:"next"   },
+
+
+	{ id:"wave",       say:{ claro:"wave"  }, spin:{ domain:"math", answers:{ wave:{win:true}}}  },
+	{ id:"wave_ask"  , say:{ claro:"wave_ask"    }, respond: { right:"wave_right", wrong:"wave_wrong"  }  },
+	{ id:"wave_wrong", say:{ claro:"wave_wrong"  }, then:"wave_ask"  },
+	{ id:"wave_close", say:{ claro:"wave_close"  }, then:"wave_ask"  },
+	{ id:"wave_right", say:{ claro:"wave_right"  }, then:"next"   },
+
+
+	{ id:"decay",       say:{ claro:"decay"  }, spin:{ domain:"math", answers:{ decay:{win:true}}}  },
+	{ id:"decay_ask"  , say:{ claro:"decay_ask"    }, respond: { right:"decay_right", wrong:"decay_wrong"  }  },
+	{ id:"decay_wrong", say:{ claro:"decay_wrong"  }, then:"decay_ask"  },
+	{ id:"decay_close", say:{ claro:"decay_close"  }, then:"decay_ask"  },
+	{ id:"decay_right", say:{ claro:"decay_right"  }, then:"next"   },
+
+
+	{ id:"prop",       say:{ claro:"prop"  }, spin:{ domain:"math", answers:{ prop:{win:true}}}  },
+	{ id:"prop_ask"  , say:{ claro:"prop_ask"    }, respond: { right:"prop_right", wrong:"prop_wrong"  }  },
+	{ id:"prop_wrong", say:{ claro:"prop_wrong"  }, then:"prop_ask"  },
+	{ id:"prop_close", say:{ claro:"prop_close"  }, then:"prop_ask"  },
+	{ id:"prop_right", say:{ claro:"prop_right"  }, then:"next"   },
+
+	{ id:"",},
 
 	]
 var lastStep=0;
 function sequence(  i  ){
+console.log(`<SEQUENCE idStep=" ${i} ">`);
 	if( i==="next" ) i=lastStep+1;
 	else if (typeof i  === "string") i=  program.findIndex ( step=> step.id===i );
 	if( i>=program.length )	return;
@@ -420,64 +538,6 @@ function sequence(  i  ){
 			}});
 	}
 
-//document.body.onclick= e=>sequence( 0 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-		["power","pulse","wave","decay","prop"].forEach( name=>{
-			let m = newMath(name);
-			let b = document.createElement("button");
-			buttons.push(b);
-			b.classList.add( "mathfunc" );
-		 	m.showExpression( b); 
-			document.querySelector("#mathmenu").append ( b);
-    		const hover = () =>{
-				b.removeEventListener( "mouseover", hover);
-				plotLine( m.name );
-				b.addEventListener( "mouseout" , e=> {
-					plotLine( "none" );
-					b.addEventListener( "mouseover", hover);
-					}, {once:true} );
-				b.addEventListener( "click", e=> {  
-					e.stopImmediatePropagation();
-				    console.log("click", e.target, e.currentTarget,e)
-					speak( answerKey[ m.name ].text ||( answerKey[ m.name ].win? "Good choice.":"Incorrect" ) )					
-					if(    answerKey[ m.name ].win ){
-						b.outerHTML=b.outerHTML;
-						plotLine("none");
-						plotArea( m.name );
-						m.showEquation(); 
-						b.classList.add( "right" );
-						b.removeEventListener( "mouseover", hover);
-						}
-					else b.classList.add( "wrong" );
-					}, {once:true});
-				};
-			b.addEventListener( "mouseover", hover);
-			newSpinner( buttons );
-			})
-		};*/
-    
 
     
     
@@ -524,6 +584,8 @@ function sequence(  i  ){
     map.addEventListener("mouseenter",e=> 
         gsap.from( r, {immediacy:0, duration:1, ease: "linear"}));
     */
+
+
 
    const newPanel = ()=>{
   
@@ -670,23 +732,25 @@ helptext.innerHTML=`
 ` ;
 
 const action={      
-//    KeyM: e=>   map.visible=!map.visible,
+//   
+    KeyW:   e=>   map.visible=!map.visible,
+    KeyE:   e=>   map= newMap(),
     Digit0: e=>   newMath("full" ).showExpression(),
     Digit1: e=>   newMath("power").showExpression(),
     Digit2: e=>   newMath("pulse").showExpression(),
     Digit3: e=>   newMath("wave" ).showExpression(),
     Digit4: e=>   newMath("decay").showExpression(),
     Digit5: e=>   newMath("prop" ).showExpression(),
-    KeyM:   mathButtons, // e=>  newMap,
+    KeyM:   e=> makeSpinner({ domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
 	KeyQ: e=>	newPic("crew").position(200,200),	
 	KeyN: e=>	newPic("crew").zoom(),	
 	KeyC: e=>	newPic("claro").rando(),	
 	KeyV: e=>	newVoice("claro", {caption:document.querySelector("#caption")} ).say( "pressure" ),	
-    KeyE: e=>   eq.visible=!eq.visible,
+//    KeyE: e=>   eq.visible=!eq.visible, 
     KeyG:       scope.show,
     KeyP: e=>{  tZero=Date.now();     scope.reset();   plot=!plot; }, 
     KeyB:       scope.bounds, 
-    KeyT: e=>{  let h = scope.hitBox;    h.interactive=h.interactiveChildren=true;   h.on("mousemove", trackit); },
+    KeyT: trace, //e=>{  let h = scope.hitBox;    h.interactive=h.interactiveChildren=true;   h.on("mousemove", trackit); },
     KeyS: e=>{  synch= (synch=="max")? false : "max";     scope.reset();     scope.show(); }, 
     KeyX: e=>{  synch= (synch=="min")? false : "min";     scope.reset();     scope.show(); }, 
 //	KeyC: e=>   curve = curves[++curvenumber % curves.length],
