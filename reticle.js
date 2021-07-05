@@ -1,3 +1,5 @@
+import  { newSignal  } from './signal.js'    ;
+const signal= newSignal();
 
 export const newReticle = cnfg => {
     const r=cnfg; 
@@ -16,10 +18,6 @@ export const newReticle = cnfg => {
       construct: ()=>{
 
         graphicLayers.forEach( (g, layer) =>{
-          g.lineStyle(  lineWidth[ layer ], r.min.color, 1);
-          g.drawCircle( 0, 0, r.min.radius  );
-          g.lineStyle(  lineWidth[ layer ], r.max.color, .7);
-          g.drawCircle(0, 0, r.max.radius  );
           blurFilter.blur = 10;
           if( !layer ) g.filters = [blurFilter];    
           g.lineStyle( lineWidth[ layer ],  [0x00FF00,0x80FF80][layer], 1);
@@ -35,23 +33,41 @@ export const newReticle = cnfg => {
           }); 
         return self;
         },
-      show: ()=>{
-        graphicLayers.forEach( g => r.parent.addChild(g) );
-        return self;
-        },
-      immediacy:1,
-      move: (x,y)=>{ 
-        let newK= self.immediacy, oldK=1-newK;
-        graphicLayers.forEach( g => {
-          g.x=x*newK + g.x*oldK;
-          g.y=y*newK + g.y*oldK;
-          });
-        return self;
-        },
-      destruct: ()=>{ 
-        graphicLayers.forEach( g => g.clear() );
-        return self;
-        }
-      }
-    return self.construct();
-    }
+		
+		circle:[],
+
+	  	radius: r=>{
+			graphicLayers.forEach( (g, layer) =>{
+				if( self.circle[layer] )	self.circle[layer].destroy();
+				g.lineStyle(  lineWidth[ layer ], r.max.color, 1);
+				self.circle[layer] =  g.drawCircle( 0, 0, r.max.radius = r  );
+				});
+			return self;
+			},
+
+		listener: e=> self.radius( e.details.km ) ,
+		listen:  ()=> signal.bus.addEventListener(  "radius", self.listener ),
+		unlisten:()=> signal.bus.removeEventListener( "radius", self.listener ),
+
+		show: ()=>{
+			graphicLayers.forEach( g => r.parent.addChild(g) );
+			return self;
+			},
+		immediacy:1,
+		move: (x,y)=>{ 
+			let newK= self.immediacy, oldK=1-newK;
+			graphicLayers.forEach( g => {
+			g.x=x*newK + g.x*oldK;
+			g.y=y*newK + g.y*oldK;
+			});
+			return self;
+			},
+		
+		destruct: ()=>{ 
+			self.unlisten();																																																																																																																																																																			
+			graphicLayers.forEach( g => g.clear() );
+			return self;
+			}
+		}
+		return self.construct();
+		}
