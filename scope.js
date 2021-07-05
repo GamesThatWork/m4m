@@ -106,6 +106,7 @@ const minVal=-.001;
     let my =-(r.y.px -pad.bottom -pad.top) / (data.span);
     let by =  r.y.px -pad.bottom;
     let ploty= y=> my*(y-data.min) + by;
+	let marks=0;
 
     let suppressed=false;
     let suppressArea= (suppress=false) =>{
@@ -135,6 +136,8 @@ const minVal=-.001;
         },
 
 	  simulating: yes => self.simulationRunning = yes ?? !self.simulationRunning, 
+	  
+	  trail:[],
 
       plot: (d,t=1)=>{
 
@@ -149,12 +152,38 @@ const minVal=-.001;
         overlay.alpha= suppressed? 0 : (1-t)**2.5; 		 // visual blast effect 
 
 		markLayers.forEach( (m, layer) =>{
-		if( !layer ) {m.filters = [blurFilter];    
-		m.lineStyle(  0);
-		m.beginFill(0x0);
-		m.drawCircle( plotx( peak), ploty( d[peak] ), 12 );
-		m.endFill();}
-		}); 
+			if( !layer ) {
+				m.filters = [blurFilter];    
+				m.lineStyle(  0);
+				m.beginFill(0x0);
+				m.drawCircle( plotx( peak), ploty( d[peak] ), 12 );
+				m.endFill();
+				if( ++marks >500){
+					m.clear();
+					marks=0;
+					};
+				}
+			}); 
+
+		/*markLayers.forEach( (m, layer) =>{
+			if( !layer ) {
+				m.filters = [blurFilter];    
+				const c = new PIXI.Graphics( );
+				if( c ){
+					c.lineStyle(  0);
+					c.beginFill(0x0);
+					c.drawCircle( plotx( peak), ploty( d[peak] ), 12 );
+					c.endFill();
+					m.addChild( c );
+					self.trail.push( c);
+					if( self.trail.length > 500 ){ 
+						let o = self.trail.shift();
+						if( o )
+							o.destroy();
+						}
+					}
+				}
+			}); */
 
 
 		let y0 =  r.y.px- pad.bottom;
@@ -185,17 +214,17 @@ const minVal=-.001;
         return self;  
         },
       line:  d=>{
-	  	let cover = d[0]===-1;
-        d= d.map( (v,i,d)=> isNaN(v)? d[i? i-1:28] : v  );
+	    d= d.map( (v,i,d)=> isNaN(v)? d[i? i-1:28] : v  );
         d= d.map( v=> v>maxVal? maxVal: (v>minVal? v: minVal) );
         let peak = d.reduce( (iMax,v,i,a)=> a[iMax]>a[i]? iMax:i, 0 );
-
+  		self.cover = d[0]==-1 && d[peak]==-1;;
+    
         lineLayers.forEach( (l, layer) =>{
 			l.clear();
 			l.alpha=1;
-			if( self.cover ) self.cover.destroy();
-			self.cover= false;
-			if( cover )    self.cover = txt( 510,220, self?.simulationRunning? "uncover" : "cover" );
+			if( self.coverText ) self.coverText.destroy();
+			self.coverText = false;
+			if( self.cover  )    self.coverText = txt( 510,220, self?.simulationRunning? "uncover" : "cover" );
 			if( d[peak]==0 ) suppressArea(false);
 			else{
 				suppressArea(true);
@@ -212,7 +241,7 @@ const minVal=-.001;
 	  	//console.log(" plotLineColor", newColor ); 
 		color.line[0]=color.line[1]=newColor;
 		return self;
-		},
+		},   
 
       grid: ()=>{
         console.log( "PLOT: grid");
@@ -276,7 +305,7 @@ const minVal=-.001;
 			g.lineTo(   x,   r.y.px-pad.bottom );
 			txt(        x+6, r.y.px-17, "edges", [ "Ground Zero","5 Mile" ][edges[ edge ]] );
 			});
-		let threshhold = { hg760:0.86, glass:0.78, steel:0.1, stone:0.2 };
+		let threshhold = { hg760:0.86, glass:0.7, steel:0.1, stone:0.32 };
 		Object.keys( threshhold ).forEach( material =>{
 			if( !elements.includes( material )) return;
 			textStyle[ material ].layer=boundsLayer;
@@ -302,16 +331,8 @@ const minVal=-.001;
         return self;
         },
       show: ()=>{
-        allLayers.forEach( g =>console.log( "SHoW:  ", g.name, g, parent) );
-        if( parent )
-			allLayers.forEach( (g,i) =>{
-				console.log( "SHOW>>  ", g.name)
-			 	//if(g && i<5 )
-				  parent.addChild(g);
-			 	} );
-		else console.log( "SHoW no parent:  ", parent);
-        
-        return self;
+        if( parent )	allLayers.forEach( (g,i) =>  parent.addChild(g) );
+		return self;
         },
       dragReport: cb=>{
         //gridLayer.interactive = true;
@@ -342,6 +363,7 @@ const minVal=-.001;
      //   console.log("PLOTTER replot");
         if( !suppressed )   sound.replay();
         markLayers.forEach( m=>m.clear());
+	 	marks=0;
         return self;
         },
       reset: r =>{ 
