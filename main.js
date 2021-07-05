@@ -1,5 +1,6 @@
 
 
+import  { newSignal  } from './signal.js'    ;
 import  { newMap     } from './map.js'    ;
 import  { newMath    } from './math.js'   ;
 import  { newSpinner } from './spinner.js';
@@ -13,8 +14,8 @@ var wavelength=25.5;
 
 window.onload= e=>{
 
-
-
+const signal= newSignal();
+console.log( signal );
 /**
  * @module main 
  * @exports nothng - this runs directly under index.html
@@ -27,27 +28,6 @@ window.onload= e=>{
 /**
  * This is the central PIXI display and update object
  */
-
-
-const signal={
-	bus:	document.querySelector("#bus"),
-	list:	[],
-	fire: 	event=> signal.bus.dispatchEvent( event ),
-	on:   	(event, handler) => signal.bus.addEventListener( event, handler ),
-	clear:  ()=>   signal.bus.parentNode.replaceChild( signal.bus.cloneNode(true), signal.bus),
-	}
-
-//const sequencer=document.body;
-
-
-
-
-
-
-
-
-
-
 
 const app = new PIXI.Application({
 	view: document.querySelector("canvas"), 
@@ -96,7 +76,9 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
 		xp2:   (x,n)=>   4* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
 		xp3:   (x,n)=>   8* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
 		xp4:   (x,n)=>  16* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
+		xp5:   (x,n)=>  32* s*((m*x)<(b+wavelength)? Math.sin(((0+(b-m*x))/wavelength ) *Math.PI)/(b**2-b*m*x):0),
 		}
+	const boost=1.3;
 	const areaFunction={
 		power: (x,n)=>  n>350? 0 : .005,                                                                                      // power constant - everywhere all at once
 		pulse: (x,n)=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
@@ -104,11 +86,12 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
 		decay: (x,n)=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )  :   0   ,     // decay
 		prop:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // propagation
 		full:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
-		xp0:   (x,n)=>      (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
-		xp1:   (x,n)=> 0.2* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
-		xp2:   (x,n)=> 0.4* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
-		xp3:   (x,n)=> 0.8* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
-		xp4:   (x,n)=> 1.6* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp0:   (x,n)=> 0.1 *boost* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp1:   (x,n)=> 0.2 *boost* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp2:   (x,n)=> 0.4 *boost* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp3:   (x,n)=> 0.8 *boost* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp4:   (x,n)=> 1.6 *boost* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) ,
+		xp5:   (x,n)=> 3.2 *boost* (x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0) 
 		}	
 	
 
@@ -188,7 +171,7 @@ function rgb2Color( str ){
         nLast=n;
         scope.plot( areaBuffer( areaFunc,  n ), n/500 ); 
         }
-      });
+      }); 
 
 //every mouse move    
     function trackit( e ){
@@ -201,11 +184,11 @@ function rgb2Color( str ){
     
 
 //every mouse move  // pointerlocked  
-    const trace= e=>{
+    const trace= ( yes=true )=>{
 		var km=0;
-		const kmScale   = 1/300; // trackball movemant to km
+		const kmScale   = 1/50;  // trackball movemant to km
 		const scopeScale= 500/8; // km to scope display units
-		
+		scope.reset();
 
 		const self={
 			mouseMove: e=>{
@@ -213,11 +196,15 @@ function rgb2Color( str ){
 				e.stopImmediatePropagation();
 				km += e.movementX * kmScale;
 				scope.plot( areaBuffer( areaFunc,  km* scopeScale ) ); 
+				signal.bus.dispatchEvent( new CustomEvent( "radius", {detail:{ km} } ) );
 				},
-	    	remove: e=> document.body.removeEventListener("mousemove", self.mouseMove ),
+	    	remove: e=>{ 
+				scope.reset();
+				document.body.removeEventListener("mousemove", self.mouseMove )
+				},
 			}
 		document.body.addEventListener("mousemove", self.mouseMove );
-		return self;
+		return yes? self : self.remove() ;
 		}
  
     
@@ -252,17 +239,19 @@ function rgb2Color( str ){
 	
 		const allFacets={
 						math:  ["start","power","pulse","wave","decay","prop"],
-						xplo:  ["start",  "xp0",  "xp1", "xp2",  "xp3", "xp4"]
+						xplo:  ["xp0",    "xp1",  "xp2", "xp3",  "xp4", "xp5"]
 						};
-		const facets=allFacets[ domain ];
+		const facetNames=allFacets[ domain ];
 
-		console.log( cfg, facets, answers );
+		const tracing= domain=="xplo";
 
-		facets.forEach( f => answers[f] = answers[f] || {}   );
+		console.log( cfg, facetNames, answers );
+
+		facetNames.forEach( f => answers[f] = answers[f] || {}   );
 
 
 			
-		const maths= (domain=="math")? {} : null;
+		const maths= {};//(domain=="math")? {} : null;
 		const buttons=[];
 		
 		const oldFrame = document.querySelector("#spinnerwindow");
@@ -278,34 +267,38 @@ function rgb2Color( str ){
 		const root   = document.createElement("div");
 		root.id    = "spinner";
 		frame.append ( root );
-		facets.forEach( (name,i)=>{
-
-		const b = document.createElement("button");
-		b.classList.add( "spinfacet");
-		b.classList.add( name );
-		b.dataset.name=name;
-		buttons.push(b );
-		root.append( b ); 
-		if( maths ){
+		facetNames.forEach( (name,i)=>{
+			const b = document.createElement("button");
+			b.classList.add( "spinfacet");
+			b.classList.add( name );
+			b.dataset.name=name;
+			buttons.push(b );
+			root.append( b ); 
 			maths[ name ] = newMath(name);		// create math element
 			maths[ name ].showExpression( b); 	// render symbol on facet
-			}
-		});
+			});
     		
 		const   hover = target => {
-					plotLine(target.dataset.name ||"none" ); 
-					target.classList.add(  target.dataset.name ); 
-					target.classList.add(    "undull"     ); 
-					target.classList.remove(  "dull"      ); 
-					};
+			target.classList.add(    "undull"     ); 
+			target.classList.remove(  "dull"      ); 
+			if( tracing ){
+				 trace( true );
+				 areaFunc= target.dataset.name ||"none"
+				 }
+			else plotLine( target.dataset.name ||"none" ); 
+			};
 		const unhover = target => { 
-					plotLine( "none" );
-				//	target.classList.remove( target.dataset.name ); 
-					target.classList.remove(  "undull"    ); 
-					target.classList.add(       "dull"    ); 
-					};
+			target.classList.remove(  "undull"    ); 
+			target.classList.add(       "dull"    ); 
+			if( tracing ){
+		//		 areaFunc= "none"
+		//		 trace( false );
+				 }
+			else plotLine( "none" );
+			};
 		const click =	target=> {  
 			let name = target.dataset.name;
+			if( tracing )	return;
 			if( name==="start")	{  
 				plot=!plot;
 				document.querySelector( ".play" ).setAttribute( "visibility",  plot? "hidden":"visible" );
@@ -317,14 +310,17 @@ function rgb2Color( str ){
 				plotArea( name );
 				maths[ name ].showEquation(); 
 				}
-			let score = answers[ name ].win ? "right":"wrong";
+			let signal = answers[ name ].signal;
+			let score  = answers[ name ].win ? "right":"wrong";
 			target.classList.add( score );
+
 			console.log("debug:: ima dispatch an event", score )
-			sequencer.dispatchEvent( new Event( score  ));
+			signal.bus.dispatchEvent( new Event( signal ?? score  ));
 			console.log("debug:: i just dispatched an event", score )
 			};
-		oldSpinner = newSpinner( root, { hover, unhover, click, mousepad:document.body} );
-		return facets;
+		
+		oldSpinner = newSpinner( root, { hover, unhover, click, mousepad:document.body }  );
+		return facetNames;
 		};
 			
 
@@ -333,11 +329,10 @@ function rgb2Color( str ){
 
 const grfx={ root:document.querySelector("#grfx"), url:"/assets/" };
 
-const sequencer=document.querySelector("#bus");//document.body;
 const listeners=[];
 
 const perform = {
-	end: ()=> sequencer.dispatchEvent( new Event("end")), //mostly internal use
+	end: ()=> signal.bus.dispatchEvent( new Event("end")), //mostly internal use
 	wait: seconds=> setTimeout( perform.end, seconds*1000 ),
 	speak: words=> {
 		speechSynthesis.cancel( );
@@ -355,15 +350,15 @@ const perform = {
 	say: 	script=>	
 				Object.keys( script ).forEach( speaker=>{
 					let pic = newPic( speaker );
-					console.log( "say starts", speaker );
+					console.log( "say starts ", speaker );
 					pic.rando();
 					newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
-					sequencer.addEventListener("end", e=>	{
-						console.log( "say ends", speaker );
+					signal.bus.addEventListener("end", e=>	{
+						console.log( "say ends ", speaker );
 						pic.pause();
 						document.body.addEventListener( "mousemove", e=> {
-							console.log( "user says more", speaker );
-							sequencer.dispatchEvent( new Event("complete") );
+							console.log( "user says more ", speaker );
+							signal.bus.dispatchEvent( new Event("complete") );
 							}, {once:true} );
 						}, {once:true} );
 					}),
@@ -374,7 +369,15 @@ const perform = {
 	pic: 	script=> Object.keys( script ).forEach( speaker=> newPic( speaker )[ script[speaker] ]() ),
 	
 	scope: 	script=> Object.keys( script ).forEach( command=> scope[  command ]( script[command] ) ),
-		
+
+	trace:  e=>{
+				scope.reset();
+				plot=false;
+				areaFunc="full";
+				trace( true );
+				},
+
+
 	sprite: s=>{
 		let key =  s.name || "default";
 		if(!grfx.sprites ) 		 grfx.sprites=[];
@@ -394,8 +397,7 @@ const perform = {
 				+  ( s.size? `      scale( ${s.size} )`                                       : "" );
 		if( xfrm   ) grfx.sprites[ key ].style.transform= xfrm;
 		if( s.time ) grfx.sprites[ key ].style.transition= `transform ${c.time}s` 
-		},
- 
+		}, 
 	camera: c=>{
 		if( c.move || c.turn || c.size )
 			grfx.root.style.transform=
@@ -416,7 +418,7 @@ const perform = {
 		console.log( "  < listeners >  ", listeners);
 		while( listeners.length){
 			let o= listeners.pop();
-			sequencer.removeEventListener( o.event, o.handler );
+			signal.bus.removeEventListener( o.event, o.handler );
 			}
 		Object.keys( events ).forEach( k=> {
 			let o={ event:k };
@@ -428,7 +430,7 @@ const perform = {
 					}
 				})( events[k] );
 			listeners.push(o);
-			sequencer.addEventListener( o.event, o.handler );
+			signal.bus.addEventListener( o.event, o.handler );
 			});
 		console.log( "  < listeners >  ", listeners);
 		}
@@ -456,12 +458,12 @@ const program=[
 	{ speak:"and move angstrom over some", sprite: {name:"ang", move:[-700, -200, 800] },                          respond:{ end:"next"}},
 	{ speak:"and do a slow parallax move", camera: {move:[ -400,  -20,  1200], time:10 },                          respond:{ end:"next"}},
 	*/
-	{ id:"cheat", say:{ claro:"null" }, then:"jumphere"     },
+	{ id:"cheat", say:{ claro:"null" }    },
 	{ id:"init", say:{ claro:"welcome" }  },
 	{ id:"", say:{ claro:"challenge"  }  },
 	{ id:"", say:{ claro:"intro"      }  },
-	{ id:"", say:{ claro:"model"      }  },
-	{ id:"", say:{ claro:"instrument" },  scope: { show: true},  pic: {claro:"small"},    },
+	{ id:"", say:{ claro:"model"      }, pic:{ romeo:"show"}  },
+	{ id:"", say:{ claro:"instrument" }, pic:{ romeo:"hide"},  scope: { show: true},  pic: {claro:"small"},    },
 	{ id:"", say:{ claro:"left"   },  scope: { bounds: "                              left" },    },
 	{ id:"", say:{ claro:"right"  },  scope: { bounds: "                        right left" },    },
 	{ id:"", say:{ claro:"normal" },  scope: { bounds: "                  hg760 right left" },    },
@@ -469,7 +471,7 @@ const program=[
 	{ id:"", say:{ claro:"steel"  },  scope: { bounds: "      steel glass hg760 right left" },    },
 	{ id:"", say:{ claro:"stone"  },  scope: { bounds: "stone steel glass hg760 right left" },    },
 	{ id:"", say:{ claro:"null"   },  scope: { bounds: "      steel                       " },    },
-	{ id:"jumphere", say:{ claro:"null"  },   scope: { show: true},  pic: {claro:"small"},        },
+	{ id:"xjumphere", say:{ claro:"null"  },   scope: { show: true},  pic: {claro:"small"},        },
 
 	{ id:"start",       say:{ claro:"start"  }, spin:{ domain:"math", answers:{ start:{win:true}}}  },
 	{ id:"start_ask"  , say:{ claro:"start_ask"    }, respond: { right:"start_right", wrong:"start_wrong"  }  },
@@ -484,7 +486,7 @@ const program=[
 	{ id:"power_right", say:{ claro:"power_right"  }, then:"next"   },
 
 
-	{ id:"pulse",       say:{ claro:"pulse"  }, spin:{ domain:"math", answers:{ pulse:{win:true}}}  },
+	{ id:"pulse",       say:{ claro:"pulse"  }, spin:{ domain:"math", answers:{ pulse:{win:true}, decay:{signal:"close"}  }}  },
 	{ id:"pulse_ask"  , say:{ claro:"pulse_ask"    }, respond: { right:"pulse_right", wrong:"pulse_wrong"  }  },
 	{ id:"pulse_wrong", say:{ claro:"pulse_wrong"  }, then:"pulse_ask"  },
 	{ id:"pulse_close", say:{ claro:"pulse_close"  }, then:"pulse_ask"  },
@@ -511,12 +513,15 @@ const program=[
 	{ id:"prop_close", say:{ claro:"prop_close"  }, then:"prop_ask"  },
 	{ id:"prop_right", say:{ claro:"prop_right"  }, then:"next"   },
 
+	{ id:"jumphere", say:{ claro:"scrub"  },   trace: true,  pic: {claro:"small"},  spin:{ domain:"xplo", answers:{ xp3:{win:true}}}       },
+
 	{ id:"",},
 
 	]
 var lastStep=0;
+
 function sequence(  i  ){
-console.log(`<SEQUENCE idStep=" ${i} ">`);
+	console.log(`<SEQUENCE idStep=" ${i} ">`);
 	if( i==="next" ) i=lastStep+1;
 	else if (typeof i  === "string") i=  program.findIndex ( step=> step.id===i );
 	if( i>=program.length )	return;
@@ -526,8 +531,6 @@ console.log(`<SEQUENCE idStep=" ${i} ">`);
 
 	if(  s.then    )	s.respond= { complete: s.then } 
 	if( !s.respond )	s.respond= { complete:"next"  } 
-
-
 
 	Object.keys( s ).forEach( k=> {
 		if (!perform[k])// &(typeof s[k] !== 'function') 
@@ -539,8 +542,7 @@ console.log(`<SEQUENCE idStep=" ${i} ">`);
 	}
 
 
-    
-    
+  
     //********************* test the reticle ********************
     map.interactive=true;
     
@@ -550,10 +552,13 @@ console.log(`<SEQUENCE idStep=" ${i} ">`);
                    min:{radius:50,heat:1}, 
                    max:{radius:70,heat:1}
                     }
-    
-    var r = newReticle( retOptions ).move(map.width/2,map.height/2)
-                                    .show();
-    
+    /*var testicle  = newReticle( {  parent:document.body,//querySelector("#container"), 
+					min:{radius:50,heat:1}, max:{radius:70,heat:1}})
+						.move( 960, 540)
+						.show()
+						.listen();*/
+        var r = newReticle( retOptions ).move(map.width/2,map.height/2)
+
     function track(e){
       let p = e.data.getLocalPosition( map );
       r.move( p.x, p.y);
@@ -734,7 +739,8 @@ helptext.innerHTML=`
 const action={      
 //   
     KeyW:   e=>   map.visible=!map.visible,
-    KeyE:   e=>   map= newMap(),
+    KeyI:   e=>   map= newMap(),
+    KeyO:   e=>   r  = newReticle( retOptions ).move(map.width/2,map.height/2).show().listen(),
     Digit0: e=>   newMath("full" ).showExpression(),
     Digit1: e=>   newMath("power").showExpression(),
     Digit2: e=>   newMath("pulse").showExpression(),
