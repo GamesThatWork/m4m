@@ -17,8 +17,8 @@ export const newScope = cnfg => {
     const data={buf:r.data};
     const parent= new PIXI.Container();
     var overlay;
-    let  steelcolor=0xFF1100;
-    let  stonecolor=0xEE5500;
+    let  stonecolor=0xFF1100;
+    let  steelcolor=0xEE5500;
     let  glasscolor=0xDDAA00;
 	let  hg760color=0x22BB22;
 
@@ -114,7 +114,7 @@ const minVal=-.001;
 		plotLayers[1].alpha = suppressed?  0.1 : 1  ;
 		markLayers[0].alpha = suppressed?  0.1 : 1  ;
 		gridLayer    .alpha = suppressed?  0.9 : 1  ;
-		boundsLayer  .alpha = suppressed? 0.05 : 0.5;
+		boundsLayer  .alpha = suppressed?  0.1 : 0.75;
 		}
 
     
@@ -305,7 +305,7 @@ const minVal=-.001;
 			g.lineTo(   x,   r.y.px-pad.bottom );
 			txt(        x+6, r.y.px-17, "edges", [ "Ground Zero","5 Mile" ][edges[ edge ]] );
 			});
-		let threshhold = { hg760:0.86, glass:0.7, steel:0.1, stone:0.32 };
+		let threshhold = { hg760:0.86,  glass:0.72, steel:0.24, stone:0.12 };
 		Object.keys( threshhold ).forEach( material =>{
 			if( !elements.includes( material )) return;
 			textStyle[ material ].layer=boundsLayer;

@@ -3,7 +3,7 @@ export const newSignal = () => {
 	const self ={
 		bus:	document.querySelector("#bus"),
 		list:	[],
-		fire: 	(event, data   ) => 	self.bus.dispatchEvent( new CustomEvent( event, { details:data } ) ),
+		fire: 	(event, data   ) => 	self.bus.dispatchEvent( new CustomEvent( event, { detail:data } ) ),
 		on:   	(event, handler) =>{ 	self.bus.addEventListener( event, handler );
 										return self.list.push( {event, handler } );
 										},
