@@ -143,5 +143,5 @@ const eq={}
 	eq.full= eq.prop;
 
 
-for( let i=0; i<5; i++)
+for( let i=0; i<6; i++)
 	 eq[ "xp"+i ]=  expression[ "xp"+i ] = `<mi>&omega;</mi><mo>=</mo><mn>${2**i}</mn>`;
