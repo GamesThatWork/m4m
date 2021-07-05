@@ -1,7 +1,6 @@
 
 const selfs={};
 var utterance;
-var caption;
 
 export const newVoice= (speaker, cfg={})=> {
 
@@ -10,11 +9,11 @@ export const newVoice= (speaker, cfg={})=> {
 		name:	 speaker,
 		script:	 script[ speaker ] || {},
 		audio:	 audio [ speaker ] || {},
-		caption: cfg.caption || true,
+		caption: cfg.caption ?? document.querySelector("caption") ?? false,
 		jiggle:  null,
 
 		say:	 line=>{
-			if( caption )	caption.innerText= self?.script[ line ] || "";
+			if(  self.caption )	self.caption.innerText= self?.script[ line ] || "";
 			console.log( "VOICE SAYS: " + line );
 			if( 	 self?.audio[  line ] )	self.audio[line].play()
 			else if( self?.script[ line ] )	self.speak( self.script[ line ] );
@@ -58,14 +57,16 @@ claro:{
 	model: 	
 		`I’ll explain parts of a shockwave model one bit at a time
 		and you find the expressions that match.
-		We’ll put it all together in one big equation
-		and use that equation to solve a special mission.`,
-		
+		We’ll put it all together in one big equation`,
+	heros: 	
+		`Then we will use that equation to perform a special mission.
+		You will help our heros get home safely.`,
 	instrument:	
-		`Munitions create a lot of pressure when they explode.
-		This instrument shows air pressure across distance.`,
+		`Lets learn the tools.
+		This instrument shows air pressure across distance.
+		Munitions create a lot of pressure when they explode.`,
 	left:
-		`The left edge is Ground Zero.
+		`The left edge of the instrument showsston Ground Zero.
 		This is where the shockwave starts.`,
 	right:
 		`The right edge is 5 miles away from ground zero.
@@ -78,12 +79,17 @@ claro:{
 	steel:
 		`Pressure can break steel when it reaches the level of this red line.`,
 	stone:
-		`Or break up stone at this level.`,
+		`Or break up a stone structure at this level.`,
 
-	start:
+	equation:
 		`Now we build a mathematical model of air pressure in action.
-	  	Build the model using this wheel.
-		This Math Wheel is a tool for building complex expressions. `,
+	  	When I say "model", I mean an equation,
+		You build this equation out of many small expressions.
+	  	Each one describes an important feature of our shockwave model.`,
+	
+	start:
+		`Build the model using this math wheel.
+		It is a tool that gives you expressions to insert.`,
 	start_ask:   `Turn the wheel to the Start position and press the button.`,
 	start_wrong: `No. That’s not the start button.`,
 	start_right: `Right. Let's get started.`,

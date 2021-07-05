@@ -6,8 +6,8 @@
 	  preview: "https://unscrewu.imgix.net/",
 		 crew: "./assets/blue/crew.jpg",
 		romeo: [
-			"./assets/romeo/1.jpg",
 			"./assets/romeo/2.jpg",
+			"./assets/romeo/1.jpg",
 			"./assets/romeo/3.jpg",
 			"./assets/romeo/4.jpg",
 			"./assets/romeo/5.jpg"
@@ -46,7 +46,7 @@ export const newPic= (name, cfg) => {
 			big:   ()=> { dom[ name ].classList.remove( "small" );                      return self;    },
 			small: ()=> { dom[ name ].classList.add(    "small" );                      return self;    },
 			show:  ()=> { dom[ name ].style.display="block";                                  return self;    },
-			hide:  ()=> { dom[ name ].style.display="none"; 	                              return self;    },
+			hide:  ()=> { dom[ name ].style.display="none"; console.log("Hide ", name );      return self;    },
 			scan:  ()=> {	
 					const zoom =4;
 					if( !self._scan ){   
@@ -79,22 +79,25 @@ export const newPic= (name, cfg) => {
 					}, 100);
 				return self;
 				},
-
+			
+			timeoutID: false,
 			rando: (run=true) =>{	
+				if( self.timeoutID ) clearTimeout( self.timeoutID );
 				let basis     =   cadence[ name ].mean -cadence[ name ].dev;
 				let variation = 2*cadence[ name ].dev;
 				self.paused   = !run; 
 			
-				let next= !run? ()=>{} : ()=>{
-					let t = basis+variation*Math.random();
-					if( self.paused )	return;
-					setTimeout( next, 1000*t+250 );
-//					console.log("rando", name, t);
-					dom[ name ].style.transition=`background-image ${t}s`;
-					dom[ name ].style.backgroundImage=
-					   `url("${url[ name ][Math.floor(Math.random()*url[ name ].length)]}"),
-					    url("${url.bg}`;
-					}  
+				let next= self.paused?
+					  ()=>{} 
+					: ()=>{
+						if( self.paused )	return;
+						let t = basis+variation*Math.random();
+						self.timeoutID = setTimeout( next, 1000*t+250 );
+						dom[ name ].style.transition=`background-image ${t}s`;
+						dom[ name ].style.backgroundImage=
+						`url("${url[ name ][Math.floor(Math.random()*url[ name ].length)]}"),
+							url("${url.bg}`;
+						}  
 				next();
 				return self;
 				},

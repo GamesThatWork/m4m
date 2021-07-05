@@ -9,6 +9,7 @@ import  { newScope   } from './scope.js'  ;
 import  { newReticle } from './reticle.js';
 import  { newVoice   } from './voice.js';
 import  { newPic     } from './pic.js';
+import  { program    } from './program.js';
 
 var wavelength=25.5;
 
@@ -55,9 +56,7 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
     
     
     //********************* test the oscilloscope *************
-   // var wavelength=16;
-    let tZero=0;    
-    
+
 		const b=2*wavelength;
 		const m= .7;	
 		const s = .7;
@@ -80,6 +79,8 @@ let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
 		}
 	const boost=1.3;
 	const areaFunction={
+		none:  (x,n)=>  0,
+		start:  (x,n)=> .0025,
 		power: (x,n)=>  n>350? 0 : .005,                                                                                      // power constant - everywhere all at once
 		pulse: (x,n)=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
 		wave:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.001        :   0   ,   // wavetrain
@@ -147,7 +148,7 @@ function rgb2Color( str ){
                             y:{  min:-.00081, max:.005,  px:500}, 
                               });
     
-    var plot=false, nLast=10000, areaFunc="full";
+    var plot=false, nLast=10000, areaFunc="none";
 
 
 	const plotArea = name=> {
@@ -161,6 +162,8 @@ function rgb2Color( str ){
 		scope.line( lineBuffer( name,  1 ) );
 //		console.log( "plotLine: "+name, lineFunction[ name ]  );
 		};
+
+var tZero=0;
 
 
 //every frame
@@ -307,16 +310,15 @@ function rgb2Color( str ){
 				}
 			else if( answers[ name ].win ){
 				plotLine("none");
-				plotArea( name );
+				plotArea( name );  
 				maths[ name ].showEquation(); 
 				}
-			let signal = answers[ name ].signal;
 			let score  = answers[ name ].win ? "right":"wrong";
 			target.classList.add( score );
 
-			console.log("debug:: ima dispatch an event", score )
-			signal.bus.dispatchEvent( new Event( signal ?? score  ));
-			console.log("debug:: i just dispatched an event", score )
+			console.log("debug:: ima dispatch an event",      answers[ name ].signal ?? score  );
+			signal.bus.dispatchEvent( new Event(              answers[ name ].signal ?? score ));
+			console.log("debug:: i just dispatched an event", answers[ name ].signal ?? score  );
 			};
 		
 		oldSpinner = newSpinner( root, { hover, unhover, click, mousepad:document.body }  );
@@ -438,86 +440,6 @@ const perform = {
 
 
 
-const program=[
-/*	{ speak:"testing here",	    respond:{ end:1 }},
-	{ speak:"second phrase",	respond:{ end:2 }},
-	{ speak:"here comes a picture --  2 seconds after I finish talking",		respond:{ end:3 }},
-	{ wait: 2, 	respond:{ end:4 } },
-	{ speak:"here I am", sprite: {filename:"romad.jpg",move:[200,100,0], size:0.3, turn:0.02, name:"popup"}, respond:{ end:5 }},
-	{ wait: 2, 	respond:{ end:6 } },
-	{ speak:"here I am", sprite: {filename:"base.jpg", move:[-600,-70,-1000], size:4,  name:"xg"}, respond:{ end:"next"}},
-	{ wait: 2, 	respond:{ end:"next" } },
-	{ speak:"camera move", camera: { move:[1000,220,0] }, respond:{ end:"next"} },
-	{ wait: 2, 	respond:{ end:"next" } },
-	{ speak:"camera move", camera: { move:[-100,-220,700] }, respond:{} }
-
-	{ speak:"this is the environment",     sprite: {name:"bg",  filename:"lecturehall.webp", move:[   0, 0,   0]}, respond:{ end:"next"}},
-	{ speak:"this is sid and his mom",     sprite: {name:"sid", filename:    "mom&sid.webp", move:[   0, 0,-100]}, respond:{ end:"next"}},
-	{ speak:"this is professor angstrom",  sprite: {name:"ang", filename:   "angstrom.webp", move:[ 300, 0, 500]}, respond:{ end:"next"}},
-	{ speak:"lets start the camera here",  camera: {move:[  850,  500,  -300] },                                   respond:{ end:"next"}},
-	{ speak:"and move angstrom over some", sprite: {name:"ang", move:[-700, -200, 800] },                          respond:{ end:"next"}},
-	{ speak:"and do a slow parallax move", camera: {move:[ -400,  -20,  1200], time:10 },                          respond:{ end:"next"}},
-	*/
-	{ id:"cheat", say:{ claro:"null" }    },
-	{ id:"init", say:{ claro:"welcome" }  },
-	{ id:"", say:{ claro:"challenge"  }  },
-	{ id:"", say:{ claro:"intro"      }  },
-	{ id:"", say:{ claro:"model"      }, pic:{ romeo:"show"}  },
-	{ id:"", say:{ claro:"instrument" }, pic:{ romeo:"hide"},  scope: { show: true},  pic: {claro:"small"},    },
-	{ id:"", say:{ claro:"left"   },  scope: { bounds: "                              left" },    },
-	{ id:"", say:{ claro:"right"  },  scope: { bounds: "                        right left" },    },
-	{ id:"", say:{ claro:"normal" },  scope: { bounds: "                  hg760 right left" },    },
-	{ id:"", say:{ claro:"glass"  },  scope: { bounds: "            glass hg760 right left" },    },
-	{ id:"", say:{ claro:"steel"  },  scope: { bounds: "      steel glass hg760 right left" },    },
-	{ id:"", say:{ claro:"stone"  },  scope: { bounds: "stone steel glass hg760 right left" },    },
-	{ id:"", say:{ claro:"null"   },  scope: { bounds: "      steel                       " },    },
-	{ id:"xjumphere", say:{ claro:"null"  },   scope: { show: true},  pic: {claro:"small"},        },
-
-	{ id:"start",       say:{ claro:"start"  }, spin:{ domain:"math", answers:{ start:{win:true}}}  },
-	{ id:"start_ask"  , say:{ claro:"start_ask"    }, respond: { right:"start_right", wrong:"start_wrong"  }  },
-	{ id:"start_wrong", say:{ claro:"start_wrong"  }, then:"start_ask"  },
-	{ id:"start_close", say:{ claro:"start_close"  }, then:"start_ask"  },
-	{ id:"start_right", say:{ claro:"start_right"  }, then:"next"   },
-	
-	{ id:"power",       say:{ claro:"power"  }, spin:{ domain:"math", answers:{ power:{win:true}}}  },
-	{ id:"power_ask"  , say:{ claro:"power_ask"    }, respond: { right:"power_right", wrong:"power_wrong"  }  },
-	{ id:"power_wrong", say:{ claro:"power_wrong"  }, then:"power_ask"  },
-	{ id:"power_close", say:{ claro:"power_close"  }, then:"power_ask"  },
-	{ id:"power_right", say:{ claro:"power_right"  }, then:"next"   },
-
-
-	{ id:"pulse",       say:{ claro:"pulse"  }, spin:{ domain:"math", answers:{ pulse:{win:true}, decay:{signal:"close"}  }}  },
-	{ id:"pulse_ask"  , say:{ claro:"pulse_ask"    }, respond: { right:"pulse_right", wrong:"pulse_wrong"  }  },
-	{ id:"pulse_wrong", say:{ claro:"pulse_wrong"  }, then:"pulse_ask"  },
-	{ id:"pulse_close", say:{ claro:"pulse_close"  }, then:"pulse_ask"  },
-	{ id:"pulse_right", say:{ claro:"pulse_right"  }, then:"next"   },
-
-
-	{ id:"wave",       say:{ claro:"wave"  }, spin:{ domain:"math", answers:{ wave:{win:true}}}  },
-	{ id:"wave_ask"  , say:{ claro:"wave_ask"    }, respond: { right:"wave_right", wrong:"wave_wrong"  }  },
-	{ id:"wave_wrong", say:{ claro:"wave_wrong"  }, then:"wave_ask"  },
-	{ id:"wave_close", say:{ claro:"wave_close"  }, then:"wave_ask"  },
-	{ id:"wave_right", say:{ claro:"wave_right"  }, then:"next"   },
-
-
-	{ id:"decay",       say:{ claro:"decay"  }, spin:{ domain:"math", answers:{ decay:{win:true}}}  },
-	{ id:"decay_ask"  , say:{ claro:"decay_ask"    }, respond: { right:"decay_right", wrong:"decay_wrong"  }  },
-	{ id:"decay_wrong", say:{ claro:"decay_wrong"  }, then:"decay_ask"  },
-	{ id:"decay_close", say:{ claro:"decay_close"  }, then:"decay_ask"  },
-	{ id:"decay_right", say:{ claro:"decay_right"  }, then:"next"   },
-
-
-	{ id:"prop",       say:{ claro:"prop"  }, spin:{ domain:"math", answers:{ prop:{win:true}}}  },
-	{ id:"prop_ask"  , say:{ claro:"prop_ask"    }, respond: { right:"prop_right", wrong:"prop_wrong"  }  },
-	{ id:"prop_wrong", say:{ claro:"prop_wrong"  }, then:"prop_ask"  },
-	{ id:"prop_close", say:{ claro:"prop_close"  }, then:"prop_ask"  },
-	{ id:"prop_right", say:{ claro:"prop_right"  }, then:"next"   },
-
-	{ id:"jumphere", say:{ claro:"scrub"  },   trace: true,  pic: {claro:"small"},  spin:{ domain:"xplo", answers:{ xp3:{win:true}}}       },
-
-	{ id:"",},
-
-	]
 var lastStep=0;
 
 function sequence(  i  ){
@@ -582,143 +504,12 @@ function sequence(  i  ){
       gsap.from( r, {immediacy:0, duration:1, ease: "linear"});
       map.on("mousemove", track);
       });
-    /*
-        map.addEventListener("mousemove", e=> r.move(e.clientX, e.clientY) );
-    map.addEventListener("mouseleave",e=> 
-        gsap.to(r, {x:map.width/2, y:map.height/2, duration: .5, ease: "elastic.out(1.1, 0.2 )"}));
-    map.addEventListener("mouseenter",e=> 
-        gsap.from( r, {immediacy:0, duration:1, ease: "linear"}));
-    */
-
-
-
-   const newPanel = ()=>{
-  
-    const dom = document.querySelector("#panel");
-    dom.innerHTML=`
-      <div id='msg' >text here </div>
-      <button>Next</button>
-      `;
-  
-  
-    return self= {
-      msg:      text=> dom.querySelector("div").innerText=text,
-      next:     func=> dom.querySelector("button").addEventListener( "click", func, {once:true}),
-      step:     s=> { self.msg(s.msg); self.next(s.next) },
-      toggle:   ()=> dom.style.display= (dom.style.display=='none')? 'block':'none',
-      }
-  }
-  
-
-
-
-
 
 
 
   
-  const step=[
-    {   
-      msg:`Overpressure Model and Decomposition:
+  const helptext= document.createElement("ul");
 
-      All formulae and graphs in this demo are utterly ~ FAKE.  
-      
-      and there is a bug so please referesh browser if demo freezes.)
-      `,
-//      This is a MADEUP Source of equation
-//          Modeling of the whole process of shock wave overpressure of free-field air explosion,
-//          Defence Technology,
-//          Zai-qing Xue, Shunping Li, Chun-liang Xin, Li-ping Shi, Hong-bin Wu,
-//          Volume 15, Issue 5,2019,
-//          (https://www.sciencedirect.com/science/article/pii/S2214914719300753)
-//      `, 
-        next: e=>{
-          scope.bounds();
-          scope.show();
-          p.step( step[1] );
-      } },
-      {   
-        msg:`We give the kids a 'scope that plots:
-               
-        y: pressure (MPa) 
-        x: distance (km)
-        t: time     (msec)
-
-        (all units are FAKE)
-                `, 
-        next: e=>{
-        //  math= newMath (  {  parent:document.body, x: 30, y:50} );
-          math.full();
-          tZero=Date.now();
-          scope.reset();
-          curve=curves[0];
-          plot = true; 
-          p.step( step[2] );
-      } },
-      {   
-        msg:`The result we are aiming for is a full model of the moving shockwave
-                `, 
-        next: e=>{
-          scope.reset();
-     //     math.power();
-          curve=curves[1];
-          p.step( step[3] );
-      } },
-      {   
-        msg:`For starts- the pressure is a function of explosive power - everywhere at once
-                `, 
-        next: e=>{
-          scope.reset();
-   ///       math.pulse();
-          curve=curves[2];
-          p.step( step[4] );
-      } },      {   
-        msg:`Then introduce a step function that shows the radius expanding at the speed of sound
-                `, 
-        next: e=>{
-          scope.reset();
-          math.wave();
-          curve=curves[3];
-          p.step( step[5] );
-      } },
-      {   
-        msg:`Then model the pressure as a wavetrain (cosine curve))
-                `, 
-        next: e=>{
-          scope.reset();
-          math.decay();
-          curve=curves[4];
-          p.step( step[6] );
-      } },
-      {   
-        msg:`Then add a term to model the wave's decay 
-                `, 
-        next: e=>{
-          scope.reset();
-          math.prop();
-          curve=curves[5];
-          p.step( step[7] );
-      } },
-      {   
-        msg:`Let's show (free-air) propagation in 3 dimensions: Peak pressure follows inverse cube of distance
-                `, 
-        next: e=>{
-          scope.reset();
-          math.full();
-          curve=curves[0];
-          p.step( step[8] );
-      } },
-      {   
-        msg:`Finally we put it all together
-                `, 
-        next: e=>{
-              location.reload();
-        } }
-   ]
-  
-  var demo=false;
-
-const helptext= document.createElement("ul");
 helptext.id= "help";
 helptext.innerHTML=`
     <li><b>M</b>:   map toggle                 </li>
@@ -738,30 +529,24 @@ helptext.innerHTML=`
 
 const action={      
 //   
-    KeyW:   e=>   map.visible=!map.visible,
-    KeyI:   e=>   map= newMap(),
-    KeyO:   e=>   r  = newReticle( retOptions ).move(map.width/2,map.height/2).show().listen(),
+
     Digit0: e=>   newMath("full" ).showExpression(),
     Digit1: e=>   newMath("power").showExpression(),
     Digit2: e=>   newMath("pulse").showExpression(),
     Digit3: e=>   newMath("wave" ).showExpression(),
     Digit4: e=>   newMath("decay").showExpression(),
     Digit5: e=>   newMath("prop" ).showExpression(),
-    KeyM:   e=> makeSpinner({ domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
-	KeyQ: e=>	newPic("crew").position(200,200),	
-	KeyN: e=>	newPic("crew").zoom(),	
-	KeyC: e=>	newPic("claro").rando(),	
-	KeyV: e=>	newVoice("claro", {caption:document.querySelector("#caption")} ).say( "pressure" ),	
-//    KeyE: e=>   eq.visible=!eq.visible, 
+	KeyA: e=>	sequence( 0 ),
+    KeyW:   e=> makeSpinner({ domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
+    KeyM:   e=> { map= map ?? newMap(); map.visible=!map.visible; },
+	KeyN:   e=>   map.visible=!map.visible,
+    KeyR:   e=> r  = newReticle( retOptions ).move(map.width/2,map.height/2).show().listen(),
     KeyG:       scope.show,
-    KeyP: e=>{  tZero=Date.now();     scope.reset();   plot=!plot; }, 
+    KeyP: 	e=>{  tZero=Date.now();     scope.reset();   plot=!plot; }, 
     KeyB:       scope.bounds, 
-    KeyT: trace, //e=>{  let h = scope.hitBox;    h.interactive=h.interactiveChildren=true;   h.on("mousemove", trackit); },
+    KeyT: 	trace,
     KeyS: e=>{  synch= (synch=="max")? false : "max";     scope.reset();     scope.show(); }, 
     KeyX: e=>{  synch= (synch=="min")? false : "min";     scope.reset();     scope.show(); }, 
-//	KeyC: e=>   curve = curves[++curvenumber % curves.length],
-	KeyR:       scope.reset,
-	KeyA: e=>	sequence( 0 ),
     help: e=>{  console.log(e.code);
 	            let body = document.querySelector("body");
                 body.requestFullscreen();
