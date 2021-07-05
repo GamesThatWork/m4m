@@ -112,12 +112,10 @@ export const newPic= (name, cfg) => {
 				return self;
 				}*/
 			}
-
 		dom[ name ] = document.createElement("div");
 		dom[ name ].id= name;
 		dom[ name ].classList.add("pic");
-//		dom[ name ].style.backgroundImage=	`url("${Array.isArray( url[ name ])? url[ name ][0] : url[ name ]}")`;
-		dom[ name ].style.backgroundImage=	`url("${typeof url[ name ]=="string"?url[ name ] : url[ name ][0]} )`;
+		dom[ name ].style.backgroundImage=	`url("${ typeof url[ name ]=="string"?url[ name ] : url[ name ][0] }" )`;
 		dom.root.appendChild( dom[ name ] )
 		return selfs[ name ]=self;
 	}
