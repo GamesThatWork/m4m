@@ -84,7 +84,7 @@ const spin = time=>{
 		document.exitPointerLock();
 		if(  elements[ trig ] ){
 			click( elements[ trig ]);
-			sfx.button.down.play();
+			sfx.button.down.play(); 
 			}
 		else sfx.button.disabled.down.play();
 		}
