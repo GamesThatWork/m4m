@@ -1,7 +1,7 @@
 
 const selfs={};
 var utterance;
-
+var caption;
 
 export const newVoice= (speaker, cfg={})=> {
 
@@ -10,7 +10,7 @@ export const newVoice= (speaker, cfg={})=> {
 		name:	 speaker,
 		script:	 script[ speaker ] || {},
 		audio:	 audio [ speaker ] || {},
-		caption: cfg.caption,
+		caption: cfg.caption || true,
 		jiggle:  null,
 
 		say:	 line=>{
@@ -69,10 +69,10 @@ claro:{
 		This is where the shockwave starts.`,
 	right:
 		`The right edge is 5 miles away from ground zero.
-		We care about all the area in between zero and five miles.`,
+		Let's study what happens between zero and five miles.`,
 	normal:
 		`The green line shows normal air pressure.
-		When the pressure is greater, it can break things.`,
+		When the pressure rises, it can break things.`,
 	glass:
 		`The yellow line shows where the pressure can break glass.`,
 	steel:
@@ -104,8 +104,8 @@ claro:{
 		`We need an expression with “t” for time, “d” for distance, 
 		and “s” for speed - for how fast the wave travels.`,
 	pulse_ask:   `Find "d" for distance, "t" for time and "s" for speed.`,
-	pulse_wrong: `No- - - look for a little "t" for time.`,
-	pulse_close: `Close, but you need the "s" for speed`,
+	pulse_wrong: `No... Make sure you see the "s" for speed.`,
+	pulse_close: `That's very close, but you really need the "s" for speed`,
 	pulse_right: `That’s it. "H" is like a switch, so it's all or nothing.
 				 Our model shows a wall of pressure moving at supersonic speed.
 				 But real pressure moves in waves, like ripples on a pond.`,
