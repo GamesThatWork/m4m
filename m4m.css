@@ -151,13 +151,14 @@ ul{
 .wave {    color: rgb(217, 255,   0);  stroke: #255;     font-size:52px;   }
 .decay{    color: rgb( 12, 170, 128);  stroke: #213;     font-size:100px;  }
 .prop {    color: rgb(  0, 132, 255);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
-.xp0,.xp1,.xp2,.xp3,.xp4{    color: rgb(  0, 132, 255);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
+.xp0,.xp1,.xp2,.xp3,.xp4,.xp5 {    color: rgb(  0, 132, 255);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
 
 .xp0{    color: rgb(23, 94, 50);} 
 .xp1{    color: rgb(48, 126, 78);} 
 .xp2{    color: rgb(70, 119, 89);} 
 .xp3{    color: rgb(96, 151, 117);} 
 .xp4{    color: rgb(152, 226, 180);} 
+.xp5{    color: rgb(218, 218, 218);} 
 
   .dull {  opacity:0.35; color:  rgb(66, 120, 202); border-color: rgb(14, 220, 93);   background-color: rgba(21, 73, 21, 0.686);}
 .undull {  opacity:0.85; 			  			  border-color: rgb(143, 196, 163); background-color: rgba(18, 73, 29, 0.734);}
