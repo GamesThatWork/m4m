@@ -1,37 +1,19 @@
+export const newMap = cfg => {
 
-export const newMap = cnfg => {
-
-	const dom ={
-		root:	document.createElement("div"),
-		parent: cnfg?.parent || document.querySelector("#map"), 
-		}
-	const svgFile= cnfg?.svgFile || "./assets/bigmap.svg"	
+	var g=false; 
 
     const self={
-      construct: ()=>{
-
-		fetch(  svgFile )
-		  .then(response => response.text())
-		  //.then(svg => document.body.insertAdjacentHTML("afterbegin", svg))
-		   //.then(  svg => console.log(dom.root.innerHTML=svg)  )
-		//.then(  svg => dom.root.innerHTML=svg )
-		.then(  svg => document.querySelector("#map").innerHTML = svg)
-		.catch( err => dom.root.innerHTML=err )
-		dom.parent.append( dom.root );
-
-		console.log(dom.root ); 
-	    return self;
-        },
-      show: ()=>{
-        return self;
-        },
-      immediacy:1,
-      move: (x,y)=>{ 
-        return self;
-        },
-      destruct: ()=>{ 
-        return self;
+		get g() { return g },
+		construct: ()=>{
+			g = new PIXI.Sprite.from( '/assets/map/eglinred.jpg');
+			cfg.parent.addChild( g )
+			return self;
+			},
+		hide: ()	=>{	g.visible=false;			return self;},
+		show: ()	=>{	g.visible=true; 			return self;},
+		move: (x,y)	=>{	g.position.set(x,y);		return self;},
+		size: (x,y)	=>{	g.width=x; g.height=y;		return self;},
+		destruct: ()=>g.destroy(),
         }
-      }
     return self.construct();
     }
