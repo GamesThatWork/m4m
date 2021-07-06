@@ -2,7 +2,7 @@
 
 body{
 	overflow: hidden;
-	background-color: black;
+	background-color: rgb(45, 22, 4);
 	margin:0;
 	padding:0;
 	color:white; 
@@ -14,8 +14,7 @@ body{
 	} 
 #container {  position: relative; overflow: hidden; }
 
-canvas,
-#panel,
+anvas,
 #map,#mapid,
 #math,#mathmenu,
 #grfx,#caption,
@@ -105,8 +104,8 @@ ul{
 	perspective-origin: center;  
 	perspective: 900px;
 	position:absolute;
-	left: 1330px;
-	top:  600px;
+	left: 535px;
+	top:  550px;
 
 	transform-style: preserve-3d;
     width:  345px;
