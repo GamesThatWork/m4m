@@ -1,29 +1,29 @@
-import  { newSignal  } from './signal.js'    ;
-const signal= newSignal();
+import  { signal  } from './signal.js'    ;
 
 export const newReticle = cnfg => {
     const r=cnfg; 
-    const blurFilter = new PIXI.filters.BlurFilter();
+	const root  = new PIXI.Graphics();
     const graphicLayers=[new PIXI.Graphics(), new PIXI.Graphics()];
     const lineWidth = [9,3];
-	r.min        = r.min        ?? {};
-	r.max        = r.max        ?? {};
-    r.min.color  = r.min.color  ?? 0xFF1100;
-    r.max.color  = r.max.color  ?? 0xDDAA00;
-    r.min.radius = r.min.radius ?? 50;
-    r.max.radius = r.max.radius ?? 50;
     const circle = [];
-
+    const blurFilter = new PIXI.filters.BlurFilter();
+console.log( signal );
 
     const self={
+      get g(   ) { return root; 						      },
       get x(   ) { return graphicLayers[0].position.x;        },
       get y(   ) { return graphicLayers[0].position.y;        },
       set x( v ) { graphicLayers.forEach(g => g.position.x=v) },
       set y( v ) { graphicLayers.forEach(g => g.position.y=v) },
   
       construct: ()=>{
-
-        graphicLayers.forEach( (g, layer) =>{
+		r.min        = r.min        ?? {};
+		r.max        = r.max        ?? {};
+		r.min.color  = r.min.color  ?? 0xFF1100;
+		r.max.color  = r.max.color  ?? 0xDDAA00;
+		r.min.radius = r.min.radius ?? 50;
+		r.max.radius = r.max.radius ?? 50;
+	    graphicLayers.forEach( (g, layer) =>{
           blurFilter.blur = 10;
           if( !layer ) g.filters = [blurFilter];    
           g.lineStyle( lineWidth[ layer ],  [0x00FF00,0x80FF80][layer], 1);
@@ -35,8 +35,11 @@ export const newReticle = cnfg => {
           g.lineTo( 2000, 0);
           g.moveTo(  -20, 0);
           g.lineTo(-2000, 0);
-      //    g.mask= mask;
+		  self.radius( 50 );
+		  root.addChild( g );
           }); 
+	  	r.parent.addChild( root );
+		self.show();
         return self;
         },
 		
@@ -44,17 +47,17 @@ export const newReticle = cnfg => {
 
 	  	radius: newRadius =>{
 			graphicLayers.forEach( (g, layer) =>{
- 				if( circle[layer] )	circle[ layer ].destroy();
-//					g.removeChild( )}
-				circle[layer]  = new PIXI.Graphics();
-				circle[layer].lineStyle(   lineWidth[ layer ], r.max.color, 1);
-				circle[layer].drawCircle( 0, 0, r.max.radius = newRadius  );
-				g.addChild( circle[layer] );
+ 				if( circle[ layer ] )	
+				 	circle[ layer ].destroy();
+				circle[ layer ] = new PIXI.Graphics()
+									.lineStyle(   lineWidth[ layer ], r.max.color, 1)
+									.drawCircle(  0, 0, r.max.radius = newRadius  );
+				g.addChild( circle[ layer ] );
 				});
 			return self;
 			},
 
-		listener: e=> self.radius( e.detail.km * 10 ) ,
+		listener: e=> self.radius( e.detail.km *100 ) ,
 		listen:  ()=> signal.bus.addEventListener(  "radius", self.listener ),
 		unlisten:()=> signal.bus.removeEventListener( "radius", self.listener ),
 
@@ -78,5 +81,5 @@ export const newReticle = cnfg => {
 			return self;
 			}
 		}
-		return self.construct();
+		return self.construct().show();
 		}

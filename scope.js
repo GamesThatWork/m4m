@@ -345,9 +345,9 @@ const minVal=-.001;
         },
       destruct: ()=>{ 
 	  	allLayers.forEach( g=>{
-    	    console.log( "Destroy Graphic Object:  ", g?.name);
+    	//    console.log( "Destroy Graphic Object:  ", g?.name);
 			if( g && g.parent ) g.parent.removeChild(g);
-			else console.log( "Found ORPHAN Graphic Object:  ", g?.name)
+		//	else console.log( "Found ORPHAN Graphic Object:  ", g?.name)
 			g.destroy( true ); 
 		 	} );
        parent.children.forEach( g => {
