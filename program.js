@@ -58,7 +58,9 @@ export const program=[
 	{ id:"prop_right", say:{ claro:"prop_right"  }, then:"next"   },
 
 	{ id:"jumphere", say:{ claro:"scrub"  }, pic: {claro:"small"},  trace: true,  pic: {claro:"small"}, 
-			icon:{ glass1:{img:"glass", x:1100, y:100, size:[50,50], show:true } }, spin:{ domain:"xplo", answers:{ xp3:{win:true}}}  },
+		//	map:{  range:{ show:true } }, 
+			icon:{ glass1:{img:"glass", x:1100, y:100, size:[50,50], show:true } }, 
+			spin:{ domain:"xplo", answers:{ xp3:{win:true}}}  },
 
 	{ id:"",},
 

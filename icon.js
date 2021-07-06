@@ -20,8 +20,8 @@ export const newIcon= (name, cfg) => {
     const self={
 		get g() { return g },
 		construct: ()=>{
-			g = new PIXI.Sprite.from( url.server + url[ cfg.img ]);
-//			g = new PIXI.Sprite();
+			let imgfile= cfg.img || name;
+			g = new PIXI.Sprite.from( url.server + url[ imgfile ]);
 			parent.addChild( g )
 			return self;
 			},

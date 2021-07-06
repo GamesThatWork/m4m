@@ -45,19 +45,20 @@ console.log( signal );
 		backgroundAlpha:0, 
 		width:1920, height:1080
 		});
-	document.body.appendChild(app.view);
+	//document.body.appendChild(app.view);
 	let layerMap   = new PIXI.Container();
 		layerMap  .position.set( 0,0);
 	let layerScope = new PIXI.Container();
-		layerScope.position.set( 320,420);
+//		layerScope.position.set( 320,420); centered
+		layerScope.position.set( 850,380 ); // on the right
 	layerMap  .zorder=0;
 	layerScope.zorder=0;
 	app.stage.addChild( layerMap   );
     app.stage.addChild( layerScope );
 
 
-    const map  = newMap (  {  parent:layerMap }).show().move(-10,-10);
-    const icon = newIcon ( "glass", {  parent:layerMap, img:"glass" }).show().size([44,44]).move([100,100]);
+    const map  = newMap (  "test"  ).show().move([ -10,-10]);
+    const icon = newIcon ( "glass", { parent:layerMap, img:"glass" }).show().move([1000,100]).size([50,50]);
     
 
     
@@ -389,6 +390,16 @@ const perform = {
 					Object.keys( instructions ).forEach( command =>{
 						console.log( "icon processor: 2. ", iconName, command, instructions[command] )
 						icon[ command ]( instructions[ command] );
+						});
+					}),
+	map: 	script=> 
+				Object.keys( script ).forEach( mapName => {
+					let instructions =   script[ mapName ];
+					let map     = newMap(  mapName, { parent:layerMap, ...instructions}  );
+					console.log( "map processor: 1. ", map, instructions );
+					Object.keys( instructions ).forEach( command =>{
+						console.log( "map processor: 2. ", mapName, command, instructions[command] )
+						map[ command ]( instructions[ command] );
 						});
 					}),
  	
