@@ -1,21 +1,21 @@
 
 
-import  { newSignal  } from './signal.js'    ;
+import  { newIcon    } from './icon.js'    ;
 import  { newMap     } from './map.js'    ;
 import  { newMath    } from './math.js'   ;
+import  { newPic     } from './pic.js';
+import  { program    } from './program.js';
+import  { newReticle } from './reticle.js';
+import  { signal     } from './signal.js'    ;
 import  { newSpinner } from './spinner.js';
 import  { newSFX	 } from './sfx.js';
 import  { newScope   } from './scope.js'  ;
-import  { newReticle } from './reticle.js';
 import  { newVoice   } from './voice.js';
-import  { newPic     } from './pic.js';
-import  { program    } from './program.js';
 
 var wavelength=25.5;
 
 window.onload= e=>{
 
-const signal= newSignal();
 console.log( signal );
 /**
  * @module main 
@@ -30,30 +30,36 @@ console.log( signal );
  * This is the central PIXI display and update object
  */
 
-const app = new PIXI.Application({
-	view: document.querySelector("canvas"), 
-	antialias: true, 
-	backgroundAlpha:0, 
-	width:1920, height:1080
-	});
-document.body.appendChild(app.view);
+
 
 
 /** 
+
 * * Visible version of the overpressure equation and its  parts rendered in MathML
 */
 //const math=  newMath ().destruct();
 
+	const app = new PIXI.Application({
+		view: document.querySelector("canvas"), 
+		antialias: true, 
+		backgroundAlpha:0, 
+		width:1920, height:1080
+		});
+	document.body.appendChild(app.view);
+	let layerMap   = new PIXI.Container();
+		layerMap  .position.set( 0,0);
+	let layerScope = new PIXI.Container();
+		layerScope.position.set( 320,420);
+	layerMap  .zorder=0;
+	layerScope.zorder=0;
+	app.stage.addChild( layerMap   );
+    app.stage.addChild( layerScope );
 
-let scopeScreen =new PIXI.Container();
-    scopeScreen.position.set( 320,420);
-    app.stage.addChild( scopeScreen )
-let map =new PIXI.Sprite.from( '/assets/overlayedmap.png');
-    map.visible=false;
-    map.position.set(1020,0);
-    app.stage.addChild( map )
+
+    const map  = newMap (  {  parent:layerMap }).show().move(-10,-10);
+    const icon = newIcon ( "glass", {  parent:layerMap, img:"glass" }).show().size([44,44]).move([100,100]);
     
-    
+
     
     //********************* test the oscilloscope *************
 
@@ -143,7 +149,7 @@ function rgb2Color( str ){
     var synch=false, extra=false;
     
     
-    const scope = newScope (  {  parent:scopeScreen, data: null,
+    const scope = newScope (  {  parent:layerScope, data: null,
                             x:{  min:0.1, max:500,   px:1000}, 
                             y:{  min:-.00081, max:.005,  px:500}, 
                               });
@@ -191,15 +197,21 @@ var tZero=0;
 		var km=0;
 		const kmScale   = 1/50;  // trackball movemant to km
 		const scopeScale= 500/8; // km to scope display units
+		const dbg=document.querySelector("#caption");
+		const bus=document.querySelector("#bus");
 		scope.reset();
-
+		console.log( signal );
+		
 		const self={
 			mouseMove: e=>{
 				if( Math.abs( e.movementX)< Math.abs( e.movementY)  )	return;
 				e.stopImmediatePropagation();
 				km += e.movementX * kmScale;
+				km = Math.max( 0.01, Math.min( km, 12));
+				//dbg.innerText= Math.floor(km*100)/100;
+				dbg.innerText= km - km%0.001;
 				scope.plot( areaBuffer( areaFunc,  km* scopeScale ) ); 
-				signal.bus.dispatchEvent( new CustomEvent( "radius", {detail:{ km} } ) );
+				signal.fire( "radius", {km} );
 				},
 	    	remove: e=>{ 
 				scope.reset();
@@ -329,7 +341,7 @@ var tZero=0;
 
 
 
-const grfx={ root:document.querySelector("#grfx"), url:"/assets/" };
+
 
 const listeners=[];
 
@@ -368,8 +380,18 @@ const perform = {
 	
 	
 	
-	pic: 	script=> Object.keys( script ).forEach( speaker=> newPic( speaker )[ script[speaker] ]() ),
-	
+	pic: 	script=> Object.keys( script ).forEach( pic => newPic(  pic  )[ script[ pic  ] ]() ),
+	icon: 	script=> 
+				Object.keys( script ).forEach( iconName => {
+					let instructions =   script[ iconName ];
+					let icon     = newIcon(  iconName, { parent:layerMap, ...instructions}  );
+					console.log( "icon processor: 1. ", icon, instructions );
+					Object.keys( instructions ).forEach( command =>{
+						console.log( "icon processor: 2. ", iconName, command, instructions[command] )
+						icon[ command ]( instructions[ command] );
+						});
+					}),
+ 	
 	scope: 	script=> Object.keys( script ).forEach( command=> scope[  command ]( script[command] ) ),
 
 	trace:  e=>{
@@ -378,36 +400,6 @@ const perform = {
 				areaFunc="full";
 				trace( true );
 				},
-
-
-	sprite: s=>{
-		let key =  s.name || "default";
-		if(!grfx.sprites ) 		 grfx.sprites=[];
-
-		if( s.filename ){	
-			if( grfx.sprites[ key ]) grfx.sprites[key].remove();
-			grfx.sprites[ key ]= document.createElement("img");
-			grfx.sprites[ key ].id = key;
-			grfx.sprites[ key ].setAttribute("src", grfx.url + s.filename);
-			grfx.sprites[ key ].style.position= "absolute";
-			grfx.sprites[ key ].style.top     = 0;
-			grfx.sprites[ key ].style.left    = 0;
-			grfx.root.append( grfx.sprites[ key ] );
-			}	
-		let xfrm = ( s.move? `translate3D( ${s.move[0]}px, ${s.move[1]}px, ${s.move[2]||0}px )` : "" )
-				+  ( s.turn? `     rotate( ${s.turn}turn )`                                   : "" )
-				+  ( s.size? `      scale( ${s.size} )`                                       : "" );
-		if( xfrm   ) grfx.sprites[ key ].style.transform= xfrm;
-		if( s.time ) grfx.sprites[ key ].style.transition= `transform ${c.time}s` 
-		}, 
-	camera: c=>{
-		if( c.move || c.turn || c.size )
-			grfx.root.style.transform=
-			   ( c.move? `translate3D( ${-c.move[0]}px, ${-c.move[1]}px, ${-c.move[2]||0}px )` : "" )
-			+  ( c.turn? `   rotate(   ${-c.turn}turn )`                                       : "" )
-			+  ( c.size? `    scale(   ${-c.size} )`                                           : "" );
-		if( c.time ) grfx.root.style.transition= `transform ${c.time}s` 
-		},
 
 	spin: cfg =>{
 	console.log( "spin", cfg)
@@ -466,11 +458,11 @@ function sequence(  i  ){
 
   
     //********************* test the reticle ********************
-    map.interactive=true;
+ //  if( map ) map.interactive=true;
     
     
     
-    const retOptions = {  parent:map, 
+    const retOptions = {  parent:layerMap, 
                    min:{radius:50,heat:1}, 
                    max:{radius:70,heat:1}
                     }
@@ -479,8 +471,9 @@ function sequence(  i  ){
 						.move( 960, 540)
 						.show()
 						.listen();*/
-        var r = newReticle( retOptions ).move(map.width/2,map.height/2)
+        var r = newReticle( retOptions ).move( 500, 300 ).show().listen();
 
+console.log("reticle", r);
     function track(e){
       let p = e.data.getLocalPosition( map );
       r.move( p.x, p.y);
@@ -494,17 +487,17 @@ function sequence(  i  ){
         r = newReticle(retOptions).move(map.width/2,map.height/2)
                                  .show();
       }
-      
+      /*
         
-    map.on("mouseout", e=>{
+    map.g.on("mouseout", e=>{
       gsap.to(   r, {x:map.width/2, y:map.height/2, duration: .5, ease: "elastic.out(1.1, 0.2 )"} );
-      map.off("mousemove", track);
+      map.g.off("mousemove", track);
       });
-    map.on("mouseover", e=> {
+    map.g.on("mouseover", e=> {
       gsap.from( r, {immediacy:0, duration:1, ease: "linear"});
-      map.on("mousemove", track);
+      map.g.on("mousemove", track);
       });
-
+*/
 
 
   
@@ -538,8 +531,7 @@ const action={
     Digit5: e=>   newMath("prop" ).showExpression(),
 	KeyA: e=>	sequence( 0 ),
     KeyW:   e=> makeSpinner({ domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
-    KeyM:   e=> { map= map ?? newMap(); map.visible=!map.visible; },
-	KeyN:   e=>   map.visible=!map.visible,
+    KeyM:   e=> map.g.visible=!map.g.visible,
     KeyR:   e=> r  = newReticle( retOptions ).move(map.width/2,map.height/2).show().listen(),
     KeyG:       scope.show,
     KeyP: 	e=>{  tZero=Date.now();     scope.reset();   plot=!plot; }, 
