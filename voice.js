@@ -1,3 +1,4 @@
+import  { signal  } from './signal.js'    ;
 
 const selfs={};
 var utterance;
@@ -20,12 +21,12 @@ export const newVoice= (speaker, cfg={})=> {
 			},
 		speak:	words=>{
 			speechSynthesis.cancel( );
-			self.jiggle= setInterval( e=>speechSynthesis.resume(), 500 );
+//			self.jiggle= setInterval( e=>speechSynthesis.resume(), 500 );
 			console.log( "  < speak >  ", words);
 			let utterance = new SpeechSynthesisUtterance(words);
 			utterance.onend= e=> {
-				clearInterval( self.jiggle );
-				document.querySelector("#bus").dispatchEvent( new Event("end") )
+//				clearInterval( self.jiggle );
+				signal.fire("end");
 				};
 			speechSynthesis.speak(  utterance );
 			}	
@@ -142,12 +143,39 @@ claro:{
 				We can use it to predict the power of any munition.
 				We can see its effect at any distance.`,
 
+	omega:
+		`Let's experiment with different values of omega. 
+		Remember: Omega represents the amount of explosives.
+		This new wheel has six different omega values.
+		Spin the wheel. Press the button when done.`,
+	
 	scrub:
-		`Now - roll left and right.
-		Move the shockwave in slow motion
-		and see the pressure at any distance.`,
-	scrub_wrong: `Roll the ball slowly left and right.`,
-	scrub_right: `Good work`,
+		`Here is a new trick: 
+		Roll the ball slowly left and right.
+		Move in slow motion to see the pressure at any distance.
+		Press the button when you are done.`,
+	
+	mapped:
+		`Let's see how this looks on a map.
+		You can see the distance on the instrument 
+		and the same distance on the map, as a circle around the munition.
+		When you are ready for a challenge, press the button.`,
+	
+	q1: 
+		`We put a steel structure on the map.
+		Find the smallest omega that will damage the strcutiue,,`,
+	q1_ask:   	`Spin the wheel, and roll it. Press the buttton when you have the answer.`,
+	q1_high:	`No, that omega is too high. You'll cewate unnecessary damage. Try a lighter touch.`,
+	q1_low: 	`Sorry - that omega is two That's very close, but you really need the "s" for speed`,
+	q1_right: `That’s it. "H" is like a switch, so it's all or nothing.
+				 Our model shows a wall of pressure moving at supersonic speed.
+				 But real pressure moves in waves, like ripples on a pond.`,
+
+
+
+
+
+
 
 	mission:
 		`Your munition model is ready... just in time.
@@ -170,6 +198,10 @@ claro:{
 		`You did very well.
 		Thank you so much for your help with math and science.
 		`},
+
+
+
+
 		
 romeo:	{
 	intro: 
