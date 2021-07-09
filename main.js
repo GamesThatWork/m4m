@@ -10,13 +10,12 @@ import  { signal     } from './signal.js'    ;
 import  { newSpinner } from './spinner.js';
 import  { newSFX	 } from './sfx.js';
 import  { newScope   } from './scope.js'  ;
-import  { newVoice   } from './voice.js';
+import  { newVoice, Voice   } from './voice.js';
 
 var wavelength=25.5;
 
 window.onload= e=>{
-
-console.log( signal );
+ 
 /**
  * @module main 
  * @exports nothng - this runs directly under index.html
@@ -29,10 +28,7 @@ console.log( signal );
 /**
  * This is the central PIXI display and update object
  */
-
-
-
-
+ 
 /** 
 
 * * Visible version of the overpressure equation and its  parts rendered in MathML
@@ -57,8 +53,8 @@ console.log( signal );
     app.stage.addChild( layerScope );
 
 
-    const map  = newMap (  "test"  ).show().move([ -10,-10]);
-    const icon = newIcon ( "glass", { parent:layerMap, img:"glass" }).show().move([1000,100]).size([50,50]);
+    const map  = newMap (  "desktop"  ).show().move([ -10,-10]);
+    const icon = newIcon ( "glass", { parent:layerMap, img:"glass" }).show().move([1000,100]).size([50,50]).hide();
     
 
     
@@ -86,7 +82,7 @@ console.log( signal );
 		}
 	const boost=1.3;
 	const areaFunction={
-		none:  (x,n)=>  0,
+		none:  (x,n)=>  -.0007,
 		start:  (x,n)=> .0025,
 		power: (x,n)=>  n>350? 0 : .005,                                                                                      // power constant - everywhere all at once
 		pulse: (x,n)=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
@@ -161,13 +157,11 @@ function rgb2Color( str ){
 	const plotArea = name=> {
 		scope.simulating(  true );
 		areaFunc=name;
-		console.log( "plotArea: "+name, areaFunction[ name ]  );
 		}
 	const plotLine = name=>{ 
 		scope.simulating( false );
 	 	scope.setLineColor( rgb2Color( getStyleSheetPropertyValue( `.${name}`, "color" )));
 		scope.line( lineBuffer( name,  1 ) );
-//		console.log( "plotLine: "+name, lineFunction[ name ]  );
 		};
 
 var tZero=0;
@@ -198,10 +192,9 @@ var tZero=0;
 		var km=0;
 		const kmScale   = 1/50;  // trackball movemant to km
 		const scopeScale= 500/8; // km to scope display units
-		const dbg=document.querySelector("#caption");
+		const dbg=document.querySelector("#help");
 		const bus=document.querySelector("#bus");
 		scope.reset();
-		console.log( signal );
 		
 		const self={
 			mouseMove: e=>{
@@ -210,7 +203,7 @@ var tZero=0;
 				km += e.movementX * kmScale;
 				km = Math.max( 0.01, Math.min( km, 12));
 				//dbg.innerText= Math.floor(km*100)/100;
-				dbg.innerText= km - km%0.001;
+				//dbg.innerText= km - km%0.001;
 				scope.plot( areaBuffer( areaFunc,  km* scopeScale ) ); 
 				signal.fire( "radius", {km} );
 				},
@@ -233,7 +226,7 @@ var tZero=0;
 
 	const speak=  words=> {
 		speechSynthesis.speak( new SpeechSynthesisUtterance(words));
-		console.log(words);
+//		console.log(words);
 		};
 
 /*
@@ -250,20 +243,24 @@ var tZero=0;
 
 	const makeSpinner = cfg=> {
 
+
+
 		const domain  = cfg.domain  || "math";
-		const answers = cfg.answers || {error: "answers not supplied"};//--fix
-	
+		const answers = cfg.answers || {}; 
+
+
 		const allFacets={
-						math:  ["start","power","pulse","wave","decay","prop"],
-						xplo:  ["xp0",    "xp1",  "xp2", "xp3",  "xp4", "xp5"]
-						};
+				math:  ["start","power","pulse","wave","decay","prop"],
+				xplo:  ["xp0",    "xp1",  "xp2", "xp3",  "xp4", "xp5"]
+				};
 		const facetNames=allFacets[ domain ];
 
 		const tracing= domain=="xplo";
 
-		console.log( cfg, facetNames, answers );
+//		console.log( cfg, facetNames, answers );
 
-		facetNames.forEach( f => answers[f] = answers[f] || {}   );
+		answers.default = answers.default || "response";
+		facetNames.forEach( f => answers[f] = answers[f] || answers.default  );
 
 
 			
@@ -279,7 +276,7 @@ var tZero=0;
 		const frame    = document.createElement("div");
 		frame.id   = "spinnerwindow";
 		frame.classList.add( new Date().toLocaleTimeString().replace(' ',''));
-		document.querySelector("#container").append ( frame );
+		document.querySelector("#math").append ( frame );
 		const root   = document.createElement("div");
 		root.id    = "spinner";
 		frame.append ( root );
@@ -315,23 +312,24 @@ var tZero=0;
 		const click =	target=> {  
 			let name = target.dataset.name;
 			if( tracing )	return;
-			if( name==="start")	{  
+		/*	if( name==="start")	{  
 				plot=!plot;
 				document.querySelector( ".play" ).setAttribute( "visibility",  plot? "hidden":"visible" );
 				document.querySelector( ".pause").setAttribute( "visibility", !plot? "hidden":"visible" );
 				//target.innerText= plot?"⏸︎":"⏵︎";
 				}
-			else if( answers[ name ].win ){
+			else */if( answers[ name ]=="right" ){
 				plotLine("none");
-				plotArea( name );  
+				plotArea( name );
+				plot=true;
+				tZero= Date.now();
+				scope.replot();  
 				maths[ name ].showEquation(); 
 				}
-			let score  = answers[ name ].win ? "right":"wrong";
-			target.classList.add( score );
 
-			console.log("debug:: ima dispatch an event",      answers[ name ].signal ?? score  );
-			signal.bus.dispatchEvent( new Event(              answers[ name ].signal ?? score ));
-			console.log("debug:: i just dispatched an event", answers[ name ].signal ?? score  );
+			target.classList.add( answers[ name ]);
+//			console.log( name +" => "+ answers[ name ] );
+			signal.fire(  answers[ name ] );
 			};
 		
 		oldSpinner = newSpinner( root, { hover, unhover, click, mousepad:document.body }  );
@@ -341,42 +339,42 @@ var tZero=0;
 
 
 
-
-
+var dbgid;
+const mouseresponse	= e=> {	signal.fire( "response");	console.log( "user responds to: ", dbgid );		};
 
 const listeners=[];
 
 const perform = {
-	end: ()=> signal.bus.dispatchEvent( new Event("end")), //mostly internal use
-	wait: seconds=> setTimeout( perform.end, seconds*1000 ),
+	end: ()=> signal.fire( "end" ), //mostly internal use
+	wait: seconds=> setTimeout( e=>signal.fire("response"), seconds*1000 ),
+	
+	/// deprecated function
 	speak: words=> {
 		speechSynthesis.cancel( );
 		console.log( "  < speak >  ", words);
 		let u= new SpeechSynthesisUtterance(words);
-		u.onend= perform.end;
+		u.onend= signal.fire( "spoken" ), 
 		speechSynthesis.speak(  u );
 		},
 	
 	voice: script=>	
 		Object.keys( script ).forEach( speaker=>
-			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
-			),
+			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )),
 	
-	say: 	script=>	
-				Object.keys( script ).forEach( speaker=>{
-					let pic = newPic( speaker );
-					console.log( "say starts ", speaker );
-					pic.rando();
-					newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
-					signal.bus.addEventListener("end", e=>	{
-						console.log( "say ends ", speaker );
-						pic.pause();
-						document.body.addEventListener( "mousemove", e=> {
-							console.log( "user says more ", speaker );
-							signal.bus.dispatchEvent( new Event("complete") );
-							}, {once:true} );
-						}, {once:true} );
-					}),
+	dialog: script=>	
+		Object.keys( script ).forEach( speaker=>{
+			dbgid = speaker  +": "+ script[speaker].substring(0,12);
+
+			let pic = newPic( speaker );
+			pic.rando();
+			console.log( "say: ", dbgid );
+			signal.on( "spoken", e=>	{
+				console.log( "spoken: ", dbgid );
+				pic.pause();
+				document.body.addEventListener( "mousemove", mouseresponse, {once:true} );
+				}, {once:true} );
+			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
+			}),
 	
 	
 	
@@ -386,9 +384,9 @@ const perform = {
 				Object.keys( script ).forEach( iconName => {
 					let instructions =   script[ iconName ];
 					let icon     = newIcon(  iconName, { parent:layerMap, ...instructions}  );
-					console.log( "icon processor: 1. ", icon, instructions );
+				//	console.log( "icon processor: 1. ", icon, instructions );
 					Object.keys( instructions ).forEach( command =>{
-						console.log( "icon processor: 2. ", iconName, command, instructions[command] )
+				//		console.log( "icon processor: 2. ", iconName, command, instructions[command] )
 						icon[ command ]( instructions[ command] );
 						});
 					}),
@@ -396,9 +394,9 @@ const perform = {
 				Object.keys( script ).forEach( mapName => {
 					let instructions =   script[ mapName ];
 					let map     = newMap(  mapName, { parent:layerMap, ...instructions}  );
-					console.log( "map processor: 1. ", map, instructions );
+				//	console.log( "map processor: 1. ", map, instructions );
 					Object.keys( instructions ).forEach( command =>{
-						console.log( "map processor: 2. ", mapName, command, instructions[command] )
+				//		console.log( "map processor: 2. ", mapName, command, instructions[command] )
 						map[ command ]( instructions[ command] );
 						});
 					}),
@@ -412,32 +410,51 @@ const perform = {
 				trace( true );
 				},
 
-	spin: cfg =>{
-	console.log( "spin", cfg)
-			makeSpinner( cfg )	},
+	spin:    makeSpinner,
 
+
+	spinchoice: name=>	perform.respond( { 
+					right   :name+"_right", 
+					close   :name+"_close", 
+					wrong   :name+"_wrong", 
+					response:name+"_ask" }),
+
+
+	then: 		next =>	perform.respond( {response:next} ),
 
 
 	respond: events=>{   // events is a map of event names and step numbers
-		console.log( "  < respond >  ", events);
-		console.log( "  < listeners >  ", listeners);
+
+
+        let currentevents = Object.keys( events ).map( k=> `${k}:"${events[k]}"`).join();
+		console.log( "entering  <perform.respond> with --> ", currentevents);
+		//console.log( "  < listeners >  ", listeners);
+		
+		// clear all existing listeners
+		document.body.removeEventListener( "mousemove", mouseresponse );
 		while( listeners.length){
 			let o= listeners.pop();
-			signal.bus.removeEventListener( o.event, o.handler );
+			signal.off( o.event, o.handler );
 			}
-		Object.keys( events ).forEach( k=> {
-			let o={ event:k };
-			o.handler= (nextStep=>{
-				console.log("composing response ", nextStep );
-				return	e=>{
-					sequence(nextStep);
-					console.log("responding ", nextStep, e );
-					}
-				})( events[k] );
-			listeners.push(o);
-			signal.bus.addEventListener( o.event, o.handler );
-			});
-		console.log( "  < listeners >  ", listeners);
+		signal.clear();
+		
+		// wait until current speech is completed before building response system
+
+		signal.once("spoken", e=>
+			Object.keys( events ).forEach( event=> {
+				let listener={ event };
+				listener.handler= (nextStep=>{
+					console.log("composing response Handler for -> ", nextStep );
+					return	e=>{
+						sequence(nextStep);
+						console.log("Handler listened to ["+ e.type +"] and responding with -> ", nextStep );
+						}
+					})( events[ event ] );
+				listeners.push( listener );
+				signal.once( listener.event, listener.handler );
+				}));
+		console.log( ( Voice.speaking? " -Deferred ":" - Immediate ") + "construction of <response> Handler for --> "+currentevents)
+		if( !Voice.speaking )	signal.fire("spoken "); // selfmotivate if appropriate
 		}
 	}
 
@@ -446,22 +463,29 @@ const perform = {
 var lastStep=0;
 
 function sequence(  i  ){
-	console.log(`<SEQUENCE idStep=" ${i} ">`);
-	if( i==="next" ) i=lastStep+1;
-	else if (typeof i  === "string") i=  program.findIndex ( step=> step.id===i );
-	if( i>=program.length )	return;
+
+	let incoming=i;
+	console.log(`<SEQUENCE idStep  = "${i}" >`);
+	if( 			i === "next"    ) i = lastStep+1;
+	else if (typeof i === "string"  ) i = program.findIndex ( step=> step.id===i );
+	if(             i >=  program.length )	return;
+	console.log(`<SEQUENCE idStep==> "${i}" >`);
+
+	if( i<0 )	console.error(`Cannot find  ${incoming} among ${ program.map(o=>o.id ) }`)
+
 	lastStep=i;
 
 	let s= program[ i ];
 
-	if(  s.then    )	s.respond= { complete: s.then } 
-	if( !s.respond )	s.respond= { complete:"next"  } 
+//	if( s.then       )	s.respond= { response: s.then }
+//	if( s.spinchoice )	s.respond= { right:s.spinchoice +"_right", close:s.spinchoice+"_close", wrong:s.spinchoice+"_wrong", response:s.spinchoice+"_ask" };
+//	if(!s.respond	 )	s.respond= { response:"next"  } 
 
 	Object.keys( s ).forEach( k=> {
 		if (!perform[k])// &(typeof s[k] !== 'function') 
 			console.error( k+" is not a valid action. Not yet, anyway.")
 		else{
-			console.log( k, s[k]);
+			console.log("<sequencer> performs ", k, s[k]);
 			perform[ k ](s[k]);
 			}});
 	}
@@ -482,9 +506,7 @@ function sequence(  i  ){
 						.move( 960, 540)
 						.show()
 						.listen();*/
-        var r = newReticle( retOptions ).move( 500, 300 ).show().listen();
-
-console.log("reticle", r);
+    var r = newReticle( retOptions ).move( 500, 300 ).show().listen().hide();
     function track(e){
       let p = e.data.getLocalPosition( map );
       r.move( p.x, p.y);
@@ -540,9 +562,9 @@ const action={
     Digit3: e=>   newMath("wave" ).showExpression(),
     Digit4: e=>   newMath("decay").showExpression(),
     Digit5: e=>   newMath("prop" ).showExpression(),
-	KeyA: e=>	sequence( 0 ),
+	KeyA:   e=>	sequence( 0 ),
     KeyW:   e=> makeSpinner({ domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
-    KeyM:   e=> map.g.visible=!map.g.visible,
+    KeyM:       map.show(),
     KeyR:   e=> r  = newReticle( retOptions ).move(map.width/2,map.height/2).show().listen(),
     KeyG:       scope.show,
     KeyP: 	e=>{  tZero=Date.now();     scope.reset();   plot=!plot; }, 
