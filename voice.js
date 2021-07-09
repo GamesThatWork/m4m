@@ -2,12 +2,18 @@ import  { signal  } from './signal.js'    ;
 
 const selfs={};
 var utterance;
+const pitch={ claro:1.1, romeo:0.7 };
+const last= {};
+var available = true;
 
-export const newVoice= (speaker, cfg={})=> {
+export 	const Voice={ get speaking() { return !available }} 
+
+export 	const newVoice= (speaker, cfg={})=> {
 
 	if( selfs[ speaker ]	)	return selfs[ speaker ];
 	let self = 	{
 		name:	 speaker,
+		voice:   speechSynthesis.getVoices()[9],
 		script:	 script[ speaker ] || {},
 		audio:	 audio [ speaker ] || {},
 		caption: cfg.caption ?? document.querySelector("caption") ?? false,
@@ -18,17 +24,28 @@ export const newVoice= (speaker, cfg={})=> {
 			console.log( "VOICE SAYS: " + line );
 			if( 	 self?.audio[  line ] )	self.audio[line].play()
 			else if( self?.script[ line ] )	self.speak( self.script[ line ] );
+			else signal.fire("spoken");
+			return self;
 			},
 		speak:	words=>{
+
+			if( !available || ((last.words === words )&& ((Date.now()-last.time)<1000 )) )		return self;
+			last.words = words;
 			speechSynthesis.cancel( );
+			available=false;	
 //			self.jiggle= setInterval( e=>speechSynthesis.resume(), 500 );
 			console.log( "  < speak >  ", words);
 			let utterance = new SpeechSynthesisUtterance(words);
+//			utterance.voice = speechSynthesis.getVoices()[21*Math.random()],//self.voice;
+			utterance.pitch = pitch[ speaker ];
 			utterance.onend= e=> {
 //				clearInterval( self.jiggle );
-				signal.fire("end");
+				available= true;
+				last.time=Date.now();
+				signal.fire("spoken");
 				};
 			speechSynthesis.speak(  utterance );
+			return self;
 			}	
 		}
 	selfs[ speaker ] = self;
@@ -45,7 +62,7 @@ claro:{
 	welcome: 
 	`	Welcome.
 		We need help here at the Air Force Research Lab.
-		We are looking for brave, young people who are not afraid of using math and science.
+		We look for brave, young people who are not afraid to use math and science.
 		Maybe you could help us.`,
 	challenge:
 	`	Let’s see if you have what it takes to be a Lab scientist.
@@ -67,7 +84,7 @@ claro:{
 		This instrument shows air pressure across distance.
 		Munitions create a lot of pressure when they explode.`,
 	left:
-		`The left edge of the instrument showsston Ground Zero.
+		`The left edge of the instrument shows Ground Zero.
 		This is where the shockwave starts.`,
 	right:
 		`The right edge is 5 miles away from ground zero.
@@ -139,7 +156,7 @@ claro:{
 		`The cube root shows models spreading out in three dimensione.`,
 	prop_ask:  `Find the term for power expanding in three dimensions.`,
 	prop_wrong:  `Keep looking.`,
-	prop_right:  `Very good! You built a very useful shockwave model.
+	prop_right:  `Very good! You have built a very useful shockwave model.
 				We can use it to predict the power of any munition.
 				We can see its effect at any distance.`,
 
@@ -147,41 +164,51 @@ claro:{
 		`Let's experiment with different values of omega. 
 		Remember: Omega represents the amount of explosives.
 		This new wheel has six different omega values.
-		Spin the wheel. Press the button when done.`,
+		Spin the wheel, see the different values. Then press the button.`,
 	
 	scrub:
-		`Here is a new trick: 
-		Roll the ball slowly left and right.
-		Move in slow motion to see the pressure at any distance.
+		`Here is a new way to use the instrument: 
+		Roll the ball sideways. Left and right.
+		Roll it slow, to see the pressure at any distance.
 		Press the button when you are done.`,
 	
 	mapped:
-		`Let's see how this looks on a map.
+		`Let's now see how this looks on a map.
 		You can see the distance on the instrument 
 		and the same distance on the map, as a circle around the munition.
 		When you are ready for a challenge, press the button.`,
 	
 	q1: 
-		`We put a steel structure on the map.
-		Find the smallest omega that will damage the strcutiue,,`,
-	q1_ask:   	`Spin the wheel, and roll it. Press the buttton when you have the answer.`,
-	q1_high:	`No, that omega is too high. You'll cewate unnecessary damage. Try a lighter touch.`,
-	q1_low: 	`Sorry - that omega is two That's very close, but you really need the "s" for speed`,
-	q1_right: `That’s it. "H" is like a switch, so it's all or nothing.
-				 Our model shows a wall of pressure moving at supersonic speed.
-				 But real pressure moves in waves, like ripples on a pond.`,
+		`We put a stone wall on the map.
+		Find the smallest omega that will damage the structure.
+		Change omega by spinning up and down. 
+		Explore pressure and distance by rolling left and right.`,
+	q1_ask:   	`Spin the ball and roll it. Press the buttton when you have the answer.`,
+	q1_high:	`No, that omega is too high. You'll cause unnecessary damage. Try a lighter touch.`,
+	q1_low: 	`Sorry - that omega is too low. It won't knock down the wall at that distance.`,
+	q1_right: `That’s it. That's the smallest munition that will serve this purpose.
+			You did well.`,
 
 
-
-
-
+	q2: 
+		`We put a lot of glass windows on the map.
+		This time I want you to find the largest munition.
+		The largest munition that does not break any glass.`,
+	q2_ask:   	`Spin the ball and roll it. Press the buttton when you have the answer.`,
+	q2_high:	`No, that omega is too high. You're going to break windows like that.`,
+	q2_low: 	`Sorry - that is too small. Make it bigger, without breaking any glass.`,
+	q2_right: `That’s it. That's the largest munition for this situation.
+			You did well.`,
 
 
 	mission:
-		`Your munition model is ready... just in time.
+		`You are ready for a mission. And just in time.
 		We have an urgent call from our allies in the Rumini Conflict. 
 		They’re in trouble and need you to rescue them.`,
-		
+
+// ROMEO TALKS NOW
+
+
 	choose:
 		`Use your model find the right munition to break the steel bridge.
 		You must disable the bridge when the munition lands within twenty yards.
@@ -204,11 +231,17 @@ claro:{
 
 		
 romeo:	{
+	pronto: 
+		`Yeah. 
+		We need some help here.
+		Pronto !`,
+	
 	intro: 
 		`Hey, Doc!
 		We have a tough problem here. 
 		We need an engineer or scientist to figure it out.
 		Can you help?`,
+		
 		
 	context: 
 		`My team just ran an exfil raid in Red territory. 
