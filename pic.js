@@ -5,6 +5,10 @@
 	      img: "https://storage.googleapis.com/unscrew-u/",
 	  preview: "https://unscrewu.imgix.net/",
 		 crew: "./assets/blue/crew.jpg",
+		alert: [
+			"./assets/icon/alert.png",
+			"./assets/icon/inert.png",
+			],
 		romeo: [
 			"./assets/romeo/2.jpg",
 			"./assets/romeo/1.jpg",
@@ -26,7 +30,7 @@
 		};
 
 
-const cadence = {	claro: { mean: 1.5, dev:.25 },	romeo: { mean: 1, dev:.75 } };
+const cadence = {	claro: { mean: 1.5, dev:.25 },	romeo: { mean: 1, dev:.75 }, alert: { mean: 2, dev:0 }  };
 
 
 const selfs={};
