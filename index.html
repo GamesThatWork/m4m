@@ -1,27 +1,23 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Science to the Rescue</title>
-    <style> @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');</style>
-    <script src="pixi.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/PixiPlugin.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/mml-chtml.js" type="text/javascript" id="MathJax-script" async ></script>
-
-    <script  type="module"        src="main.js"></script>
-    <link     rel="stylesheet"   href="m4m.css"></link>
-  </head>
-  <body>
-</head>
-
-<body>
-  <div id="container">           <!--  All Graphic Layers              -->
-    <div    id="map">   </div>      <!--   Map                         -->
-    <div    id="canvas"><canvas></canvas></div> <!--  (Oscillo) Scope and Map      -->
-	<div    id="math"   ></div   >  <!--  Composed Math Equation       -->
-    <div    id="pix"    ></div   > 	<!--  Image pop-ups & overlays     -->
-    <div    id="caption"></div   >  <!--  text layer                   -->
-  </div>
-  <div id="bus"></div>           <!-- Nonvisible element for signaling -->
-  </body>
+	<head>
+		<title>Science to the Rescue</title>
+		<style> @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');</style>
+		<link   rel="stylesheet"   href="m4m.css"></link>
+		<script src="pixi.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/PixiPlugin.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/mml-chtml.js" type="text/javascript" id="MathJax-script" async ></script>
+		<script type="module"        src="main.js"></script>
+	</head>
+	<body>
+		<div id="container">                   <!--  All Graphic Layers                    -->
+			<div    id="map"    >                 </div><!--  Map                          -->
+			<div    id="canvas" ><canvas></canvas></div><!--  (Oscillo) Scope and Map      -->
+			<div    id="math"   >                 </div><!--  Composed Math Equation       -->
+			<div    id="pix"    >	              </div><!--  Image pop-ups & overlays     -->
+			<div    id="caption">	              </div><!--  text layer                   -->
+			<div 	id="bus"    >	              </div><!--  Nonvisible signaling element -->
+		</div>
+	</body>
 </html>

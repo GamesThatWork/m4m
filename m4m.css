@@ -14,26 +14,18 @@ body{
 	} 
 #container {  position: relative; overflow: hidden; }
 
-anvas,
-#map,#mapid,
-#math,#mathmenu,
-#grfx,#caption,
-#help		  { position: absolute;  }
+#map,canvas,#mapid,#math,#caption,#help		  { position: absolute;  }
 
 #map          {  z-index:  0;    top:  0px; left:   0px; width: 100vw; height: 100vh; }
 canvas        {  z-index:  1;    top:  0px; left:   0px; width: 100vw; height: 100vh; }
-#mapid        {  z-index:  2;    top:  0px; left:   0px; width: 100vw; height: 100vh; }
-#panel        {  z-index:  3;    top: 12px; left:  12px; width: 100vw; 
-				font-family: 'Lucida Sans', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-				font-size:    1.4vw;  padding: .5vw 2vw;  color:darkgoldenrod;    display:block; background-color: #222;     }
-#grfx         {  z-index:  4;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
 #pix          {  z-index:  5;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
-#mathmenu     {  z-index:  6;    top:  0px; left:   0px; width: 100vw; height: 100vh;  }
-#math         {  z-index:  6;    top:120px; left: 560px;  }
+#math         {  z-index:  5;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
+/*#math         {  z-index:  6;    top:120px; left: 560px;  }*/
 #caption      {  z-index:  7; bottom: 20px; left: 260px; width:1400px; padding: 12px; margin:4px; color:darkgoldenrod; font-family:'Share Tech Mono', sans-serif; font-size:32px;}
 #help         {  z-index:  8;    top:  40px; left:  40px;                              }
 button { background-color: rgb(170, 224, 19); margin: 20px;   }
 
+.map          {  position:absolute;  background-size:cover;  top:  0px; left:   0px; width: 100vw; height: 100vh; }
 
 
 
@@ -67,39 +59,6 @@ ul{
 #romeo {	width: 360px;	height: 405px;	left:3vw;	top: 3vw;	}
 #crew { border-top: 480px;  border-right: 270px;  border-bottom: 480px;  border-left: 270px; border-color: red;    }
 
-
-/* 
-.mathscene {
-  display: block;
-  border: 8px solid rgb(141, 255, 183);
-  position: relative;
-  width: 210px;
-  height: 140px;
-  margin: 200px auto;
-  perspective: 1000px;
-}
-
-
-
-.carousel__cell {
-  font-family: sans-serif;
-  text-align: center;
-  position: absolute;
-  width: 190px;
-  height: 120px;
-  left: 10px;
-  top: 10px;
-  border: 2px solid rgb(28, 11, 11);
-  line-height: 116px;
-  font-size: 80px;
-  font-weight: bold;
-  color: white;
-  text-align: center;
-     transition: color .4s;
-     user-select: none;
-	 background-color:rgb(116, 112, 112);
-}
-*/
 #spinnerwindow {
 	perspective-origin: center;  
 	perspective: 900px;
