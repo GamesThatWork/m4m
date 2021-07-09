@@ -1,8 +1,10 @@
 
 const url= { 	
-	server: "./assets/map/",
-	range :  "eglinred.jpg",
-	test  :  "bigmap.svg",
+	server  :  "./assets/map/",
+	range   :  "eglinred.jpg",
+	title   :  "title.png",
+	desktop :  "codex.png",         //"desktop(dark).jpg",
+	blur    :  "codeblur.png"       //"desktop(dark).jpg",
 	};
 const dom ={
 	parent: document.querySelector("#map"), 
@@ -23,14 +25,16 @@ export const newMap = (name,cfg={}) => {
 			dom[ name ].id= name;
 			dom[ name ].classList.add("map");
 			dom.parent.appendChild( dom[ name ] );
-			let imgfile= cfg.img || name;
-			if( url[ imgfile ].includes(".svg") )
-				fetch(   url.server + url[ imgfile ] )
+			let img    = cfg.img || name;
+			let imgurl = url[ img ] || img;
+			
+			if( imgurl.includes(".svg") )
+				fetch(   url.server + imgurl )
 					.then(response => response.text())
 					.then(  svg => dom[ name ].innerHTML = svg)
 					.catch( err => dom.root.innerHTML=err );
 			else	dom[ name ].style.backgroundImage=
-						`url("${ url.server + url[ imgfile ] }")`;
+						`url("${ url.server + imgurl }")`;
 			return selfs[ name ]=self;
 			},
 
