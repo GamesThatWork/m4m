@@ -1,3 +1,6 @@
+import  { sfx		 } from './sfx.js';
+
+
 export const newScope = cnfg => {
     const r=cnfg ; 
     const blurFilter = new PIXI.filters.BlurFilter();
@@ -48,7 +51,7 @@ export const newScope = cnfg => {
       x:{ n:17, color:0x448844,   width:1, label:"KILOMETERS",      scale:30}, 
       y:{ n:8,  color:0x888888,   width:1, label:"MPa",             scale:30},
 	  edges:{   color:0xBBBBBB,   width:5                                   },
-      hasBounds: false,
+      activeBounds: false,
       hasEquation: false
     } 
     
@@ -65,24 +68,17 @@ export const newScope = cnfg => {
       return t;
       }
 
-    const sound = {
-      dom: null,
+
+
+const sound = {
       playOnce: true,
-      construct: ()=> {
-        sound.api= new Audio("assets/sfx/exploslow.ogg");
-        sound.api.volume=.1;
-        },
       replay: ()=> sound.playOnce=true,
       play: ()=> {
-        if( sound.playOnce ){ 
-          if( !sound.api) sound.construct();
-//          console.log( "SOUND", sound);
-          sound.api.currentTime=0;
-          sound.api.play();
-          sound.playOnce=false;
-          }
-        }
+        	if( sound.playOnce )     sfx.explosion.slow.play();
+          	sound.playOnce=false;
+	        }
       }
+ 
 
 function rgbToHex(R,G,B) {return toHex(R)+toHex(G)+toHex(B)}
 function toHex(n) {
@@ -131,7 +127,6 @@ const minVal=-.001;
 		allLayers.forEach( (g,i)=>g.name=["grid", "markfx","mark","plotfx","plot","linefx","line","bounds"][i] );
         self.grid();
         if(data.buf) self.plot( data.buf );
-        sound.construct();
         return self;
         },
 
@@ -280,31 +275,34 @@ const minVal=-.001;
         overlay.blendMode= PIXI.BLEND_MODES.LIGHTEN;
         overlay.alpha=0;
         g.addChild( overlay );
-        if( grid.hasBounds   ) self.bounds(); 
+        self.bounds(); 
         if( grid.hasEquation ) self.equation(); 
 //console.log( g,gridLayer );
         return self;
         },
-      bounds: elements=>{
-        console.log( "PLOT: bounds", elements );
-		grid.hasBounds = !!elements;
+      
+	bounds: (elements=grid.activeBounds)=>{
+        console.log( "SCOPE: bounds", elements );
+
+		if( !elements || elements=="")	return;
+        elements=(typeof (elements=="string") && (elements!="*") )? String( elements ) : "glass stone left right hg760 steel";
+		grid.activeBounds = elements;
+
         let g= boundsLayer;
-       	g.children.forEach( c => {
-			 g.removeChild( c );
-			 c.destroy( true ); 
-			 });
-        elements=typeof elements=="string" ? String( elements ) : "glass stone left right hg760 steel";
+       	
+		g.children.forEach( c =>  c.destroy( true ) );
+
 		let edges = { left:0, right:1 };
 		Object.keys( edges ).forEach( edge =>{
 			if( !elements.includes( edge )) return;
 			textStyle.edges.layer=boundsLayer;
 			g.lineStyle(  grid.edges.width, grid.edges.color );
 			let x = [ pad.left, r.x.px-pad.right][edges[ edge ]]
-			
 			g.moveTo(   x,   pad.top           );
 			g.lineTo(   x,   r.y.px-pad.bottom );
 			txt(        x+6, r.y.px-17, "edges", [ "Ground Zero","5 Mile" ][edges[ edge ]] );
 			});
+
 		let threshhold = { hg760:0.86,  glass:0.72, steel:0.24, stone:0.12 };
 		Object.keys( threshhold ).forEach( material =>{
 			if( !elements.includes( material )) return;
@@ -315,10 +313,11 @@ const minVal=-.001;
 			g.lineTo(   r.x.px-pad.right, y);
 			txt( r.x.px-pad.left-10, y-17, material );
 			});
+
         return self;
         }, 
 
-      equation: ()=>{
+    equation: ()=>{ //deprecated
         grid.hasEquation = true;
         let texture = PIXI.Texture.from('/assets/equation.png');
         const eq = new PIXI.Sprite(texture);
@@ -331,7 +330,11 @@ const minVal=-.001;
         return self;
         },
       show: ()=>{
-        if( parent )	allLayers.forEach( (g,i) =>  parent.addChild(g) );
+        if( parent )	allLayers.forEach( g =>  parent.addChild(g) );
+		return self;
+        },
+      hide: ()=>{
+        if( parent )	allLayers.forEach( g=>  parent.removeChild(g) );
 		return self;
         },
       dragReport: cb=>{
