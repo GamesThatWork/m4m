@@ -1,53 +1,53 @@
+export {newSFX, sfx};
+
 const sfxcfg={
 	root:  			{ url: "./assets/sfx/" 					},
-	jog:  			{ url: "tok.wav", 			volume:0.1	},
-	click:			{ url: "click.wav",    		volume:0.2	},
-	clickoff:   	{ url: "clickoff.wav", 		volume:0.2	},
-	clicksoft: 		{ url: "clicksoft.wav",    	volume:0.4	},
-	clickoffsoft:   { url: "clickoffsoft.wav", 	volume:0.4	},
+	ok:  			{ url: "ok.wav", 			volume:0.25	},
+	jog:  			{ url: "tok.wav", 			volume:1.0	},
+	click:			{ url: "click.wav",    		volume:1.0  },
+	clickoff:   	{ url: "clickoff.wav", 		volume:1.0	},
+	clicksoft: 		{ url: "clicksoft.wav",    	volume:1.0	},
+	clickoffsoft:   { url: "clickoffsoft.wav", 	volume:1.0	},
+	exploslow:  	{ url: "exploslow.ogg", 	volume:0.15	},
 	}
 
-export const newSFX = sfx =>{
-/*	sfx = typeof sfx=="string" ? sfxcfg[ sfx ] : sfx;
-	const api=      new Audio(     sfxcfg.root.url    + sfx.url );
-	let   volume=   sfx.volume ||  sfxcfg.root.volume || 1;
-	let   playOnce=  true;
-	const self= {
-		replay: ()=>{ 
-			playOnce=true;
-			return self;
-			},
-	  	play: ()=> {
-			if( self.playOnce ) {
-				api.currentTime=0;
 
-				api.play();
-				playOnce=false;
-				}
-			return self;
-			}
-		}
-	console.log( api, playOnce, self)
-	
-	return self;
+const newSFX = sound =>{
 
-	}
-*/
-	
-	sfx = typeof sfx=="string" ? sfxcfg[ sfx ] : sfx;
+	sound = typeof sound=="string" ? sfxcfg[ sound ] : sound;
  
 	const self= {
-		api:      new Audio(     sfxcfg.root.url    + sfx.url ),
-		volume:   sfx.volume ||  sfxcfg.root.volume || 1, //does nothing
+		api:      new Audio(     sfxcfg.root.url    + sound.url ),
+		volume:   sound.volume ||  sfxcfg.root.volume || 1, //does nothing
 	  	playOnce: true,//does nothing
 
 		replay: ()=> self.playOnce=true,
 	  	play: ()=> {
 			if( !self.playOnce ) return; 
+			self.api.volume=self.volume;
 			self.api.currentTime=0;
 			self.api.play();
 			self.playOnce=true; //does nothing
 			}
 		}
 	return self;
-	}
+	};
+
+const sfx = {
+	ok:  newSFX("ok"),
+	jog: newSFX("jog"),
+	button:{
+		down: 	newSFX("click"),
+		up: 	newSFX("clickoff"),
+		disabled:{
+			down:	newSFX("clicksoft"),
+			up: 	newSFX("clickoffsoft")
+			}
+		},
+	explosion:{
+		slow:  	newSFX("exploslow")
+		},
+	current:{
+		up: 	newSFX("clickoff"),		
+		}
+	};
