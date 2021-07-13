@@ -14,14 +14,19 @@ body{
 	} 
 #container {  position: relative; overflow: hidden; }
 
-#map,canvas,#mapid,#math,#caption,#help		  { position: absolute;  }
+#map,canvas,#mapid,#math,#caption,#help,.fullscreen		  { position: absolute;  }
 
 #map          {  z-index:  0;    top:  0px; left:   0px; width: 100vw; height: 100vh; }
 canvas        {  z-index:  1;    top:  0px; left:   0px; width: 100vw; height: 100vh; }
 #pix          {  z-index:  5;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
 #math         {  z-index:  5;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: transform 2s; perspective: 800; transform-style: preserve-3d; }
 /*#math         {  z-index:  6;    top:120px; left: 560px;  }*/
-#caption      {  z-index:  7; bottom: 20px; left: 260px; width:1400px; padding: 12px; margin:4px; color:darkgoldenrod; font-family:'Share Tech Mono', sans-serif; font-size:32px;}
+
+
+.pic.fullscreen   {  z-index:  8;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: opacity 2s;  }
+#caption      {  z-index:  7;    top: 890px; left: 440px; width:1400px; padding:12px 20px; 
+color:darkgoldenrod; font-family:'Share Tech Mono', sans-serif; 
+font-size:32px;}
 #help         {  z-index:  8;    top:  40px; left:  40px;                              }
 button { background-color: rgb(170, 224, 19); margin: 20px;   }
 
@@ -50,18 +55,24 @@ ul{
     height: 540px;
 	left:0px;
 	top: 0px;
-	border: thick solid rgba(0, 141, 146, 0.72);
+	border: thick solid rgba(0, 146, 37, 0.981);
 	background-size: cover;
 	}
-#claro      {	width: 1000px;	height: 666px;	left:25vw;	  top: 9vw;	}
-#claro.small {	width:  420px;	height: 240px;	left:1440px;  top: 60px;	}
+#claro      {  width:1000px; height: 666px;	left: 500px; top: 180px;}
+#claro.small { width: 420px; height: 240px;	left:1425px; top:  90px;	}
+#romeo {	   width: 360px; height: 405x;	left:15px;   top: 511px;}
 
-#romeo {	width: 360px;	height: 405px;	left:3vw;	top: 3vw;	}
+
 #crew { border-top: 480px;  border-right: 270px;  border-bottom: 480px;  border-left: 270px; border-color: red;    }
+
+#equation {position:absolute;	left: 790px; top:182px; display: none;
+			background-color: rgba(4, 49, 13, 0.871); text-align: center;
+			box-shadow: 12px 12px 40px 7px black;
+			border: thin dotted rgba(233, 161, 5, 0.789); padding:12px 20px;}
 
 #spinnerwindow {
 	perspective-origin: center;  
-	perspective: 900px;
+	perspective: 1700px;
 	position:absolute;
 	left: 535px;
 	top:  550px;
@@ -82,23 +93,38 @@ ul{
     height: 100%;
 	transform-style: preserve-3d;
 	}
+button.spinfacet  {
+	width: 300px; height:150px;
+	border-radius: 30px; 
+	transform-style: preserve-3d; 
+	position: absolute;
+	transition: opacity .4s;
+	user-select: none;
+	border-width: 3px;
+	}
 
-
-
-
- button.spinfacet  { width: 300px; height:150px; border-radius: 30px; 
-					transform-style: preserve-3d; 
-					position: absolute;
-					transition: opacity .4s;
-					user-select: none;
-					border-width: 3px;
-					}
- button.spinfacet:hover:not(.right) {                                   border: 5px solid gold;}
- button.spinfacet.right { background-color: rgba(76, 151, 21, 0.398); border: 5px solid rgb(42, 148, 7);}
- button.spinfacet.wrong { background-color: rgba(73, 7, 7, 0.638);    border: 5px solid red; }
-
-
-
+button.spinfacet.right { 
+	background-color: rgba(76, 151, 21, 0.398); 
+	border: 5px solid rgb(42, 148, 7);}
+button.spinfacet.wrong { 
+	background-color: rgba(73, 7, 7, 0.638);
+	border: 5px solid red; }
+button.spinfacet.dull   {
+	opacity:0.55; 
+/*	color:  rgb(66, 120, 202); */
+	border: 5px solid rgb(24, 189, 87);  
+	background-color: rgba(4, 49, 13, 0.871); 
+/*	background-color: rgba(21, 73, 21, 0.686);*/}
+button.spinfacet.undull { 
+	opacity:0.80;
+	border:7px solid rgb(143, 196, 163); 
+	background-color: rgba(4, 49, 13, 0.871);
+	/*background-color: rgba(18, 73, 29, 0.734);*/  }
+button.spinfacet.back { 
+	opacity:0.30;
+	border-width:3px }
+ /*button.spinfacet:hover:not(.right) {     
+	border: 5px solid gold;}*/
 
 .start{    color: rgb(211, 255, 255);  stroke: #f5d8d8;  font-size:1px;    }
 .power{    color: rgb(26, 211, 9);     stroke: #15d11c;  font-size:200px;  }
@@ -115,11 +141,6 @@ ul{
 .xp4{    color: rgb(152, 226, 180);} 
 .xp5{    color: rgb(218, 218, 218);} 
 
-button.spinfacet.dull   { opacity:0.35; color:  rgb(66, 120, 202); border: 2px solid rgb(14, 220, 93);   background-color: rgba(21, 73, 21, 0.686);}
-button.spinfacet.undull { opacity:0.85; 			  			      border:7px solid rgb(143, 196, 163); background-color: rgba(18, 73, 29, 0.734);}
-
-
-
 .dull  mjx-container { filter:blur(3px) }
 .power mjx-container { top:-210px; }
 .pulse mjx-container { top:-55px; }
@@ -132,50 +153,6 @@ button.spinfacet.undull { opacity:0.85; 			  			      border:7px solid rgb(143, 
 .xp3  mjx-container,
 .xp4  mjx-container  { color: rgb(96, 237, 15);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
 
-
-
-
-/*
-button.power{    line-height: 80px ;}
-button.pulse{    color: inherit;  font-size:36px;      }
-button.wave {    color: rgb(217, 255,   0);  font-size:32px;      }
-button.decay{    color: rgb( 12, 170, 128);  font-size:64px;      }
-button.prop {    color: rgb(  0, 132, 255);  font-size:45px;      } 
-
-
-button.power{    color: inherit;      }
-button.pulse{    color: inherit;  font-size:36px;      }
-button.wave {    color: rgb(217, 255,   0);  font-size:32px;      }
-button.decay{    color: rgb( 12, 170, 128);  font-size:64px;      }
-button.prop {    color: rgb(  0, 132, 255);  font-size:45px;      } 
-
-
-
-
-.color.start{    color: rgb(255, 255, 200); }
-.color.power{    color: rgb(211,   9,   9); }
-.color.pulse{    color: rgb(255, 174,   0); }
-.color.wave {    color: rgb(217, 255,   0); }
-.color.decay{    color: rgb( 12, 170, 128); }
-.color.prop {    color: rgb(  0, 132, 255); } 
-.size.start {    font-size:90px;      }
-.size.power {    font-size:90px;      }
-.size.pulse {    font-size:36px;      }
-.size.wave  {    font-size:32px;      }
-.size.decay {    font-size:64px;      }
-.size.prop  {    font-size:45px;      } 
-
-button.power{    color: rgb(211,   9,   9);  font-size:90px;      }
-button.pulse{    color: rgb(255, 174,   0);  font-size:36px;      }
-button.wave {    color: rgb(217, 255,   0);  font-size:32px;      }
-button.decay{    color: rgb( 12, 170, 128);  font-size:64px;      }
-button.prop {    color: rgb(  0, 132, 255);  font-size:45px;      } 
-.power{    font-size:90px;      }
-.pulse{    font-size:36px;      }
-.wave {    font-size:32px;      }
-.decay{    font-size:64px;      }
-.prop {    font-size:45px;      } 
-*/
 .map0 {    fill: rgb(204,  44,  44);        }
 .map1 {    fill: rgb( 32,  13,  75);       stroke:white;   }
 .map2 {    fill: rgb( 75, 3, 3);         stroke:rgb(228, 0, 0);  }
