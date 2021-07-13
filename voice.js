@@ -62,7 +62,7 @@ claro:{
 	welcome: 
 	`	Welcome.
 		We need help here at the Air Force Research Lab.
-		We look for brave, young people who are not afraid to use math and science.
+		We look for brave young people who are not afraid to use math and science.
 		Maybe you could help us.`,
 	challenge:
 	`	Let’s see if you have what it takes to be a Lab scientist.
@@ -145,16 +145,18 @@ claro:{
 
 	decay: 
 		`We want math that models how waves decay.
-		We can call this the "D" function.`,
-	decay_ask:   `Use "D" to represent the wave Decay function.`,
-	decay_wrong: `Not that one, choose the big “D” for Decay.`,
+		We can call this the decay function.
+		We can use the symbol "d", "K"`,
+	decay_ask:   `Use "dK" to represent the wave Decay function.`,
+	decay_wrong: `Not that one, choose “dK” for Decay.`,
 	decay_right: `Bingo! Our model is looking great.
 		Our pressure wave expands outward - never changing shape.
 		But real waves lose power as they expand in three dimensions.`,
 
 	prop: 
-		`The cube root shows models spreading out in three dimensione.`,
-	prop_ask:  `Find the term for power expanding in three dimensions.`,
+		`The inverse cube - distance to the power of three - 
+		shows energy spreading out in three dimensione.`,
+	prop_ask:  `Find the term for expanding in three dimensions.`,
 	prop_wrong:  `Keep looking.`,
 	prop_right:  `Very good! You have built a very useful shockwave model.
 				We can use it to predict the power of any munition.
@@ -245,33 +247,43 @@ romeo:	{
 		
 	context: 
 		`My team just ran an exfil raid in Red territory. 
-		Perfect operation… but the Reds are chasing us now and they’re retty mad. 
+		Perfect operation… but the Reds are chasing us now and they’re pretty mad. 
 		There is an awful lot of them. It looks like they will attack our base.`,
 		
 	blue:
-		`You see us? We’re the blue square.
-		Find the blue square.
-		Put us in the crosshair.		`,
-	blue_wrong: `Find the blue square.`,
+		`You see us? We’re the blue guys.
+		Find the blue hummer.`,
+	blue_wrong: `No, the good guys are blue.`,
+	blue_close: `No, we're in a jeep.`,
 	blue_right: `There you go. You can see us.`,
 
 	red:
-		`Now can you see the Reds chasing us?
-		Put the Red symbol in the crosshair.`,
-	red_wrong:`Get the Red symbol.`,
+		`Now can you see the Reds right behind us?`,
+	red_wrong:`No, the Red jeep following us.`,
+	red_close:`The guys right on our tail.`,
 	red_right:`That’s it!`,
 
-	red2: 
-		`There are even more of these guys further back! See them?
-		Up further north - near the top of the map.`,
-	red2_wrong: `Look up near the top on the map.`,
-	red2_right: `Yeah, that’s them.`,
+	reds: 
+		`There's a lot more Reds behind them, and they brought big guns.
+		Looks like they have a plan. See them all?`,
+	reds_wrong: `No. Up north, coming down fast.`,
+	reds_close: `The other Reds.`,
+	reds_right: `Yeah, that’s them.`,
 
-	mission: 
-		`There are an awful lot of Reds and they brought their big guns.
-		They’re gonna attack Rumini and overrun our base. 
-		You can stop them. There are three bridges that cross the Josko River. 
-		Blow up the bridges and stop the Reds.`,
+	hq: 
+		`Today is a bad day for a visit by the Reds.
+		Our guys are busy in the West and we don't have much air support
+		Nobody is protecting our Base.
+		Do you see our Headquarters?`,
+	hq_wrong: `No. Up north, coming down fast.`,
+	hq_close: `The other Reds.`,
+	hq_right: `Yeah, that’s them.`,
+
+	threat:
+		`It looks like they plan to cross the river and attack our Base
+		But you can stop them. 
+		They can't cross the Josko if you take out the bridges.
+		`,
 
 	bridge1:
 		`But first -stop the guys who are chasing us. 
@@ -281,9 +293,8 @@ romeo:	{
 	bridge1_right: `Yeah, that’s the bridge.`,
 
 	bridge1a:
-		`Now you have to choose a munition. 
-		You only have four munitions to choose from, so pick carefully.
-		A small munition means less danger for us here on the ground, 
+		`Now you have to choose a munition. Pick carefully.
+		A small munition means less damage and less danger for us here on the ground, 
 		but it has to be big enough to destroy the bridge.
 		Just wait until we get across.`,
 	bridge1a_wrong: `Too late. You let the Reds get into Rumini territory.`,
