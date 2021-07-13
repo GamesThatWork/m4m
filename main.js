@@ -8,7 +8,7 @@ import  { program    } from './program.js';
 import  { newReticle } from './reticle.js';
 import  { signal     } from './signal.js'    ;
 import  { newSpinner } from './spinner.js';
-import  { newSFX	 } from './sfx.js';
+import  { sfx		 } from './sfx.js';
 import  { newScope   } from './scope.js'  ;
 import  { newVoice, Voice   } from './voice.js';
 
@@ -41,6 +41,10 @@ window.onload= e=>{
 		backgroundAlpha:0, 
 		width:1920, height:1080
 		});
+ 
+
+
+
 	//document.body.appendChild(app.view);
 	let layerMap   = new PIXI.Container();
 		layerMap  .position.set( 0,0);
@@ -53,9 +57,16 @@ window.onload= e=>{
     app.stage.addChild( layerScope );
 
 
+
+
+
+
+
+
     const map  = newMap (  "desktop"  ).show().move([ -10,-10]);
     const icon = newIcon ( "glass", { parent:layerMap, img:"glass" }).show().move([1000,100]).size([50,50]).hide();
-    
+
+
 
     
     //********************* test the oscilloscope *************
@@ -244,9 +255,19 @@ var tZero=0;
 	const makeSpinner = cfg=> {
 
 
+	
+		const oldFrame = document.querySelector("#spinnerwindow");
+		if( oldSpinner )	oldSpinner.remove();
+		if( oldFrame   )	oldFrame.remove();
+		oldSpinner = false;
 
-		const domain  = cfg.domain  || "math";
-		const answers = cfg.answers || {}; 
+
+		if( cfg===false )	return;
+
+
+
+		const domain  = cfg?.domain  || "math";
+		const answers = cfg?.answers || {}; 
 
 
 		const allFacets={
@@ -266,13 +287,7 @@ var tZero=0;
 			
 		const maths= {};//(domain=="math")? {} : null;
 		const buttons=[];
-		
-		const oldFrame = document.querySelector("#spinnerwindow");
-		if( oldSpinner )	oldSpinner.remove();
-		if( oldFrame   )	oldFrame.remove();
-
-
-
+	
 		const frame    = document.createElement("div");
 		frame.id   = "spinnerwindow";
 		frame.classList.add( new Date().toLocaleTimeString().replace(' ',''));
@@ -311,7 +326,8 @@ var tZero=0;
 			};
 		const click =	target=> {  
 			let name = target.dataset.name;
-			if( tracing )	return;
+			console.log( "click", name, answers );
+//			if( tracing )	return;
 		/*	if( name==="start")	{  
 				plot=!plot;
 				document.querySelector( ".play" ).setAttribute( "visibility",  plot? "hidden":"visible" );
@@ -324,6 +340,7 @@ var tZero=0;
 				plot=true;
 				tZero= Date.now();
 				scope.replot();  
+
 				maths[ name ].showEquation(); 
 				}
 
@@ -340,7 +357,12 @@ var tZero=0;
 
 
 var dbgid;
-const mouseresponse	= e=> {	signal.fire( "response");	console.log( "user responds to: ", dbgid );		};
+const mouseresponse	= e=> {
+	e.target.removeEventListener( "mousemove", mouseresponse);
+	setTimeout( e=>signal.fire( "response"), 300);
+	console.log( "user responds to: ", dbgid );		
+	sfx.ok.play(); 
+	};
 
 const listeners=[];
 
@@ -361,20 +383,32 @@ const perform = {
 		Object.keys( script ).forEach( speaker=>
 			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )),
 	
-	dialog: script=>	
+	monolog: script=>	
 		Object.keys( script ).forEach( speaker=>{
 			dbgid = speaker  +": "+ script[speaker].substring(0,12);
 
 			let pic = newPic( speaker );
 			pic.rando();
 			console.log( "say: ", dbgid );
-			signal.on( "spoken", e=>	{
-				console.log( "spoken: ", dbgid );
-				pic.pause();
-				document.body.addEventListener( "mousemove", mouseresponse, {once:true} );
-				}, {once:true} );
+			signal.on( "spoken", e=> setTimeout( e=>signal.fire( "response"), 250 ) ); 
 			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
 			}),
+	
+	
+	dialog: script=>	
+	Object.keys( script ).forEach( speaker=>{
+		dbgid = speaker  +": "+ script[speaker].substring(0,12);
+
+		let pic = newPic( speaker );
+		pic.rando();
+		console.log( "say: ", dbgid );
+		signal.on( "spoken", e=>	{
+			console.log( "spoken: ", dbgid );
+			pic.pause();
+			document.body.addEventListener( "mousemove", mouseresponse, {once:true} );
+			}, {once:true} );
+		newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
+		}),
 	
 	
 	
@@ -401,17 +435,20 @@ const perform = {
 						});
 					}),
  	
-	scope: 	script=> Object.keys( script ).forEach( command=> scope[  command ]( script[command] ) ),
+	scope: 		script=> Object.keys( script ).forEach( command=> scope[    command ]( script[command] ) ),
+	reticle: 	script=> Object.keys( script ).forEach( command=> reticle[  command ]( script[command] ) ),
 
-	trace:  e=>{
+
+	trace:  yes=>{
 				scope.reset();
 				plot=false;
 				areaFunc="full";
-				trace( true );
+				trace( yes  );
 				},
 
-	spin:    makeSpinner,
+	plot:  yes=>plot=yes,
 
+	spin:  makeSpinner,
 
 	spinchoice: name=>	perform.respond( { 
 					right   :name+"_right", 
@@ -422,12 +459,29 @@ const perform = {
 
 	then: 		next =>	perform.respond( {response:next} ),
 
+	goto: 		next =>	perform.respond( {continue:next} ),
 
 	respond: events=>{   // events is a map of event names and step numbers
 
+		if( events.continue )	return sequence( events.continue ); // shortcircuit response system
 
-        let currentevents = Object.keys( events ).map( k=> `${k}:"${events[k]}"`).join();
-		console.log( "entering  <perform.respond> with --> ", currentevents);
+		if( events.spinRightWrong )	events= { 
+					right   :events.spinRightWrong+"_right", 
+					close   :events.spinRightWrong+"_close", 
+					wrong   :events.spinRightWrong+"_wrong", 
+					response:events.spinRightWrong+"_ask" }
+
+		if( events.spinHighLow )	events= { 
+					right   :events.spinHighLow+"_right", 
+					high    :events.spinHighLow+"_high", 
+					close   :events.spinHighLow+"_close", 
+					low     :events.spinHighLow+"_low", 
+					response:events.spinHighLow+"_ask" }
+		
+		
+
+        let currentevents = Object.keys( events ).map( k=> `  ${k} -> "${events[k]} "`).join(" | ");
+		console.log( "entering  <perform.respond> to compose:  ", currentevents);
 		//console.log( "  < listeners >  ", listeners);
 		
 		// clear all existing listeners
@@ -440,21 +494,25 @@ const perform = {
 		
 		// wait until current speech is completed before building response system
 
-		signal.once("spoken", e=>
+		let composeResponses=  e=>
 			Object.keys( events ).forEach( event=> {
 				let listener={ event };
-				listener.handler= (nextStep=>{
-					console.log("composing response Handler for -> ", nextStep );
+				listener.handler= ((nextStep,event)=>{
+					console.log(`composing response Handler:  ${event} -> ${nextStep}` );
 					return	e=>{
+						console.log(`Handler listened to [${e.type}] and responding with  ${event} -> ${nextStep}` );
 						sequence(nextStep);
-						console.log("Handler listened to ["+ e.type +"] and responding with -> ", nextStep );
 						}
-					})( events[ event ] );
+					})( events[ event ], event);
 				listeners.push( listener );
 				signal.once( listener.event, listener.handler );
-				}));
-		console.log( ( Voice.speaking? " -Deferred ":" - Immediate ") + "construction of <response> Handler for --> "+currentevents)
-		if( !Voice.speaking )	signal.fire("spoken "); // selfmotivate if appropriate
+				});
+
+
+		console.log( ( Voice.speaking? " -Deferred ":" - Immediate ") + "composition of <response> Handler(s) for --> "+currentevents)
+
+		if( Voice.speaking )	signal.once("spoken", composeResponses);
+		else					composeResponses();
 		}
 	}
 
@@ -479,7 +537,7 @@ function sequence(  i  ){
 
 //	if( s.then       )	s.respond= { response: s.then }
 //	if( s.spinchoice )	s.respond= { right:s.spinchoice +"_right", close:s.spinchoice+"_close", wrong:s.spinchoice+"_wrong", response:s.spinchoice+"_ask" };
-//	if(!s.respond	 )	s.respond= { response:"next"  } 
+	if(!s.respond && !s.spinchoice && !s.then && !s.goto)	s.then= "next";  //default progression   
 
 	Object.keys( s ).forEach( k=> {
 		if (!perform[k])// &(typeof s[k] !== 'function') 
@@ -501,12 +559,14 @@ function sequence(  i  ){
                    min:{radius:50,heat:1}, 
                    max:{radius:70,heat:1}
                     }
-    /*var testicle  = newReticle( {  parent:document.body,//querySelector("#container"), 
-					min:{radius:50,heat:1}, max:{radius:70,heat:1}})
-						.move( 960, 540)
-						.show()
-						.listen();*/
-    var r = newReticle( retOptions ).move( 500, 300 ).show().listen().hide();
+    
+	const    reticle = newReticle( retOptions ).hide();
+//	reticle.position( [300, 352] ).listen().show();
+    
+
+
+
+    var   r =reticle;
     function track(e){
       let p = e.data.getLocalPosition( map );
       r.move( p.x, p.y);
@@ -531,6 +591,115 @@ function sequence(  i  ){
       map.g.on("mousemove", track);
       });
 */
+
+function positionIcon(  ){
+	const m= newMap("bridges");
+		
+	newIcon("blue", {parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
+	newIcon("red.0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
+	newIcon("red.1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135, 135]).show();
+    newIcon("red.2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 135]).show();
+    newIcon("red.3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
+	
+	let which="red1";
+
+	const probe =newReticle( retOptions ).hide();
+//	const probe =newIcon( which, { parent:layerMap, img:which } );
+	
+ 	const size=[ -70,70];
+	const pos={x:1300, y:10};
+	var shifted= 1, nudge=1, resize=1.05, radius=25, beenhere=0;
+	
+	
+	const tweak = {      
+		ArrowRight: e=>  pos.x+=nudge * shifted,
+		ArrowLeft:  e=>  pos.x-=nudge * shifted,
+		ArrowUp:    e=>  pos.y-=nudge * shifted,
+		ArrowDown:  e=>  pos.y+=nudge * shifted,
+		PageUp:		e=>	 size[0]=size[1]=radius*=resize * shifted,
+		PageDown:	e=>	 size[0]=size[1]=radius/=resize * shifted,
+		ShiftRight: e=>	 shifted=10,
+		ShiftLeft:  e=>	 shifted=10,
+		help:		e=>  {}
+		};
+	document.addEventListener('keydown', e=>{
+		(tweak[e.code] || tweak.help)( e );
+		probe.x( pos.x ).y( pos.y ).radius( radius ).show();
+		console.log( which, " ::: ", pos, radius );
+		if( !beenhere++) document.querySelector("body").requestFullscreen();
+		});
+	document.addEventListener('keyup',   e=> shifted = e.code.includes("Shift")? 1:shifted ) ;
+}
+
+
+const finder = cfg =>{
+
+
+	var found= null,  radius=0, shown=null;
+	const probe =newReticle( retOptions ).hide();
+
+	const targets= [
+		{ name: "blue",    x:  300, y: 770, radius: 66, color:   "blue" },
+		{ name: "red0",    x:   45, y: 690, radius: 60, color:    "red" },
+		{ name: "red1",    x:  275, y: 267, radius: 80, color:    "red" },
+		{ name: "red2",    x: 1160, y: 100, radius: 80, color:    "red" },
+		{ name: "red3",    x: 1245, y:  16, radius: 66, color:    "red" },
+		{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+		{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
+		{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
+		{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
+		{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
+		];
+	newMap("bridges");
+	newIcon("blue", {parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
+	newIcon("red.0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
+	newIcon("red.1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135, 135]).show();
+    newIcon("red.2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 135]).show();
+    newIcon("red.3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
+	
+
+
+	const dsq = (e,t)=> (e.x-t.x)*(e.x-t.x) + (e.y-t.y)*(e.y-t.y);
+
+	const handlers={
+		mousemove: e=>{
+			let target= targets.reduce( (closest,t)=> dsq(e,t) < dsq(e,closest)? t : closest, targets[0]);
+			let d =  Math.sqrt(dsq( e, target));
+			let r = Math.max(0, target.radius - d);
+			found =  d<25?  target : null;
+		//	console.log( target.name, Math.floor(d), r  );
+			probe.x( e.x ).y( e.y ).lines( found?.color ?? "grey" ).radius( r, target.color ).show();
+			},
+		mousedown: e => {
+			let answer = 	!cfg? "No paramters on Finder"
+						: 	(!cfg.answers? "No answers supplied"
+						:	(!found? "Nothing found"	
+						: 	(cfg.answers[ found.name ] || ("No answer for "+found.name))));
+
+			if( found ) 	signal.fire( answer );
+			console.log( "fires: "+ found?.name +" => "+ answer );
+			sfx.current = found? sfx.button : sfx.button.disabled;
+			sfx.current.down.play(); 
+			if( found )	{
+				shown = newPic( found.name ).show().full();
+				document.querySelector("#canvas").style.display="none";
+				}
+			else shown = null;
+			},
+		mouseup: e =>{ 
+			sfx.current.up.play();
+			if( shown ){
+				shown.fadeout();
+				signal.once( "pic.kill", e=>document.querySelector("#canvas").style.display="block" );
+				}}
+		}
+	Object.keys( handlers ).forEach( event=> document.body.addEventListener( event, handlers[ event ] ) );
+	
+}
+
+
+
+
 
 
   
@@ -562,17 +731,19 @@ const action={
     Digit3: e=>   newMath("wave" ).showExpression(),
     Digit4: e=>   newMath("decay").showExpression(),
     Digit5: e=>   newMath("prop" ).showExpression(),
+	KeyF:   finder,
+	KeyQ:   positionIcon,
 	KeyA:   e=>	sequence( 0 ),
-    KeyW:   e=> makeSpinner({ domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
+    KeyW:   e=> makeSpinner( oldSpinner? false : { domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
     KeyM:       map.show(),
-    KeyR:   e=> r  = newReticle( retOptions ).move(map.width/2,map.height/2).show().listen(),
+    KeyR:   e=> reticle.show().listen(),
     KeyG:       scope.show,
     KeyP: 	e=>{  tZero=Date.now();     scope.reset();   plot=!plot; }, 
     KeyB:       scope.bounds, 
     KeyT: 	trace,
     KeyS: e=>{  synch= (synch=="max")? false : "max";     scope.reset();     scope.show(); }, 
     KeyX: e=>{  synch= (synch=="min")? false : "min";     scope.reset();     scope.show(); }, 
-    help: e=>{  console.log(e.code);
+    help: e=>{  console.log(e.code); return;
 	            let body = document.querySelector("body");
                 body.requestFullscreen();
 				body.requestPointerLock()
@@ -581,6 +752,7 @@ const action={
                 else                                               body.appendChild(  helptext );
               }
         };
+
 document.addEventListener('keydown', e=>(action[e.code] || action.help)( e ) );
  
  }
