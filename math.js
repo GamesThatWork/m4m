@@ -1,7 +1,7 @@
 
 export const mathFunction={}, newMath = cnfg => {
     const dom = {
-		equation:   document.querySelector("#math"),
+		equation:   document.querySelector("#equation"),
 		expression: document.querySelector("#math"),
 		}
     const self={
@@ -25,6 +25,7 @@ export const mathFunction={}, newMath = cnfg => {
 		console.log("showEquation:  newDom = ",newDom );
 		if( newDom )	dom.equation=newDom;
 		dom.equation.innerHTML = self.equation;
+		dom.equation.style.display="block";
 		setTimeout( MathJax.typeset, 500 );
 		},
 	hideEquation:  ()=> dom.equation.innerHTML = "",
@@ -112,7 +113,7 @@ const expression ={
 		</mrow>		`,
 	decay:`
 		<mrow class="decay">
-			<mn>D</mn>
+			<mn>dK</mn>
 			<mfenced  separators="" >    
 			<mn>t</mn>
 			</mfenced>
