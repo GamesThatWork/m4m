@@ -1,6 +1,7 @@
 
 
-import  { newSFX	 } from './sfx.js';
+import  { sfx		 } from './sfx.js';
+import  { Voice 	 } from './voice.js';
 
 export const newSpinner = ( root, cfg) =>{
 
@@ -47,17 +48,6 @@ const spin = time=>{
 		oldTrig=trig;
 		}
 	}
-	const sfx = {
-		jog: newSFX("jog"),
-		button:{
-			down: 	newSFX("click"),
-			up: 	newSFX("clickoff"),
-			disabled:{
-				down:	newSFX("clicksoft"),
-				up: 	newSFX("clickoffsoft")
-				}
-			}
-		}
 
 	root.style.transformOrigin= `0px ${.5*radius}px ${-radius}px`
 
@@ -79,19 +69,18 @@ const spin = time=>{
 		rotation +=e.movementY * spinScale;
 	    if(!spinning)	spin();
 		}
+	
 	function mouseDown( e ) {	
-		console.log("clicked on "+trig)
-		document.exitPointerLock();
-		if(  elements[ trig ] ){
+		if(  elements[ trig ]  && !Voice.speaking ){
+			//	document.exitPointerLock();
 			click( elements[ trig ]);
-			sfx.button.down.play(); 
+			sfx.current = sfx.button;
 			}
-		else sfx.button.disabled.down.play();
+		else sfx.current = sfx.button.disabled;
+		console.log(  (sfx.current==sfx.button? "Click on ":"Aborted Click on " ) +trig );
+		sfx.current.down.play(); 
 		}
-	function mouseUp( e ) {	
-		if(  elements[ trig ] )	sfx.button.up.play();
-		else 					sfx.button.disabled.up.play();
-		}
+	function mouseUp( e ) {	sfx.current.up.play();}
 
 
 	const self ={
