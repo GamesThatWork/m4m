@@ -25,8 +25,18 @@
 			"./assets/claro/6.webp",
 			"./assets/claro/7.webp"
 			],
-		bg:	"./assets/claro/lab.jpg"
-
+		bg:	"./assets/claro/lab.jpg",
+		
+		blue:    "./assets/blue/crew.jpg",
+		red0:    "./assets/red/0.jpg",
+		red1:    "./assets/red/1.jpg",
+		red2:    "./assets/red/1.jpg",
+		red3:    "./assets/red/1.jpg",
+		target0: "./assets/target/0.jpg",
+		bridge1: "./assets/target/1.jpg",
+		bridge2: "./assets/target/2.jpg",
+		bridge3: "./assets/target/3.jpg",
+		hq:  	 "./assets/blue/camp.jpg"
 		};
 
 
@@ -44,14 +54,22 @@ export const newPic= (name, cfg) => {
 		const dom={
 			root: document.querySelector("#pix")
 			}
+		const div = null;
 		const self ={ 
 			position: (x,y,z=1)=>
 						{ dom[ name ].style.transform=`translate(${x}px,${y}px) scale(${z})`; return self;	  },
-			big:   ()=> { dom[ name ].classList.remove( "small" );                      return self;    },
-			small: ()=> { dom[ name ].classList.add(    "small" );                      return self;    },
-			show:  ()=> { dom[ name ].style.display="block";                                  return self;    },
-			hide:  ()=> { dom[ name ].style.display="none"; console.log("Hide ", name );      return self;    },
-			scan:  ()=> {	
+			full:  ()=> { 
+					//Array.from( document.querySelectorAll(".pic.fullscreen")).forEach( p=> newPic(p.id).kill());
+					dom[ name ].classList.add( "fullscreen" );                         
+					return self;    
+					},
+			big:   	()=> { dom[ name ].classList.remove( "small" );                            return self;    },
+			small: 	()=> { dom[ name ].classList.add(    "small" );                            return self;    },
+			show:	()=> { dom[ name ].style.display="block";                                  return self;    },
+			hide:	()=> { dom[ name ].style.display="none"; console.log("Hide ", name );      return self;    },
+			kill:	()=> { dom[ name ].remove(); delete selfs[ name ];						  return self;    },
+			fadeout:()=> { dom[ name ].style.transition= console.log( selfs ); dom[ name ].remove(); delete selfs[ name ];	console.log( selfs );						  return self;    },
+			scan:  	()=> {	
 					const zoom =4;
 					if( !self._scan ){   
 						dom[ name ].style.transition="transform 0s";
@@ -119,7 +137,7 @@ export const newPic= (name, cfg) => {
 				return self;
 				}*/
 			}
-		dom[ name ] = document.createElement("div");
+		dom[ name ] = 	document.createElement("div");
 		dom[ name ].id= name;
 		dom[ name ].classList.add("pic");
 		dom[ name ].style.backgroundImage=	`url("${ typeof url[ name ]=="string"?url[ name ] : url[ name ][0] }" )`;
