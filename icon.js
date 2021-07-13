@@ -4,9 +4,12 @@ const url= {
 	server: "./assets/icon/",
 	stone:  "stone.png",
 	glass:  "glass.png",
+  	 blue:  "bluecrew.png",
+	 red1:  "1red.png",
+	 red3:  "3red.png",
 	};
 const selfs=[];
-var parent;
+var parent= document.querySelector("#pix");
 
 
 export const newIcon= (name, cfg) => {
