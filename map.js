@@ -1,6 +1,7 @@
 
 const url= { 	
 	server  :  "./assets/map/",
+	bridges :  "3bridges.png",
 	range   :  "eglinred.jpg",
 	title   :  "title.png",
 	desktop :  "codex.png",         //"desktop(dark).jpg",
@@ -39,9 +40,9 @@ export const newMap = (name,cfg={}) => {
 			},
 
 		img:   i =>{	/*unsupported as command*/   return self;},
-		move:  m =>	{ dom[ name ].style.transform=`translate(${m[0]}px,${m[1]}px) scale(${m[2]})`; return self;	  },
-		show:  ()=> { dom[ name ].style.display="block";                                           return self;   },
-		hide:  ()=> { dom[ name ].style.display="none"; console.log("Hide ", name );               return self;   },
+		move:  m =>	{ dom[ name ].style.transform=`translate(${m[0]}px,${m[1]}px) scale(${m[2]||1})`; return self;},
+		show:  ()=> { dom[ name ].style.display="block";   console.log("show ", dom[name] );       return self;},
+		hide:  ()=> { dom[ name ].style.display="none";    console.log("Hide ", dom[name] );       return self;},
         }
     return selfs[ name ]=self.construct();
     }
