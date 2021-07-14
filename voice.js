@@ -223,8 +223,7 @@ claro:{
 	choose_close: `That did the job on the bridge. But it is very large and dangerous.`,
 	choose_close: `Good job of munitions selection.`,
 
-	end: 
-		`You did very well.
+	end: `You did very well.
 		Thank you so much for your help with math and science.
 		`},
 
@@ -250,84 +249,107 @@ romeo:	{
 		Perfect operation… but the Reds are chasing us now and they’re pretty mad. 
 		There is an awful lot of them. It looks like they will attack our base.`,
 		
-	blue:
-		`You see us? We’re the blue guys.
-		Find the blue hummer.`,
+	blue:	`You see us? We’re the blue guys.`,
+	blue_ask:	`Find the blue hummer.`,
 	blue_wrong: `No, the good guys are blue.`,
 	blue_close: `No, we're in a jeep.`,
 	blue_right: `There you go. You can see us.`,
 
-	red:
-		`Now can you see the Reds right behind us?`,
+	red:	`The Red squad is getting kind of close.`,
+	red_ask:  `See the Reds chasing us?`,
 	red_wrong:`No, the Red jeep following us.`,
 	red_close:`The guys right on our tail.`,
 	red_right:`That’s it!`,
 
-	reds: 
-		`There's a lot more Reds behind them, and they brought big guns.
-		Looks like they have a plan. See them all?`,
+	reds: 	`There's a lot more Reds behind them, and they brought big guns.
+			Looks like they have a plan.`,
+	reds_ask:	`See them all?`,
 	reds_wrong: `No. Up north, coming down fast.`,
 	reds_close: `The other Reds.`,
 	reds_right: `Yeah, that’s them.`,
 
-	hq: 
-		`Today is a bad day for a visit by the Reds.
-		Our guys are busy in the West and we don't have much air support
-		Nobody is protecting our Base.
-		Do you see our Headquarters?`,
+	hq: `Today is a bad day for us to get visitors.
+		Our guys are all out EaSt and we don't have much air support.
+		Nobody to protect our Base.`,
+	hq_ask: `Do you see our Headquarters?`,
 	hq_wrong: `No. Up north, coming down fast.`,
 	hq_close: `The other Reds.`,
 	hq_right: `Yeah, that’s them.`,
 
-	threat:
-		`It looks like they plan to cross the river and attack our Base
+	bridge1:	`It looks like they plan to cross the Josko river and attack our Base
 		But you can stop them. 
-		They can't cross the Josko if you take out the bridges.
-		`,
-
-	bridge1:
-		`But first -stop the guys who are chasing us. 
-		Blow up this bridge --  after we cross it.`,
+		They can't cross the Josko if you knock out the bridges.`,
+	bridge1_ask:	`Do you see Bridge Number One?
+					Right in front of our blue jeep.`,
 	bridge1_wrong: `No- not there.`,
-	bridge1_close: `Get that bridge later.`,
-	bridge1_right: `Yeah, that’s the bridge.`,
+	bridge1_close: `Not that one.`,
+	bridge1_right: `Yeah. It's a steel truss bridge.`,
 
-	bridge1a:
-		`Now you have to choose a munition. Pick carefully.
-		A small munition means less damage and less danger for us here on the ground, 
-		but it has to be big enough to destroy the bridge.
-		Just wait until we get across.`,
-	bridge1a_wrong: `Too late. You let the Reds get into Rumini territory.`,
-	bridge1a_close: `Too soon. You dropped the munition on top of us. Somebody will get hurt.`,
-	bridge1a_right: `Good work. Perfect timing.`,
+	bridge2:	`Bridge Two is upriver a few kilometers.`,
+	bridge2_ask:	`Can you see Bridge Two?`,
+	bridge2_wrong: `No- not there.`,
+	bridge2_close: `Not that one.`,
+	bridge2_right: `Yeah. It's a simple steel beam bridge.`,
 
-	shrine: 
-		`Now get the next bridge. 
-		But first, look at the Rumini Historic Shrine.`,
+
+	bridge3:	`There  is a little old stone bridge.`,
+	bridge3_ask: 	`Do you see the stone bridge - number three?`,
+	bridge3_wrong: 	`No- not there.`,
+	bridge3_close: 	`Not that one.`,
+	bridge3_right: 	`Yeah. Pretty. I hate to bust it.`,
+
+	bombsite1:	`Let's start with Bridge One
+				and stop the guys who are chasing us.`,
+	bombsite1_ask: 	 `Quick. Pick Bridge One`,
+	bombsite1_wrong: `No- not there.`,
+	bombsite1_close: `Not that one.`,
+	bombsite1_right: `Good. Just make sure we get across before you hit it.`,
+
+
+	bomb1:
+		`You have your target, and an estimated point of impact.
+		Now you choose a munition. 
+		Small munitions mean less damage. Less danger for us. 
+		But it has to be big enough to destroy the bridge.`,
+	bomb1_ask:   `Design your munition 
+					And deploy it.
+					After we get across!`,
+	bomb1_wrong: `Too late. You let the Reds get into Rumini territory.`,
+	bomb1_close: `Too soon. You dropped the munition on top of us. Somebody will get hurt.`,
+	bomb1_right: `Good work. Perfect timing.
+				Let's knock out the other bridges.`,
+
+	shrine: `But first, look at the Rumini Historic Shrine.`,
+	shrine_ask:  `Do you see the shrine?`,
 	shrine_wrong:`That isn’t the shrine`,
 	shrine_close:`Look for the obelisk on the map.`,
 	shrine_right:
-		`This is the shrine.
-		Do you see those ancient stained glass windows? 
+		`Those ancient stained glass windows are protected by treaty.
 		They are cultural treasures of the Rumini people.
-		You must be careful not to break them.
-		You’ll have to break the bridge without breaking the windows.`,
+		You must be careful not to break the windows.`,
 		
-	bridge2:
-		`Now get the next bridge. 
-		This one is made of stone. You will need a big munition.`,
-		
-	bridge2_wrong: `That munition is too big. We can’t damage the windows! Try another one.`,
-	bridge2_close: `Your munition was too small. It didn't disable the bridge. Try again.`,
-	bridge2_right: `Good choice. The bridge is taken out but the shrine is safe`,
+	bombsite2:
+		`Uh oh. You can only make one more strike!
+		You must design a munition to disable both remaining bridges in one blow!
+		Be careful: One is stone and one is steel. 
+		And you must be very careful not to break the ancient glass!`,
+	bombsite2_ask: `Set your target.`,
+	bombsite2_wrong: `Pick a target in the right area.`,
+	bombsite2_close: `Pick a better target.`,
+	bombsite2_right: `Good target.`,
 
-	bridge3:
-		`This bridge is the hardest of all. It is so close to the Shrine.
-		Choose the best weapon and aim very carefully.`,
-		
-	bridge3_wrong: `That munition is too big. We can’t damage the windows! Try another one.`,
-	bridge3_close: `Your munition was too small. It didn't disable the bridge. Try again.`,
-	bridge3_right: `Good choice. You disabled the bridge without demaging the shrine.`,
+	bomb2:
+		`This is a very tough problem.
+		You have to knock out a steel bridge and a stone bridge with one shot
+		without damaging the ancient windows right nearby.`,
+
+	bomb2_ask: `Choose the munition very carefully.`,
+	bomb2_wrong: `That munition is too big. We can’t damage the windows! Try another one.`,
+	bomb2_close: `Your munition was too small. It didn't disable the bridge. Try again.`,
+	bomb2_right: `Good choice. You disabled the bridge without damaging the shrine.`,
+
+
+	bda:	`Check out the results`,
 
 	end:   `Good work. You saved Rumini from the Red invasion!`
 	}
