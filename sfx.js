@@ -9,6 +9,7 @@ const sfxcfg={
 	clicksoft: 		{ url: "clicksoft.wav",    	volume:1.0	},
 	clickoffsoft:   { url: "clickoffsoft.wav", 	volume:1.0	},
 	exploslow:  	{ url: "exploslow.ogg", 	volume:0.15	},
+	music:		  	{ url: "drums.ogg", 	    volume:0.01, loop:true	},
 	}
 
 
@@ -18,13 +19,16 @@ const newSFX = sound =>{
  
 	const self= {
 		api:      new Audio(     sfxcfg.root.url    + sound.url ),
-		volume:   sound.volume ||  sfxcfg.root.volume || 1, //does nothing
+		volume:   v=> self.api.volume =v, 
 	  	playOnce: true,//does nothing
 
 		replay: ()=> self.playOnce=true,
+		stop: ()=> self.api.stop(),
 	  	play: ()=> {
 			if( !self.playOnce ) return; 
-			self.api.volume=self.volume;
+			self.api.volume=sound.volume;
+			self.api.loop=  sound.loop;
+			
 			self.api.currentTime=0;
 			self.api.play();
 			self.playOnce=true; //does nothing
@@ -34,6 +38,7 @@ const newSFX = sound =>{
 	};
 
 const sfx = {
+	music: newSFX("music"),
 	ok:  newSFX("ok"),
 	jog: newSFX("jog"),
 	button:{
