@@ -107,6 +107,7 @@ export const program=[
 					}, 
 			spin:{ domain:"xplo", answers:{ xp0:"low",xp1:"low",xp2:"low",xp3:"right",xp4:"high",xp5:"high"}},
 			then:"next"  },
+
 	{ id:"q2_ask"  , dialog:{ claro:"q2_ask"    }, scope: {  show: true, bounds:"*" },  respond: {spinHighLow:"q2"}   },
 	{ id:"q2_high",  dialog:{ claro:"q2_high"   }, scope: {  show: true, bounds:"*" },  respond: {spinHighLow:"q2"}   },
 	{ id:"q2_low",   dialog:{ claro:"q2_low"    }, scope: {  show: true, bounds:"*" },  respond: {spinHighLow:"q2"}   },
@@ -116,9 +117,106 @@ export const program=[
 	{ id:"jumphere",
 		goto:"next"  
 		},
+
 	{ dialog:{ claro:"mission" }, scope:hide, reticle:hide,	plot:false, spin:false  },
-	{ dialog:{ romeo:"intro" } ,  pic:{ claro:"small", romeo:"show"}	 },
-	{ dialog:{ romeo:"context" }, map:  {range:hide, bridges:show}       },
+	{ dialog:{ romeo:"intro" } ,  pic:{ claro:"big", romeo:"show"},	music:{ volume:0.03, play:true } },
+	{ dialog:{ romeo:"context" }, 
+	 	 pic:{ claro:"hide", romeo:"small"},
+		 map:{ range:hide, bridges:show},
+		icon:{
+			blue: { img:"blue", x: 266, y: 735,  size: [  60,  60], show:true },
+			red0: { img:"red1", x:  10, y: 660,  size: [  60,  60], show:true },
+			red1: { img:"red3", x: 211, y: 190,  size: [ 135, 135], show:true },
+			red2: { img:"red3", x:1100, y:  30,  size: [ 135, 135], show:true },
+			red3: { img:"red1", x:1225, y: -20,  size: [  55,  55], show:true }
+				}},
+	
+	{ id:"blue",      monolog:{ romeo:"blue"  }, 		find:{ domain:"full", answers:{ blue:"right", default:"wrong" }}  },
+	{ id:"blue_ask"  , dialog:{ romeo:"blue_ask"    },	respond: {spinRightWrong:"blue"}  },
+	{ id:"blue_wrong", dialog:{ romeo:"blue_wrong"  },  respond: {spinRightWrong:"blue"} },
+	{ id:"blue_close", dialog:{ romeo:"blue_close"  },	respond: {spinRightWrong:"blue"}   },
+	{ id:"blue_right", dialog:{ romeo:"blue_right"  },	then:"next"   },
+
+	
+	{ id:"red",      monolog:{ romeo:"red"  }, 		find:{ domain:"full", answers:{ red0:"right", default:"wrong" }}  },
+	{ id:"red_ask"  , dialog:{ romeo:"red_ask"    },	respond: {spinRightWrong:"red"}  },
+	{ id:"red_wrong", dialog:{ romeo:"red_wrong"  },    respond: {spinRightWrong:"red"} },
+	{ id:"red_close", dialog:{ romeo:"red_close"  },	respond: {spinRightWrong:"red"}   },
+	{ id:"red_right", dialog:{ romeo:"red_right"  },	then:"next"   },
+
+	{ id:"reds",      monolog:{ romeo:"reds"  }, 		find:{ domain:"full", answers:{ red1:"right",red2:"right",red3:"right",default:"wrong" }}  },
+	{ id:"reds_ask"  , dialog:{ romeo:"reds_ask"    },	respond: {spinRightWrong:"reds"}  },
+	{ id:"reds_wrong", dialog:{ romeo:"reds_wrong"  },  respond: {spinRightWrong:"reds"} },
+	{ id:"reds_close", dialog:{ romeo:"reds_close"  },	respond: {spinRightWrong:"reds"}   },
+	{ id:"reds_right", dialog:{ romeo:"reds_right"  },	then:"next"   },
+
+	{ id:"hq",      monolog:{ romeo:"hq"  }, 		find:{ domain:"full", answers:{ hq:"right", default:"wrong" }}  },
+	{ id:"hq_ask"  , dialog:{ romeo:"hq_ask"    },	respond: {spinRightWrong:"hq"}  },
+	{ id:"hq_wrong", dialog:{ romeo:"hq_wrong"  },  respond: {spinRightWrong:"hq"} },
+	{ id:"hq_close", dialog:{ romeo:"hq_close"  },	respond: {spinRightWrong:"hq"}   },
+	{ id:"hq_right", dialog:{ romeo:"hq_right"  },	then:"next"   },
+	
+	{ id:"bridge1",      monolog:{ romeo:"bridge1"  }, 		find:{ domain:"full", answers:{ bridge1:"right", default:"wrong" }}  },
+	{ id:"bridge1_ask"  , dialog:{ romeo:"bridge1_ask"    },	respond: {spinRightWrong:"bridge1"}  },
+	{ id:"bridge1_wrong", dialog:{ romeo:"bridge1_wrong"  },  	respond: {spinRightWrong:"bridge1"} },
+	{ id:"bridge1_close", dialog:{ romeo:"bridge1_close"  },	respond: {spinRightWrong:"bridge1"}   },
+	{ id:"bridge1_right", dialog:{ romeo:"bridge1_right"  },	then:"next"   },
+	
+	{ id:"bridge2",      monolog:{ romeo:"bridge2"  }, 		find:{ domain:"full", answers:{ bridge2:"right", default:"wrong" }}  },
+	{ id:"bridge2_ask"  , dialog:{ romeo:"bridge2_ask"    },	respond: {spinRightWrong:"bridge2"}  },
+	{ id:"bridge2_wrong", dialog:{ romeo:"bridge2_wrong"  },  	respond: {spinRightWrong:"bridge2"} },
+	{ id:"bridge2_close", dialog:{ romeo:"bridge2_close"  },	respond: {spinRightWrong:"bridge2"}   },
+	{ id:"bridge2_right", dialog:{ romeo:"bridge2_right"  },	then:"next"   },
+	
+	{ id:"bridge3",      monolog:{ romeo:"bridge3"  }, 		find:{ domain:"full", answers:{ bridge3:"right", default:"wrong" }}  },
+	{ id:"bridge3_ask"  , dialog:{ romeo:"bridge3_ask"    },	respond: {spinRightWrong:"bridge3"}  },
+	{ id:"bridge3_wrong", dialog:{ romeo:"bridge3_wrong"  },  	respond: {spinRightWrong:"bridge3"} },
+	{ id:"bridge3_close", dialog:{ romeo:"bridge3_close"  },	respond: {spinRightWrong:"bridge3"}   },
+	{ id:"bridge3_right", dialog:{ romeo:"bridge3_right"  },	then:"next"   },
+	
+	{ id:"bombsite1",      monolog:{ romeo:"bombsite1"  }, 	find:{ domain:"full", answers:{ bridge1:"right", default:"wrong" }}  },
+	{ id:"bombsite1_ask"  , dialog:{ romeo:"bombsite1_ask"    },	respond: {spinRightWrong:"bombsite1"}  },
+	{ id:"bombsite1_wrong", dialog:{ romeo:"bombsite1_wrong"  },  	respond: {spinRightWrong:"bombsite1"} },
+	{ id:"bombsite1_close", dialog:{ romeo:"bombsite1_close"  },	respond: {spinRightWrong:"bombsite1"}   },
+	{ id:"bombsite1_right", dialog:{ romeo:"bombsite1_right"  },	then:"next"   },
+	{	find:false	},
+	
+	{ id:"bomb1",   	 monolog:{ romeo:"bomb1"  }, spin:{ domain:"xplo", answers:{ xp0:"low",xp1:"low",xp2:"low",xp3:"right",xp4:"high",xp5:"high"}}},
+	{ id:"bomb1_ask"  , dialog:{ romeo:"bomb1_ask"    },	respond: {spinRightWrong:"bomb1"}  },
+	{ id:"bomb1_wrong", dialog:{ romeo:"bomb1_wrong"  },  	respond: {spinRightWrong:"bomb1"} },
+	{ id:"bomb1_close", dialog:{ romeo:"bomb1_close"  },	respond: {spinRightWrong:"bomb1"}   },
+	{ id:"bomb1_right", dialog:{ romeo:"bomb1_right"  },	then:"next"   },
+	{ 	scope:hide, reticle:hide,	plot:false, spin:false  },
+	
+	{ id:"bda1",      monolog:{ romeo:"bda"  }, 	find:{ domain:"bda", answers:{ bridge1:"right"} }  },
+	
+	{ id:"shrine",      monolog:{ romeo:"shrine"  }, 	find:{ domain:"full", answers:{ shrine:"right", default:"wrong" }}  },
+	{ id:"shrine_ask"  , dialog:{ romeo:"shrine_ask"    },	respond: {spinRightWrong:"shrine"}  },
+	{ id:"shrine_wrong", dialog:{ romeo:"shrine_wrong"  },  respond: {spinRightWrong:"shrine"} },
+	{ id:"shrine_close", dialog:{ romeo:"shrine_close"  },	respond: {spinRightWrong:"shrine"}   },
+	{ id:"shrine_right", dialog:{ romeo:"shrine_right"  },	then:"next"   },
+	
+	{ id:"bombsite2",      monolog:{ romeo:"bombsite2"  }, 	find:{ domain:"full", answers:{ bridge2:"right", bridge3:"right", default:"wrong" }}},
+	{ id:"bombsite2_ask"  , dialog:{ romeo:"bombsite2_ask"    },	respond: {spinRightWrong:"bombsite2"}  },
+	{ id:"bombsite2_wrong", dialog:{ romeo:"bombsite2_wrong"  },	respond: {spinRightWrong:"bombsite2"} },
+	{ id:"bombsite2_close", dialog:{ romeo:"bombsite2_close"  },	respond: {spinRightWrong:"bombsite2"}   },
+	{ id:"bombsite2_right", dialog:{ romeo:"bombsite2_right"  },	then:"next"   },
+	
+	{ id:"bomb2",   	 monolog:{ romeo:"bomb2"  }, find:false,
+					spin:{ domain:"xplo", answers:{ xp0:"low",xp1:"low",xp2:"low",xp3:"right",xp4:"high",xp5:"high"}}},
+	{ id:"bomb2_ask"  , dialog:{ romeo:"bomb2_ask"    },	respond: {spinRightWrong:"bomb2"}  },
+	{ id:"bomb2_wrong", dialog:{ romeo:"bomb2_wrong"  },  respond: {spinRightWrong:"bomb2"} },
+	{ id:"bomb2_close", dialog:{ romeo:"bomb2_close"  },	respond: {spinRightWrong:"bomb2"}   },
+	{ id:"bomb2_right", dialog:{ romeo:"bomb2_right"  },	then:"next"   },
+
+	{ scope:hide, reticle:hide,	plot:false, spin:false  },
+	{ id:"bda2",      monolog:{ romeo:"bda"  }, 	find:{ domain:"bda", answers:{ bridge2:"right",bridge3:"right"} }  },
+
+
+	{ dialog:{ romeo:"end" } ,  pic:{ claro:"big", romeo:"show"},  map:{ blur:hide, bridges:hide}, music:{volume:0} },
+
+	{ id:"end", dialog:{ claro:"end"},  pic:{ claro:"big", romeo:"hide"} },
+		
 	{ id:"",},
 
 	];
