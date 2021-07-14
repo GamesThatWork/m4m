@@ -435,10 +435,11 @@ const perform = {
 						});
 					}),
  	
-	scope: 		script=> Object.keys( script ).forEach( command=> scope[    command ]( script[command] ) ),
-	reticle: 	script=> Object.keys( script ).forEach( command=> reticle[  command ]( script[command] ) ),
+	scope: 		script=> Object.keys( script ).forEach( command=> scope[     command ]( script[command] ) ),
+	reticle: 	script=> Object.keys( script ).forEach( command=> reticle[   command ]( script[command] ) ),
+	music: 		script=> Object.keys( script ).forEach( command=> sfx.music[ command ]( script[command] ) ),
 
-
+	find:	data => finder(data),
 	trace:  yes=>{
 				scope.reset();
 				plot=false;
@@ -651,16 +652,20 @@ const finder = cfg =>{
 		{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
 		];
 	newMap("bridges");
-	newIcon("blue", {parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
-	newIcon("red.0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
-	newIcon("red.1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135, 135]).show();
-    newIcon("red.2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 135]).show();
-    newIcon("red.3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
+	newIcon("blue",{parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
+	newIcon("red0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
+	newIcon("red1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135, 135]).show();
+    newIcon("red2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 135]).show();
+    newIcon("red3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
 	
 
-
+	let busy=false;
 	const dsq = (e,t)=> (e.x-t.x)*(e.x-t.x) + (e.y-t.y)*(e.y-t.y);
 
+
+	sfx.music.play();
+	sfx.music.volume(0.025);
+		
 	const handlers={
 		mousemove: e=>{
 			let target= targets.reduce( (closest,t)=> dsq(e,t) < dsq(e,closest)? t : closest, targets[0]);
@@ -671,6 +676,7 @@ const finder = cfg =>{
 			probe.x( e.x ).y( e.y ).lines( found?.color ?? "grey" ).radius( r, target.color ).show();
 			},
 		mousedown: e => {
+			if( busy ) 	return;
 			let answer = 	!cfg? "No paramters on Finder"
 						: 	(!cfg.answers? "No answers supplied"
 						:	(!found? "Nothing found"	
@@ -681,6 +687,7 @@ const finder = cfg =>{
 			sfx.current = found? sfx.button : sfx.button.disabled;
 			sfx.current.down.play(); 
 			if( found )	{
+				sfx.music.volume(0.25);
 				shown = newPic( found.name ).show().full();
 				document.querySelector("#canvas").style.display="none";
 				}
@@ -690,8 +697,17 @@ const finder = cfg =>{
 			sfx.current.up.play();
 			if( shown ){
 				shown.fadeout();
-				signal.once( "pic.kill", e=>document.querySelector("#canvas").style.display="block" );
-				}}
+				signal.once( "pic.kill", e=>{
+					document.querySelector("#canvas").style.display="block";
+					busy=false;
+					});
+				setTimeout( e=>sfx.music.volume(.12), 1000 );
+				setTimeout( e=>sfx.music.volume(.06), 2000 );
+				setTimeout( e=>sfx.music.volume(.03), 3000 );
+				setTimeout( e=>sfx.music.volume(.02), 4000 );
+				}
+			}
+			
 		}
 	Object.keys( handlers ).forEach( event=> document.body.addEventListener( event, handlers[ event ] ) );
 	
