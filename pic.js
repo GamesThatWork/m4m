@@ -26,13 +26,14 @@ import  { signal     } from './signal.js'    ;
 			"./assets/claro/6.webp",
 			"./assets/claro/7.webp"
 			],
-		bg:	"./assets/claro/lab.jpg",
-		
+		bg:{	
+			claro: "./assets/claro/lab.jpg",
+			},
 		blue:    "./assets/blue/crew.jpg",
 		red0:    "./assets/red/0.jpg",
 		red1:    "./assets/red/1.jpg",
-		red2:    "./assets/red/1.jpg",
-		red3:    "./assets/red/1.jpg",
+		red2:    "./assets/red/2.jpg",
+		red3:    "./assets/red/3.jpg",
 		target0: "./assets/target/0.jpg",
 		bridge1: "./assets/target/1.jpg",
 		bridge2: "./assets/target/2.jpg",
@@ -122,10 +123,9 @@ export const newPic= (name, cfg) => {
 						if( self.paused )	return;
 						let t = basis+variation*Math.random();
 						self.timeoutID = setTimeout( next, 1000*t+250 );
-						transition=`background-image ${t}s`;
-						style.backgroundImage=
-						`url("${url[ name ][Math.floor(Math.random()*url[ name ].length)]}"),
-							url("${url.bg}`;
+						style.transition=`background-image ${t}s`;
+						style.backgroundImage=	`url("${url[ name ][Math.floor(Math.random()*url[ name ].length)]}")
+						     ${ url.bg[name]?  `,url("${url.bg[name]}`  : '' }`;
 						}  
 				next();
 				return self;
