@@ -94,7 +94,7 @@ window.onload= e=>{
 	const boost=1.3;
 	const areaFunction={
 		none:  (x,n)=>  -.0007,
-		start:  (x,n)=> .0025,
+		start: (x,n)=>   .0007,
 		power: (x,n)=>  n>350? 0 : .005,                                                                                      // power constant - everywhere all at once
 		pulse: (x,n)=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
 		wave:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.001        :   0   ,   // wavetrain
@@ -197,9 +197,13 @@ var tZero=0;
       if( synch ) setRadius( synch, x*111+50);
       }
     
+	let existingTrace=null;
 
 //every mouse move  // pointerlocked  
     const trace= ( yes=true )=>{
+	
+		if( existingTrace  )return yes? existingTrace  : existingTrace.remove() ;
+
 		var km=0;
 		const kmScale   = 1/50;  // trackball movemant to km
 		const scopeScale= 500/8; // km to scope display units
@@ -208,7 +212,7 @@ var tZero=0;
 		scope.reset();
 		
 		const self={
-			mouseMove: e=>{
+			mousemove: e=>{
 				if( Math.abs( e.movementX)< Math.abs( e.movementY)  )	return;
 				e.stopImmediatePropagation();
 				km += e.movementX * kmScale;
@@ -219,11 +223,13 @@ var tZero=0;
 				signal.fire( "radius", {km} );
 				},
 	    	remove: e=>{ 
+				existingTrace =null;
 				scope.reset();
-				document.body.removeEventListener("mousemove", self.mouseMove )
+				document.body.removeEventListener("mousemove", self.mousemove )
 				},
 			}
-		document.body.addEventListener("mousemove", self.mouseMove );
+		existingTrace =self;
+		document.body.addEventListener("mousemove", self.mousemove );
 		return yes? self : self.remove() ;
 		}
  
@@ -287,7 +293,7 @@ var tZero=0;
 			
 		const maths= {};//(domain=="math")? {} : null;
 		const buttons=[];
-	
+		let traceFunc=null;
 		const frame    = document.createElement("div");
 		frame.id   = "spinnerwindow";
 		frame.classList.add( new Date().toLocaleTimeString().replace(' ',''));
@@ -310,7 +316,7 @@ var tZero=0;
 			target.classList.add(    "undull"     ); 
 			target.classList.remove(  "dull"      ); 
 			if( tracing ){
-				 trace( true );
+				 traceFunc= trace( true );
 				 areaFunc= target.dataset.name ||"none"
 				 }
 			else plotLine( target.dataset.name ||"none" ); 
@@ -320,7 +326,8 @@ var tZero=0;
 			target.classList.add(       "dull"    ); 
 			if( tracing ){
 		//		 areaFunc= "none"
-		//		 trace( false );
+				 if( traceFunc ) 
+				 traceFunc.mousemove( {movementX:1,movementY:0, stopImmediatePropagation:i=>true } ); //refresh trace
 				 }
 			else plotLine( "none" );
 			};
@@ -367,8 +374,12 @@ const mouseresponse	= e=> {
 const listeners=[];
 
 const perform = {
-	end: ()=> signal.fire( "end" ), //mostly internal use
-	wait: seconds=> setTimeout( e=>signal.fire("response"), seconds*1000 ),
+	end: 	()=> signal.fire( "end" ), //mostly internal use
+//immediate has problems
+	immediate: 	msg		=> signal.fire( typeof msg=="string"? msg : "response" ), //no user interaction
+	now: 		next	=> sequence(next===true?"next":next ), //no user interaction
+	timeout: 	seconds	=> setTimeout( e=>signal.fire("response"), seconds*1000 ),
+	await:		action	=> document.body.addEventListener( action, e=>signal.fire("response"), {once:true}),
 	
 	/// deprecated function
 	speak: words=> {
@@ -437,6 +448,7 @@ const perform = {
  	
 	scope: 		script=> Object.keys( script ).forEach( command=> scope[     command ]( script[command] ) ),
 	reticle: 	script=> Object.keys( script ).forEach( command=> reticle[   command ]( script[command] ) ),
+	equation: 	script=> Object.keys( script ).forEach( command=> equation[  command ]( script[command] ) ),
 	music: 		script=> Object.keys( script ).forEach( command=> sfx.music[ command ]( script[command] ) ),
 
 	find:	data => finder(data),
@@ -451,20 +463,20 @@ const perform = {
 
 	spin:  makeSpinner,
 
+//kill this -made a feature of respond
 	spinchoice: name=>	perform.respond( { 
 					right   :name+"_right", 
 					close   :name+"_close", 
 					wrong   :name+"_wrong", 
 					response:name+"_ask" }),
 
-
-	then: 		next =>	perform.respond( {response:next} ),
-
+//deprecate - use immediate keyword, plus any respond
 	goto: 		next =>	perform.respond( {continue:next} ),
 
-	respond: events=>{   // events is a map of event names and step numbers
+// this is the only shorthand for respond -- or omit for respond
+	then: 		next =>	perform.respond( {response:next} ),
 
-		if( events.continue )	return sequence( events.continue ); // shortcircuit response system
+	respond: events=>{   // events is a map of event names and step numbers
 
 		if( events.spinRightWrong )	events= { 
 					right   :events.spinRightWrong+"_right", 
@@ -593,6 +605,32 @@ function sequence(  i  ){
       });
 */
 
+
+	const  newEquation= (cfg={})=>{
+		
+		const root = document.querySelector("#math");
+		const div  = document.querySelector("#equation") ?? document.createElement("div");
+		div.id="equation";
+		root.appendChild( div );
+		const style = div.style;
+		const self = {
+			get dom()  { return div;   },
+			hide: ()=> { style.display="none";	return self;},
+			show: ()=> { style.display="block";	return self;},
+			}
+		return self;
+		}
+	
+	const  equation = newEquation( ).hide();
+    
+
+
+
+
+
+
+
+
 function positionIcon(  ){
 	const m= newMap("bridges");
 		
@@ -689,6 +727,7 @@ const finder = cfg =>{
 			if( found )	{
 				sfx.music.volume(0.25);
 				shown = newPic( found.name ).show().full();
+				if( cfg.answers[ found.name]=="bda" )	shown.bda();
 				document.querySelector("#canvas").style.display="none";
 				}
 			else shown = null;
@@ -747,6 +786,7 @@ const action={
     Digit3: e=>   newMath("wave" ).showExpression(),
     Digit4: e=>   newMath("decay").showExpression(),
     Digit5: e=>   newMath("prop" ).showExpression(),
+	KeyZ:   e=>   newPic("bridge2").show().full().bda(),
 	KeyF:   finder,
 	KeyQ:   positionIcon,
 	KeyA:   e=>	sequence( 0 ),
@@ -770,5 +810,7 @@ const action={
         };
 
 document.addEventListener('keydown', e=>(action[e.code] || action.help)( e ) );
- 
+
+
+sequence( 0 );
  }
