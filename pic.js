@@ -11,11 +11,15 @@ import  { signal     } from './signal.js'    ;
 			"./assets/icon/inert.png",
 			],
 		romeo: [
+			"./assets/romeo/5.jpg",
+			"./assets/romeo/5.jpg",
+			"./assets/romeo/5.jpg",
+			"./assets/romeo/5.jpg",
+			"./assets/romeo/4.jpg",
+			"./assets/romeo/3.jpg",
 			"./assets/romeo/2.jpg",
 			"./assets/romeo/1.jpg",
-			"./assets/romeo/3.jpg",
-			"./assets/romeo/4.jpg",
-			"./assets/romeo/5.jpg"
+			"./assets/romeo/1.jpg"
 			],
 		claro: [
 			"./assets/claro/1.webp",
@@ -62,21 +66,27 @@ export const newPic= (name, cfg) => {
 		style.backgroundImage=	`url("${ typeof url[ name ]=="string"?url[ name ] : url[ name ][0] }" )`;
 		root.appendChild( div );
 
+		const classify = classy  =>{
+				classList.remove("small","medium","big","fullscreen" );
+				classList.add( classy  );
+				}
 
 		const self ={ 
 			position: (x,y,z=1)=>
 						 { style.transform=`translate(${x}px,${y}px) scale(${z})`; return self;	 },
-			full:  	()=> { classList.add( "fullscreen" );                          return self;  },
-			big:   	()=> { classList.remove( "small" );                            return self;  },
-			small: 	()=> { classList.add(    "small" );                            return self;  },
+			small: 	()=> { classify( "small" );                                    return self;  },
+			medium:	()=> { classify( "medium" );                                   return self;  },
+			big:   	()=> { classify( "big" );    			                       return self;  },
+			full:  	()=> { classify( "fullscreen" );                               return self;  },
 			show:	()=> { style.display="block";                                  return self;  },
 			hide:	()=> { style.display="none"; console.log("Hide ", name );      return self;  },
 			kill:	()=> { 	div.remove(); 
 							delete selfs[name]; 
-							signal.fire("pic.kill");						 	   return self;  },
+							signal.fire("pic.kill", {name});						 	   return self;  },
 			fadeout:()=> { 	style.transition="opacity 4s"; 
 							style.opacity="0"; 
 							setTimeout( self.kill, 4000 );                         return self;  },
+
 			scan:  	()=> {	
 					const zoom =4;
 					if( !self._scan ){   
@@ -110,6 +120,19 @@ export const newPic= (name, cfg) => {
 				return self;
 				},
 			
+			bda: () =>{	
+				let pre = `url("${url[name]}`;
+				let post= pre.replace( '/target/', '/target/bda/');
+				console.log( pre, post );
+				//style.backgroundImage=	pre;
+				style.transitionProperty=  "background-image" ;
+				//style.transitionTimingFunction= "ease-in-out";
+				style.transitionDuration = "1200ms";
+				style.transitionDelay = "800ms";
+				setTimeout( e=>style.backgroundImage=	post, 100);
+				return self;
+				},
+
 			timeoutID: false,
 			rando: (run=true) =>{	
 				if( self.timeoutID ) clearTimeout( self.timeoutID );
