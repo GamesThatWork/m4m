@@ -4,26 +4,23 @@ const show={show:true},  hide={hide:true }, listen={listen:true },unlisten={unli
 
 
 export const program=[
-//	{ id:"shortcut", dialog:{ claro:"null" }, then:"jumphere" },
-///	{ dialog:{ claro:"null" }    },
-//	{ map:{ "desktop":{ show:true } }, pic: { alert:"rando" }, then:"next"} ,
- 
-	{ id:"init", dialog:{ claro:"welcome" }, map:{ blur:{ show:true } }, then:"jumphere"  },
+
+ 	{ id:"attractmode", map:{ desktop:{ show:true } }, await:"click", then:"init"   },
+ 	{ id:"init", dialog:{ claro:"welcome" }, map:{ desktop:{hide:true}, blur:{show:true} }   },
 	
 	{ dialog:{ claro:"challenge"  }},
-	{ dialog:{ claro:"intro"      }  },
-	{ dialog:{ claro:"model"      }  },
-	{ dialog:{ claro:"heros"      }, pic:{ romeo:"show"}  },
+	{ dialog:{ claro:"intro"      }, equation:show },
+	{ dialog:{ claro:"model"      }, equation:hide  },
+	{ dialog:{ claro:"heros"      }, pic:{ romeo:"show"}   },
 	{ dialog:{ romeo:"pronto"     }  },
-	{ dialog:{ claro:"instrument" }, pic:{ romeo:"hide", claro:"small"},  scope: { show: true} },
+	{ dialog:{ claro:"instrument" }, pic:{ romeo:"hide", claro:"medium"},  scope: { show: true} },
 	{ dialog:{ claro:"left"   },  scope: { bounds: "                              left" },    },
 	{ dialog:{ claro:"right"  },  scope: { bounds: "                        right left" },    },
 	{ dialog:{ claro:"normal" },  scope: { bounds: "                  hg760 right left" },    },
 	{ dialog:{ claro:"glass"  },  scope: { bounds: "            glass hg760 right left" },    },
 	{ dialog:{ claro:"steel"  },  scope: { bounds: "      steel glass hg760 right left" },    },
 	{ dialog:{ claro:"stone"  },  scope: { bounds: "stone steel glass hg760 right left" },    },
-	{ dialog:{ claro:"null"   },  scope: { bounds: "      steel                       " },    },
-	{ id:"",scope: { show: true},  pic: {claro:"small"},  goto:"next"  },
+	{    pic:{ claro:"medium" },  scope: { bounds: "      steel ", show:true }, equation:show, now:"next"},
 	
 	{ dialog:{ claro:"equation"  },  },
 	
@@ -63,21 +60,21 @@ export const program=[
 	{ id:"prop_close", dialog:{ claro:"prop_close"  },  respond: {spinRightWrong:"prop"}   },
 	{ id:"prop_right", dialog:{ claro:"prop_right"  },  then:"next"   },
 
-	{ id:"omega", dialog:{ claro:"omega"  }, pic: {claro:"small"}, spin:{ domain:"xplo", answers:{}}  }, // support all
 
-	{ id:"scrub", dialog:{ claro:"scrub"  }, trace:true, 		   spin:{ domain:"xplo", answers:{default:"response"}}},
-
-	{ id:"mapped", dialog:{ claro:"mapped"}, trace:true, map:{ range:{show:true } }, 
-			icon:{ glass1:{img:"glass", x:1100, y:100, size:[50,50], show:true } }, 
-			spin:{ domain:"xplo", answers:{ xp3:{win:true}}}  },
-
-
+	{ id:"xplo",  scope:show,  pic: {claro:"small"}, equation:hide,  now:"next"  },
+	
+	{ id:"omega", dialog:{ claro:"omega"  }, pic: {claro:"small"},
+								spin:{ domain:"xplo", answers:{default:"ok" }}, 			respond: {ok:"next"}     }, // support all
+	{ id:"scrub", dialog:{ claro:"scrub"  }, trace:true,
+								spin:{ domain:"xplo", answers:{default:"ok" }}, 			respond: {ok:"next"}     }, // support all
+	{ id:"mapped", dialog:{ claro:"mapped"}, trace:true,
+			map:{range:show},	spin:{ domain:"xplo", answers:{default:"ok", xp3:"ok" }}, 	respond: {ok:"next"}     }, // support all
 
 
 
 	{ id:"q1", 
 			monolog:{ claro:"q1" }, 
-			scope: {  show: true}, 
+			scope: show, 
 			trace: true,
 			pic:   {   claro:"small" }, 
 			map:   {   range:{ show:true } }, 
@@ -114,10 +111,8 @@ export const program=[
 	{ id:"q2_close", dialog:{ claro:"q2_close"  }, scope: {  show: true, bounds:"*" },  respond: {spinHighLow:"q2"}   },
 	{ id:"q2_right", dialog:{ claro:"q2_right"  },
 		icon:   {	glass0:{ hide:true},glass1:{ hide:true},glass2:{ hide:true},glass3:{ hide:true} }, 	then:"next"   },
-	{ id:"jumphere",
-		goto:"next"  
-		},
-
+	{ id:"jumphere",   now:"next" 	},
+ 
 	{ dialog:{ claro:"mission" }, scope:hide, reticle:hide,	plot:false, spin:false  },
 	{ dialog:{ romeo:"intro" } ,  pic:{ claro:"big", romeo:"show"},	music:{ volume:0.03, play:true } },
 	{ dialog:{ romeo:"context" }, 
@@ -188,7 +183,7 @@ export const program=[
 	{ id:"bomb1_right", dialog:{ romeo:"bomb1_right"  },	then:"next"   },
 	{ 	scope:hide, reticle:hide,	plot:false, spin:false  },
 	
-	{ id:"bda1",      monolog:{ romeo:"bda"  }, 	find:{ domain:"bda", answers:{ bridge1:"right"} }  },
+	{ id:"bda1",      monolog:{ romeo:"bda"  }, 	find:{ domain:"bda", answers:{ bridge1:"bda"} }  },
 	
 	{ id:"shrine",      monolog:{ romeo:"shrine"  }, 	find:{ domain:"full", answers:{ shrine:"right", default:"wrong" }}  },
 	{ id:"shrine_ask"  , dialog:{ romeo:"shrine_ask"    },	respond: {spinRightWrong:"shrine"}  },
