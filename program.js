@@ -5,8 +5,9 @@ const show={show:true},  hide={hide:true }, listen={listen:true },unlisten={unli
 
 export const program=[
 
- 	{ id:"attractmode", map:{ desktop:{ show:true } }, await:"click", then:"init"   },
- 	{ id:"init", dialog:{ claro:"welcome" }, map:{ desktop:{hide:true}, blur:{show:true} }   },
+	{ id:"attractmode", map:{ title:{ show:true } }, await:"click", then:"init"   },
+	{ id:"pattern", map:{ title:{ show:true } }, wait:"click", then:"init"   },
+	{ id:"init", dialog:{ claro:"welcome" }, map:{ desktop:{hide:true}, blur:{show:true} }   },
 	
 	{ dialog:{ claro:"challenge"  }},
 	{ dialog:{ claro:"intro"      }, equation:show },
@@ -185,7 +186,7 @@ export const program=[
 	
 	{ id:"bda1",      monolog:{ romeo:"bda"  }, 	find:{ domain:"bda", answers:{ bridge1:"bda"} }  },
 	
-	{ id:"shrine",      monolog:{ romeo:"shrine"  }, 	find:{ domain:"full", answers:{ shrine:"right", default:"wrong" }}  },
+	{ id:"shrine",      monolog:{ romeo:"shrine"  }, 	find:{ domain:"full", answers:{ shrine:"right", target0:"right", default:"wrong" }}  },
 	{ id:"shrine_ask"  , dialog:{ romeo:"shrine_ask"    },	respond: {spinRightWrong:"shrine"}  },
 	{ id:"shrine_wrong", dialog:{ romeo:"shrine_wrong"  },  respond: {spinRightWrong:"shrine"} },
 	{ id:"shrine_close", dialog:{ romeo:"shrine_close"  },	respond: {spinRightWrong:"shrine"}   },

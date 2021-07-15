@@ -5,7 +5,7 @@ const url= {
 	range   :  "eglinred.jpg",
 	title   :  "title.png",
 	desktop :  "codex.png",         //"desktop(dark).jpg",
-	blur    :  "codeblur.png"       //"desktop(dark).jpg",
+	blur    :  "codeglitch.jpg"// "codeblur.png"       //"desktop(dark).jpg",
 	};
 const dom ={
 	parent: document.querySelector("#map"), 
