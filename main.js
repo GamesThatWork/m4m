@@ -675,7 +675,7 @@ const finder = cfg =>{
 
 
 	var found= null,  radius=0, shown=null;
-	const probe =newReticle( retOptions ).hide();
+	const probe =newReticle( retOptions ).unlisten();
 
 	const targets= [
 		{ name: "blue",    x:  300, y: 770, radius: 66, color:   "blue" },
