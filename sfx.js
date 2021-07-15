@@ -2,7 +2,7 @@ export {newSFX, sfx};
 
 const sfxcfg={
 	root:  			{ url: "./assets/sfx/" 					},
-	ok:  			{ url: "ok.wav", 			volume:0.25	},
+	ok:  			{ url: "ok.wav", 			volume:0.125	},
 	jog:  			{ url: "tok.wav", 			volume:1.0	},
 	click:			{ url: "click.wav",    		volume:1.0  },
 	clickoff:   	{ url: "clickoff.wav", 		volume:1.0	},
