@@ -57,9 +57,10 @@ ul{
 	border: thick solid rgba(0, 146, 37, 0.981);
 	background-size: cover;
 	}
-#claro      {  width:1000px; height: 666px;	left: 500px; top: 180px;}
-#claro.small { width: 420px; height: 240px;	left:1425px; top:  90px;	}
-#romeo {	   width: 360px; height: 405px;	left:  15px; top: 511px;}
+#claro        {  width:1000px; height: 666px;	left: 500px; top: 180px;}
+#claro.medium { width: 500px; height: 333px;	left: 100px; top:  50px;	}
+#claro.small  { width: 420px; height: 240px;	left:1425px; top:  90px;	}
+#romeo {	   width: 360px; height: 405px;	left:1400px; top: 111px;}
 #romeo.small { width: 240px; height: 270px;	left:1640px; top: 770px;	}
 
 
@@ -130,7 +131,7 @@ button.spinfacet.back {
 .power{    color: rgb(26, 211, 9);     stroke: #15d11c;  font-size:200px;  }
 .pulse{    color: rgb(255, 174,   0);  stroke: #222;     font-size:55px;   }
 .wave {    color: rgb(217, 255,   0);  stroke: #255;     font-size:52px;   }
-.decay{    color: rgb( 12, 170, 128);  stroke: #213;     font-size:100px;  }
+.decay{    color: rgb(6, 225, 166);  stroke: #213;     font-size:100px;  }
 .prop {    color: rgb(  0, 132, 255);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
 .xp0,.xp1,.xp2,.xp3,.xp4,.xp5 {    color: rgb(  0, 132, 255);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
 
@@ -141,17 +142,24 @@ button.spinfacet.back {
 .xp4{    color: rgb(152, 226, 180);} 
 .xp5{    color: rgb(218, 218, 218);} 
 
-.dull  mjx-container { filter:blur(3px) }
+.dull  mjx-container { filter:blur(4px) }
+/*
 .power mjx-container { top:-210px; }
 .pulse mjx-container { top:-55px; }
 .wave  mjx-container { top:-55px; }
 .decay mjx-container { top:-95px; }
-.prop  mjx-container { top:-58px;  }
+.prop  mjx-container { top:-58px;  }*/
+.power mjx-container { top:-180px;  font-size:150px; }
+.pulse mjx-container { top:-28px;  font-size:40px; }
+.wave  mjx-container { top:-28px;  font-size:40px; }
+.decay mjx-container { top:-26px;  font-size:60px; }
+.prop  mjx-container { top:-28px;  font-size:40px; }
 .xp0  mjx-container,
 .xp1  mjx-container,
 .xp2  mjx-container,
 .xp3  mjx-container,
-.xp4  mjx-container  { color: rgb(96, 237, 15);  stroke: #333333;  font-size:55px;    font-weight:800;  } 
+.xp4  mjx-container,
+.xp5  mjx-container  { color: rgb(96, 237, 15);  stroke: #333333; top:-30px; font-size:55px;    font-weight:800;  } 
 
 .map0 {    fill: rgb(204,  44,  44);        }
 .map1 {    fill: rgb( 32,  13,  75);       stroke:white;   }
