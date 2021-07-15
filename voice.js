@@ -319,10 +319,11 @@ romeo:	{
 					After we get across!`,
 	bomb1_wrong: `Too late. You let the Reds get into Rumini territory.`,
 	bomb1_close: `Too soon. You dropped the munition on top of us. Somebody will get hurt.`,
-	bomb1_right: `Good work. Perfect timing.
-				Let's knock out the other bridges.`,
+	bomb1_right: `Good work. Perfect timing.`,
 
-	shrine: `But first, look at the Rumini Historic Shrine.`,
+	shrine: `
+		Let's knock out the other bridges.
+		But first, look at the Rumini Historic Shrine.`,
 	shrine_ask:  `Do you see the shrine?`,
 	shrine_wrong:`That isn’t the shrine`,
 	shrine_close:`Look for the obelisk on the map.`,
@@ -352,7 +353,8 @@ romeo:	{
 	bomb2_right: `Good choice. You disabled the bridge without damaging the shrine.`,
 
 
-	bda:	`Check out the results`,
+	bda:	`First, take a look.
+			Check out the results of this strike`,
 
 	end:   `Good work. You saved Rumini from the Red invasion!`
 	}
