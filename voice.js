@@ -75,10 +75,10 @@ claro:{
 	model: 	
 		`I’ll explain parts of a shockwave model one bit at a time
 		and you find the expressions that match.
-		We’ll put it all together in one big equation`,
+		We’ll put it all together in one big equation.
+		Then we will use that equation to perform a special mission.`,
 	heros: 	
-		`Then we will use that equation to perform a special mission.
-		You will help our heros get home safely.`,
+		`You will help our heros get home safely.`,
 	instrument:	
 		`Lets learn the tools.
 		This instrument shows air pressure across distance.
@@ -131,22 +131,22 @@ claro:{
 	pulse_wrong: `No... Make sure you see the "s" for speed.`,
 	pulse_close: `That's very close, but you really need the "s" for speed`,
 	pulse_right: `That’s it. "H" is like a switch, so it's all or nothing.
-				 Our model shows a wall of pressure moving at supersonic speed.
-				 But real pressure moves in waves, like ripples on a pond.`,
+				 Our model shows a supersonic wall of pressure moving through the air.
+				 But pressure really moves through air in waves. Like ripples in water.`,
 
 	wave:
 		`The shape of a natural wave is described by the sine function.`,
 	wave_ask:   `Add the sine wave function to our equation.`,
 	wave_wrong: `Try again,   we need the sine function.`,
 	wave_close: `Not that one, choose the sine function.`,
-	wave_right: `Perfect. Now we see the waves expand outward. 
-		But these waves continue forever full strength.
-		Real waves lose strength as they age. They decay.`,
+	wave_right: `Excellent. Now we see waves moving through the air. 
+		The waves are all perfect, and all the same strength.
+		But in a real explosion, the first waves are much much stronger.`,
 
 	decay: 
-		`We want math that models how waves decay.
+		`We want math to show each wave weaker than the one before.
 		We can call this the decay function.
-		We can use the symbol "d", "K"`,
+		We can use the symbol "dK"`,
 	decay_ask:   `Use "dK" to represent the wave Decay function.`,
 	decay_wrong: `Not that one, choose “dK” for Decay.`,
 	decay_right: `Bingo! Our model is looking great.
@@ -154,8 +154,9 @@ claro:{
 		But real waves lose power as they expand in three dimensions.`,
 
 	prop: 
-		`The inverse cube - distance to the power of three - 
-		shows energy spreading out in three dimensione.`,
+		`When energy spreads out in three dimensions,
+		power is spent according to distance to the power of three.
+		Divide pressure by the distance cubed.`,
 	prop_ask:  `Find the term for expanding in three dimensions.`,
 	prop_wrong:  `Keep looking.`,
 	prop_right:  `Very good! You have built a very useful shockwave model.
@@ -187,7 +188,8 @@ claro:{
 		Explore pressure and distance by rolling left and right.`,
 	q1_ask:   	`Spin the ball and roll it. Press the buttton when you have the answer.`,
 	q1_high:	`No, that omega is too high. You'll cause unnecessary damage. Try a lighter touch.`,
-	q1_low: 	`Sorry - that omega is too low. It won't knock down the wall at that distance.`,
+	q1_low: 	`Sorry - that omega is too low. It won't knock down the wall.
+				The pressure peak must be above the red line when the wave hits the wall.`,
 	q1_right: `That’s it. That's the smallest munition that will serve this purpose.
 			You did well.`,
 
@@ -197,7 +199,8 @@ claro:{
 		This time I want you to find the largest munition.
 		The largest munition that does not break any glass.`,
 	q2_ask:   	`Spin the ball and roll it. Press the buttton when you have the answer.`,
-	q2_high:	`No, that omega is too high. You're going to break windows like that.`,
+	q2_high:	`No, that omega is too high. You're going to break windows like that.
+				The pressure peak must be below the yellow line when it hits the first window.`,
 	q2_low: 	`Sorry - that is too small. Make it bigger, without breaking any glass.`,
 	q2_right: `That’s it. That's the largest munition for this situation.
 			You did well.`,
@@ -233,9 +236,9 @@ claro:{
 		
 romeo:	{
 	pronto: 
-		`Yeah. 
-		We need some help here.
-		Pronto !`,
+		`You bet! We could use some help here. 
+		We got a tough problem and need a little science... 
+		Pronto!`,
 	
 	intro: 
 		`Hey, Doc!
