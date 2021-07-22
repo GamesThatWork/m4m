@@ -533,7 +533,7 @@ const perform = {
 						}
 					})( events[ event ], event);
 				listeners.push( listener );
-				signal.once( listener.event, listener.handler );
+				signal.on( listener.event, listener.handler );
 				});
 
 
@@ -543,7 +543,6 @@ const perform = {
 		else					composeResponses();
 		}
 	}
-
 
 
 var lastStep=0;
