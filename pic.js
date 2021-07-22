@@ -1,6 +1,8 @@
 
 import  { signal     } from './signal.js'    ;
 
+
+	const fadeoutDuration= 7000;//ms
 	const url= { 	
 	imgserver: "https://storage.googleapis.com/storage/v1/b/unscrew-u/" ,
 	      img: "https://storage.googleapis.com/unscrew-u/",
@@ -11,7 +13,6 @@ import  { signal     } from './signal.js'    ;
 			"./assets/icon/inert.png",
 			],
 		romeo: [
-			"./assets/romeo/5.jpg",
 			"./assets/romeo/5.jpg",
 			"./assets/romeo/5.jpg",
 			"./assets/romeo/5.jpg",
@@ -33,16 +34,22 @@ import  { signal     } from './signal.js'    ;
 		bg:{	
 			claro: "./assets/claro/lab.jpg",
 			},
-		blue:    "./assets/blue/crew.jpg",
-		red0:    "./assets/red/0.jpg",
-		red1:    "./assets/red/1.jpg",
-		red2:    "./assets/red/2.jpg",
-		red3:    "./assets/red/3.jpg",
-		target0: "./assets/target/0.jpg",
-		bridge1: "./assets/target/1.jpg",
-		bridge2: "./assets/target/2.jpg",
-		bridge3: "./assets/target/3.jpg",
-		hq:  	 "./assets/blue/camp.jpg"
+		blue:     "./assets/blue/crew.jpg",
+		red0:     "./assets/red/0.jpg",
+		red1:     "./assets/red/1.jpg",
+		red2:     "./assets/red/2.jpg",
+		red3:     "./assets/red/3.jpg",
+		shrine:   "./assets/target/0.jpg",  // alias
+		target0:  "./assets/target/0.jpg",  // alias
+		bridge0:  "./assets/target/0.jpg",  // alias
+		bridge1:  "./assets/target/1.jpg",
+		bridge2:  "./assets/target/2.jpg",
+		bridge3:  "./assets/target/3.jpg",
+		bridge023:"./assets/target/3.jpg",  // combo 0+2+3
+		hq:  	  "./assets/blue/camp.jpg",
+		win:  	  "./assets/blue/happy.jpg",
+		lose:  	  "./assets/blue/sad.jpg",
+		
 		};
 
 
@@ -73,19 +80,22 @@ export const newPic= (name, cfg) => {
 
 		const self ={ 
 			position: (x,y,z=1)=>
-						 { style.transform=`translate(${x}px,${y}px) scale(${z})`; return self;	 },
-			small: 	()=> { classify( "small" );                                    return self;  },
-			medium:	()=> { classify( "medium" );                                   return self;  },
-			big:   	()=> { classify( "big" );    			                       return self;  },
-			full:  	()=> { classify( "fullscreen" );                               return self;  },
-			show:	()=> { style.display="block";                                  return self;  },
-			hide:	()=> { style.display="none"; console.log("Hide ", name );      return self;  },
+						 { style.transform=`translate(${x}px,${y}px) scale(${z})`; 
+						 							console.log("pic: Position",name); return self;	 },
+			small: 	()=> { classify( "small" );     console.log("pic: Small ",name);   return self;  },
+			medium:	()=> { classify( "medium" );    console.log("pic: Medium",name);   return self;  },
+			big:   	()=> { classify( "big" );       console.log("pic: Big  ",name);    return self;  },
+			full:  	()=> { classify( "fullscreen" );console.log("pic: Full ",name);    return self;  },
+			show:	()=> { style.display="block";   console.log("pic: Show ",name);    return self;  },
+			hide:	()=> { style.display="none";    console.log("pic: Hide ",name);    return self;  },
 			kill:	()=> { 	div.remove(); 
-							delete selfs[name]; 
-							signal.fire("pic.kill", {name});						 	   return self;  },
-			fadeout:()=> { 	style.transition="opacity 4s"; 
+						   	delete selfs[name]; 
+							signal.fire("pic.kill", {name});
+													console.log("pic: Kill ",name);    return self;  },
+			fadeout:()=> { 	style.transition=`opacity ${fadeoutDuration}ms`; 
 							style.opacity="0"; 
-							setTimeout( self.kill, 4000 );                         return self;  },
+							setTimeout( self.kill, fadeoutDuration ); 
+							 						console.log("pic: Fade ",name);    return self;  },
 
 			scan:  	()=> {	
 					const zoom =4;
@@ -95,16 +105,21 @@ export const newPic= (name, cfg) => {
 								Math.min(Math.max(0,e.x*4-2400), 3840/zoom), 
 								Math.min(Math.max(0,e.y*4-1350), 2160/zoom),
 								zoom ))( self );
-						document.body.addEventListener( "mousemove", self._scan );
-						document.body.addEventListener( "click",     self.scan );
+//						document.body.addEventListener( "mousemove", self._scan );
+//						document.body.addEventListener( "click",     self.scan );
+						signal.onBody( "mousemove", self._scan );
+						signal.onBody( "click",     self.scan );
 						self._scan( {target:div, x:960,y:490});
 						}
 					else{
-						document.body.removeEventListener( "mousemove", self._scan );
+//						document.body.removeEventListener( "mousemove", self._scan );
+						signal.offBody( "mousemove", self._scan );
 						style.transition="transform 1s erase-in ease-out 1.5s";
 						style.transform="translate( 975px,0px) scale(.9) "; 
 						self._scan= null;
-						}},
+						}
+						console.log("pic: Scan ",name);    return self;  },						
+						
 		
 		
 			zoom:  ()=> {
@@ -117,21 +132,20 @@ export const newPic= (name, cfg) => {
 					style.opacity="1"; 
 //					console.log( style );	
 					}, 100);
-				return self;
-				},
+				console.log("pic: Zoom ",name);    return self;  }, 
 			
 			bda: () =>{	
 				let pre = `url("${url[name]}`;
 				let post= pre.replace( '/target/', '/target/bda/');
-				console.log( pre, post );
+				console.log( "showing BDA effect", pre, post );
 				//style.backgroundImage=	pre;
 				style.transitionProperty=  "background-image" ;
 				//style.transitionTimingFunction= "ease-in-out";
 				style.transitionDuration = "1200ms";
 				style.transitionDelay = "800ms";
+				style.backgroundImage=	post;
 				setTimeout( e=>style.backgroundImage=	post, 100);
-				return self;
-				},
+				console.log("pic: Fade ",name);    return self;  }, 
 
 			timeoutID: false,
 			rando: (run=true) =>{	
@@ -151,9 +165,8 @@ export const newPic= (name, cfg) => {
 						     ${ url.bg[name]?  `,url("${url.bg[name]}`  : '' }`;
 						}  
 				next();
-				return self;
-				},
-			pause: (pausing=true) => self.rando( !pausing )
+				console.log("pic: Rando ",name);    return self;  },
+			pause: (pausing=true) => { self.rando( !pausing ); console.log("pic: Pause ",name);    return self;  },
 			}
 		return selfs[ name ]=self;
 	}
