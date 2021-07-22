@@ -1,9 +1,12 @@
 
 export const mathFunction={}, newMath = cnfg => {
     const dom = {
-		equation:   document.querySelector("#equation"),
+		equation:    document.querySelector("#equation") ?? document.createElement("div"),
 		expression: document.querySelector("#math"),
 		}
+	dom.equation.id="equation";
+	document.querySelector("#math").appendChild( dom.equation );;
+
     const self={
 /*      get x(   ) { return graphicLayers[0].position.x;        },
       get y(   ) { return graphicLayers[0].position.y;        },
@@ -22,10 +25,11 @@ export const mathFunction={}, newMath = cnfg => {
 		return self;
 		},
 	showEquation:  newDom=>{
-		console.log("showEquation:  newDom = ",newDom );
-		if( newDom )	dom.equation=newDom;
+//		console.log("showEquation:  newDom = ",newDom );
+//		if( newDom )	dom.equation=newDom;
+		
 		dom.equation.innerHTML = self.equation;
-		dom.equation.style.display="block";
+//		dom.equation.style.display="block";
 		setTimeout( MathJax.typeset, 500 );
 		},
 	hideEquation:  ()=> dom.equation.innerHTML = "",
