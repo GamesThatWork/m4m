@@ -25,14 +25,16 @@ canvas        {  z-index:  1;    top:  0px; left:   0px; width: 100vw; height: 1
 
 .pic.fullscreen   {  z-index:  8;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: opacity 2s;  }
 #caption      {  z-index:  7;    top: 920px; left: 440px; width:1400px; padding:12px 20px; 
-				font-size:27px; color:rgb(196, 171, 107); font-family:'Share Tech Mono', sans-serif; }
+				font-size:27px; color:rgb(4, 155, 85)/*rgb(196, 171, 107)*/; font-family:'Share Tech Mono', sans-serif; }
 #help         {  z-index:  8;    top:  40px; left:  40px;                              }
 button { background-color: rgb(170, 224, 19); margin: 20px;   }
 
 .map          {  position:absolute;  background-size:cover;  top:  0px; left:   0px; width: 100vw; height: 100vh; }
 
 
-
+.listeners { font-size:26px;}
+.listeners sub{ color:grey;}
+.listeners system{ color:cyan;}
 
 li {
     font-family: 'Share Tech Mono';
@@ -57,11 +59,12 @@ ul{
 	border: thick solid rgba(0, 146, 37, 0.981);
 	background-size: cover;
 	}
-#claro        {  width:1000px; height: 666px;	left: 500px; top: 180px;}
-#claro.medium { width: 500px; height: 333px;	left: 100px; top:  50px;	}
-#claro.small  { width: 420px; height: 240px;	left:1425px; top:  90px;	}
-#romeo {	   width: 360px; height: 405px;	left:1400px; top: 111px;}
-#romeo.small { width: 240px; height: 270px;	left:1640px; top: 770px;	}
+#claro        	{ width:1000px; height: 666px;	left: 500px; top: 180px;	}
+#claro.medium 	{ width: 500px; height: 333px;	left: 100px; top:  50px;	}
+#claro.small	{ width: 420px; height: 240px;	left:1425px; top:  90px;	}
+#romeo 			{ width: 360px; height: 405px;	left:1400px; top: 111px;	}
+#romeo.medium 	{ width: 240px; height: 270px;	left:1640px; top: 770px;	}
+#romeo.small  	{ width: 240px; height: 270px;	left:  22px; top: 788px;	}
 
 
 #crew { border-top: 480px;  border-right: 270px;  border-bottom: 480px;  border-left: 270px; border-color: red;    }

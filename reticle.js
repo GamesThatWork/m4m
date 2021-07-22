@@ -95,10 +95,12 @@ console.log( signal );
 			},
 
 		listener: e=> self.radius( e.detail.km *100 ) ,
-		listen:  ()=> {	signal.bus.   addEventListener(  "radius", self.listener ); 		return self; },
-		unlisten:()=> {	signal.bus.removeEventListener(  "radius", self.listener ); 		return self; },
-		show:    ()=> {	graphicLayers.forEach( g => r.parent.   addChild(g) );			    return self; },
-		hide:    ()=> {	graphicLayers.forEach( g => r.parent.removeChild(g) );			    return self; },
+//		listen:  ()=> {	signal.bus.   addEventListener(  "radius", self.listener ); 		return self; },
+//		unlisten:()=> {	signal.bus.removeEventListener(  "radius", self.listener ); 		return self; },
+		listen:  ()=> {	signal.on(   "radius", self.listener ); 					return self; },
+		unlisten:()=> {	signal.off(  "radius", self.listener ); 					return self; },
+		show:    ()=> {	graphicLayers.forEach( g => r.parent.   addChild(g) );	return self; },
+		hide:    ()=> {	graphicLayers.forEach( g => r.parent.removeChild(g) );	return self; },
 		immediacy:1,
 		move: (x,y)=>{ 
 			let newK= self.immediacy, oldK=1-newK;

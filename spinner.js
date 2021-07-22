@@ -2,6 +2,7 @@
 
 import  { sfx		 } from './sfx.js';
 import  { Voice 	 } from './voice.js';
+import  { signal 	 } from './signal.js';
 
 export const newSpinner = ( root, cfg) =>{
 
@@ -57,11 +58,13 @@ const spin = time=>{
 		});
 	const spinScale = .004;//   360 /mousepad.getBoundingClientRect().height * 2;
 	console.log( mousepad.getBoundingClientRect().height);
-	mousepad.addEventListener( 'mousemove', mouseMove, );
-	mousepad.addEventListener( 'mousedown', mouseDown  );
-	mousepad.addEventListener( 'mouseup',   mouseUp    );
+//	mousepad.addEventListener( 'mousemove', mouseMove, );
+//	mousepad.addEventListener( 'mousedown', mouseDown  );
+//	mousepad.addEventListener( 'mouseup',   mouseUp    );
 
-
+	signal.onBody( 'mousemove', mouseMove, );
+	signal.onBody(  'mousedown', mouseDown  );
+	signal.onBody(  'mouseup',   mouseUp    );
 
 	function mouseMove( e ) {
 		if( Math.abs( e.movementX) > Math.abs( e.movementY)  )	return;
@@ -85,9 +88,12 @@ const spin = time=>{
 
 	const self ={
 		remove: ()=>{
-			mousepad.removeEventListener( 'mousemove', mouseMove  );
-			mousepad.removeEventListener( 'mousedown', mouseDown  );
-			mousepad.removeEventListener( 'mouseup',   mouseUp    );
+//			mousepad.removeEventListener( 'mousemove', mouseMove  );
+//			mousepad.removeEventListener( 'mousedown', mouseDown  );
+//			mousepad.removeEventListener( 'mouseup',   mouseUp    );
+			signal.offBody( 'mousemove', mouseMove  );
+			signal.offBody( 'mousedown', mouseDown  );
+			signal.offBody( 'mouseup',   mouseUp    );
 			}
 		};
 	return self;
