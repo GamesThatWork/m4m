@@ -225,11 +225,11 @@ var tZero=0;
 	    	remove: e=>{ 
 				existingTrace =null;
 				scope.reset();
-				document.body.removeEventListener("mousemove", self.mousemove )
+				signal.offBody("mousemove", self.mousemove )
 				},
 			}
 		existingTrace =self;
-		document.body.addEventListener("mousemove", self.mousemove );
+		signal.onBody("mousemove", self.mousemove );
 		return yes? self : self.remove() ;
 		}
  
@@ -354,6 +354,7 @@ var tZero=0;
 			target.classList.add( answers[ name ]);
 //			console.log( name +" => "+ answers[ name ] );
 			signal.fire(  answers[ name ] );
+			console.log( "<find> fires: "+ name +" => "+ answers[ name ] );
 			};
 		
 		oldSpinner = newSpinner( root, { hover, unhover, click, mousepad:document.body }  );
@@ -365,7 +366,8 @@ var tZero=0;
 
 var dbgid;
 const mouseresponse	= e=> {
-	e.target.removeEventListener( "mousemove", mouseresponse);
+//	e.target.removeEventListener( "mousemove", mouseresponse);
+	signal.offBody( "mousemove", mouseresponse);
 	setTimeout( e=>signal.fire( "response"), 300);
 	console.log( "user responds to: ", dbgid );		
 	sfx.ok.play(); 
@@ -375,12 +377,13 @@ const listeners=[];
 
 const perform = {
 	end: 	()=> signal.fire( "end" ), //mostly internal use
-//immediate has problems
-	immediate: 	msg		=> signal.fire( typeof msg=="string"? msg : "response" ), //no user interaction
 	now: 		next	=> sequence(next===true?"next":next ), //no user interaction
 	timeout: 	seconds	=> setTimeout( e=>signal.fire("response"), seconds*1000 ),
-	await:		action	=> document.body.addEventListener( action, e=>signal.fire("response"), {once:true}),
+	//await:		action	=> document.body.addEventListener( action, e=>signal.fire("response"), {once:true}),
+	await:		action	=> signal.onBody( action, e=>signal.fire("response"), {once:true}),
 	
+//immediate has problems, deprecated
+	immediate: 	msg		=> signal.fire( typeof msg=="string"? msg : "response" ), //no user interaction
 	/// deprecated function
 	speak: words=> {
 		speechSynthesis.cancel( );
@@ -408,16 +411,21 @@ const perform = {
 	
 	dialog: script=>	
 	Object.keys( script ).forEach( speaker=>{
-		dbgid = speaker  +": "+ script[speaker].substring(0,12);
+		dbgid = speaker  +": "+ script[speaker].substring(0,50);
 
 		let pic = newPic( speaker );
 		pic.rando();
 		console.log( "say: ", dbgid );
-		signal.on( "spoken", e=>	{
+/*		signal.on( "spoken", e=>	{
 			console.log( "spoken: ", dbgid );
 			pic.pause();
 			document.body.addEventListener( "mousemove", mouseresponse, {once:true} );
-			}, {once:true} );
+			}, {once:true} );*/
+		signal.once( "spoken", e=>	{
+			console.log( "spoken: ", dbgid );
+			pic.pause();
+			signal.onceBody( "mousemove", mouseresponse);
+			});
 		newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
 		}),
 	
@@ -431,7 +439,7 @@ const perform = {
 					let icon     = newIcon(  iconName, { parent:layerMap, ...instructions}  );
 				//	console.log( "icon processor: 1. ", icon, instructions );
 					Object.keys( instructions ).forEach( command =>{
-				//		console.log( "icon processor: 2. ", iconName, command, instructions[command] )
+				 		console.log( "icon processor: 2. ", iconName, command, instructions[command] )
 						icon[ command ]( instructions[ command] );
 						});
 					}),
@@ -478,18 +486,24 @@ const perform = {
 
 	respond: events=>{   // events is a map of event names and step numbers
 
-		if( events.spinRightWrong )	events= { 
-					right   :events.spinRightWrong+"_right", 
-					close   :events.spinRightWrong+"_close", 
-					wrong   :events.spinRightWrong+"_wrong", 
-					response:events.spinRightWrong+"_ask" }
+		if( events.pickRightWrong )	events= { 
+					right   :events.pickRightWrong+"_right", 
+					close   :events.pickRightWrong+"_close", 
+					wrong   :events.pickRightWrong+"_wrong", 
+					response:events.pickRightWrong+"_ask" }
 
-		if( events.spinHighLow )	events= { 
-					right   :events.spinHighLow+"_right", 
-					high    :events.spinHighLow+"_high", 
-					close   :events.spinHighLow+"_close", 
-					low     :events.spinHighLow+"_low", 
-					response:events.spinHighLow+"_ask" }
+		if( events.pickHighLow )	events= { 
+					right   :events.pickHighLow+"_right", 
+					high    :events.pickHighLow+"_high", 
+					close   :events.pickHighLow+"_close", 
+					low     :events.pickHighLow+"_low", 
+					response:events.pickHighLow+"_ask" }
+		
+		if( events.pickLateEarly )	events= { 
+					late    :events.pickLateEarly+"_late", 
+					early   :events.pickLateEarly+"_early", 
+					okay    :events.pickLateEarly+"_okay", 
+					response:events.pickLateEarly+"_end" };
 		
 		
 
@@ -498,7 +512,8 @@ const perform = {
 		//console.log( "  < listeners >  ", listeners);
 		
 		// clear all existing listeners
-		document.body.removeEventListener( "mousemove", mouseresponse );
+//		document.body.removeEventListener( "mousemove", mouseresponse );
+		signal.offBody( "mousemove", mouseresponse );
 		while( listeners.length){
 			let o= listeners.pop();
 			signal.off( o.event, o.handler );
@@ -540,7 +555,7 @@ function sequence(  i  ){
 	if( 			i === "next"    ) i = lastStep+1;
 	else if (typeof i === "string"  ) i = program.findIndex ( step=> step.id===i );
 	if(             i >=  program.length )	return;
-	console.log(`<SEQUENCE idStep==> "${i}" >`);
+	console.log(`<SEQUENCE idStep==> "${i}"   >(${ program[i].id })`);
 
 	if( i<0 )	console.error(`Cannot find  ${incoming} among ${ program.map(o=>o.id ) }`)
 
@@ -550,11 +565,14 @@ function sequence(  i  ){
 
 //	if( s.then       )	s.respond= { response: s.then }
 //	if( s.spinchoice )	s.respond= { right:s.spinchoice +"_right", close:s.spinchoice+"_close", wrong:s.spinchoice+"_wrong", response:s.spinchoice+"_ask" };
-	if(!s.respond && !s.spinchoice && !s.then && !s.goto)	s.then= "next";  //default progression   
+//	if(!s.respond && !s.spinchoice && !s.then && !s.goto)	s.then= "next";  //default progression   
+
+//REMOVE THIS DEFAULT
+//	if(!s.respond && !s.spinchoice && !s.then && !s.goto)	s.then= "next";  //default progression   
 
 	Object.keys( s ).forEach( k=> {
 		if (!perform[k])// &(typeof s[k] !== 'function') 
-			console.error( k+" is not a valid action. Not yet, anyway.")
+			console.warn( k+" is not a valid action. Not yet, anyway.")
 		else{
 			console.log("<sequencer> performs ", k, s[k]);
 			perform[ k ](s[k]);
@@ -606,8 +624,7 @@ function sequence(  i  ){
 */
 
 
-	const  newEquation= (cfg={})=>{
-		
+	const  newEquation= ()=>{
 		const root = document.querySelector("#math");
 		const div  = document.querySelector("#equation") ?? document.createElement("div");
 		div.id="equation";
@@ -619,12 +636,8 @@ function sequence(  i  ){
 			show: ()=> { style.display="block";	return self;},
 			}
 		return self;
-		}
-	
-	const  equation = newEquation( ).hide();
-    
-
-
+		},
+	equation= newEquation();
 
 
 
@@ -634,68 +647,159 @@ function sequence(  i  ){
 function positionIcon(  ){
 	const m= newMap("bridges");
 		
-	newIcon("blue", {parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
+newIcon("win",  {parent:layerMap, img:"blue" } ).x(  811).y( 830).size([  60,  60]).show();
+newIcon("lose", {parent:layerMap, img:"blue" } ).x(  660).y( 847).size([  60,  60]).show();
+newIcon("bomb2",{parent:layerMap, img:"blue" } ).x( 1301).y( 747).size([  60,  60]).show();
+newIcon("blue", {parent:layerMap, img:"blue" } ).x(  266).y( 735).size([  60,  60]).show();
+
+/*
+win  {x: 840, y: 852} 47.14122855808092
+lose {x: 689, y: 874} 47.14122855808092
+both {x: 1330, y: 770} 47.14122855808092
+bothtarget{x: 1405, y: 288} 125.0797135508448
 	newIcon("red.0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
 	newIcon("red.1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135, 135]).show();
-    newIcon("red.2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 135]).show();
+    newIcon("red.2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 70]).show();
     newIcon("red.3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
-	
-	let which="red1";
+*/
+	let which="blue";
 
 	const probe =newReticle( retOptions ).hide();
 //	const probe =newIcon( which, { parent:layerMap, img:which } );
 	
- 	const size=[ -70,70];
+ 	const size=[ 85,85];
 	const pos={x:1300, y:10};
 	var shifted= 1, nudge=1, resize=1.05, radius=25, beenhere=0;
-	
+document.querySelector("#caption").setAttribute("contentEditable", "true");
+document.querySelector("#caption").style.top= "400px";
 	
 	const tweak = {      
 		ArrowRight: e=>  pos.x+=nudge * shifted,
 		ArrowLeft:  e=>  pos.x-=nudge * shifted,
-		ArrowUp:    e=>  pos.y-=nudge * shifted,
+		ArrowUp:    e=>  pos.y-=nudge *+ shifted,
 		ArrowDown:  e=>  pos.y+=nudge * shifted,
-		PageUp:		e=>	 size[0]=size[1]=radius*=resize * shifted,
-		PageDown:	e=>	 size[0]=size[1]=radius/=resize * shifted,
+		PageUp:		e=>	{size[0]*=resize*shifted; size[1]*=resize*shifted; radius*=resize*shifted; },
+		PageDown:	e=>	{size[0]/=resize*shifted; size[1]/=resize*shifted; radius/=resize*shifted; },
 		ShiftRight: e=>	 shifted=10,
 		ShiftLeft:  e=>	 shifted=10,
+		Space:		e=>	document.querySelector("#caption").innerText+=
+  `[${pos.x},${pos.y}], `,
+		Escape:		probe.drive,
 		help:		e=>  {}
 		};
 	document.addEventListener('keydown', e=>{
 		(tweak[e.code] || tweak.help)( e );
 		probe.x( pos.x ).y( pos.y ).radius( radius ).show();
+//		probe.x( pos.x ).y( pos.y ).size( size ).show();
 		console.log( which, " ::: ", pos, radius );
+
+
 		if( !beenhere++) document.querySelector("body").requestFullscreen();
 		});
 	document.addEventListener('keyup',   e=> shifted = e.code.includes("Shift")? 1:shifted ) ;
 }
 
 
-const finder = cfg =>{
+let activeFinderHandlers={};
 
+const finder = cfg =>{
 
 	var found= null,  radius=0, shown=null;
 	const probe =newReticle( retOptions ).unlisten();
 
-	const targets= [
-		{ name: "blue",    x:  300, y: 770, radius: 66, color:   "blue" },
-		{ name: "red0",    x:   45, y: 690, radius: 60, color:    "red" },
-		{ name: "red1",    x:  275, y: 267, radius: 80, color:    "red" },
-		{ name: "red2",    x: 1160, y: 100, radius: 80, color:    "red" },
-		{ name: "red3",    x: 1245, y:  16, radius: 66, color:    "red" },
-		{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
-		{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
-		{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
-		{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
-		{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
-		];
-	newMap("bridges");
-	newIcon("blue",{parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
-	newIcon("red0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
-	newIcon("red1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135, 135]).show();
-    newIcon("red2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 135]).show();
-    newIcon("red3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
+//	Object.keys( activeFinderHandlers ).forEach( event=> document.body.removeEventListener( event, activeFinderHandlers[ event ] ) );
+	Object.keys( activeFinderHandlers ).forEach( event=> signal.offBody( event, activeFinderHandlers[ event ] ) );
+	activeFinderHandlers={};
+	if( cfg===false )	return;
+
+
+	const targetSets= {
+		intro: [
+			{ name: "blue",    x:  300, y: 770, radius: 66, color:   "blue" },
+			{ name: "red0",    x:   45, y: 690, radius: 60, color:    "red" },
+			{ name: "red1",    x:  275, y: 267, radius: 80, color:    "red" },
+			{ name: "red2",    x: 1160, y: 100, radius: 80, color:    "red" },
+			{ name: "red3",    x: 1245, y:  16, radius: 66, color:    "red" },
+			{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+			{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
+			{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
+			{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
+			{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
+			],
+		aim1: [
+			{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+			{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
+			{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
+			{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
+			{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
+			],
+		aim2: [
+			{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+			{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
+			{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
+			{ name: "bridge23",x: 1405, y: 288, radius:160, color: "yellow" },
+			{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
+			{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
+			],
+		bda1:{
+			win: [
+				{ name: "win",     x:  840, y: 852, radius: 66, color:   "blue"},
+				{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow", bda:true },
+				],
+			lose: [
+				{ name: "lose",    x:  680, y: 847, radius: 66, color:   "blue" },
+				{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow", bda:true  },
+				]
+			},
+		bda2:{
+			win: [
+				{ name: "win",     x: 1330, y: 770, radius: 66, color:   "blue" },
+				{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+				{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow", bda:true },
+				{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow", bda:true },
+				],
+			lose: [
+				{ name: "lose",    x: 1330, y: 770, radius: 66, color:   "blue" },
+				{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+				{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow", bda:true },
+				{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow", bda:true },
+				],
+			}	
+		};
 	
+	
+	newMap("bridges").show();
+	
+	const setIcons={
+		intro: e=>{
+			newIcon("blue",{parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
+			newIcon("red0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
+			newIcon("red1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135, 135]).show();
+			newIcon("red2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 135]).show();
+			newIcon("red3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
+			},
+		aim1: e=>{	},
+		aim2: e=>{	},
+		bda1:{
+			win:  e=>newIcon("win",  {parent:layerMap, img:"blue" } ).x(  811).y( 830).size([  60,  60]).show(),
+			lose: e=>newIcon("lose", {parent:layerMap, img:"blue" } ).x(  660).y( 847).size([  60,  60]).show()
+			},
+		bda2:{
+			win:  e=>newIcon("win",  {parent:layerMap, img:"blue" } ).x( 1301).y( 747).size([  60,  60]).show(),
+			lose: e=>newIcon("lose", {parent:layerMap, img:"blue" } ).x( 1301).y( 747).size([  60,  60]).show()
+			}
+		};
+	let domain = cfg.domain ?? "bda2";
+	let result =!targetSets[domain].win? null : (newIcon("blue").getTime()==="okay"? "win":"lose");
+	console.log( domain, result);
+
+	             (result? setIcons[   domain ][ result ] : setIcons[   domain ])();
+	let targets=  result? targetSets[ domain ][ result ] : targetSets[ domain ];
+
+//	if( result ) setIcons[   domain ][ result ] ()
+//	else		 setIcons[   domain ]();
+
+
 
 	let busy=false;
 	const dsq = (e,t)=> (e.x-t.x)*(e.x-t.x) + (e.y-t.y)*(e.y-t.y);
@@ -706,28 +810,29 @@ const finder = cfg =>{
 		
 	const handlers={
 		mousemove: e=>{
-			let target= targets.reduce( (closest,t)=> dsq(e,t) < dsq(e,closest)? t : closest, targets[0]);
+			let target= targets.reduce( (closest,t)=> dsq(e,t) < dsq(e,closest)? t : closest, {x:-9999,y:-9999} );
 			let d =  Math.sqrt(dsq( e, target));
-			let r = Math.max(0, target.radius - d);
+			let r =  Math.max(0, target.radius - d);
 			found =  d<25?  target : null;
 		//	console.log( target.name, Math.floor(d), r  );
 			probe.x( e.x ).y( e.y ).lines( found?.color ?? "grey" ).radius( r, target.color ).show();
 			},
 		mousedown: e => {
 			if( busy ) 	return;
-			let answer = 	!cfg? "No paramters on Finder"
-						: 	(!cfg.answers? "No answers supplied"
-						:	(!found? "Nothing found"	
-						: 	(cfg.answers[ found.name ] || ("No answer for "+found.name))));
+			let answer = 	!cfg?                     	   "No parameters on Finder"
+						: 	(!cfg.answers?                 "No answers supplied"
+						:	(!found?                       "Nothing found"	
+						: 	(cfg.answers[ found.name ] ?? 
+							 cfg.answers.default       ?? (`No answer (nor default) for ${found.name}`  ))));
 
 			if( found ) 	signal.fire( answer );
-			console.log( "fires: "+ found?.name +" => "+ answer );
+			console.log( "<find> fires: "+ found?.name +" => "+ answer );
 			sfx.current = found? sfx.button : sfx.button.disabled;
 			sfx.current.down.play(); 
 			if( found )	{
-				sfx.music.volume(0.25);
+				sfx.music.volume(0.35);
 				shown = newPic( found.name ).show().full();
-				if( cfg.answers[ found.name]=="bda" )	shown.bda();
+				if( found.bda )	shown.bda();
 				document.querySelector("#canvas").style.display="none";
 				}
 			else shown = null;
@@ -737,19 +842,21 @@ const finder = cfg =>{
 			if( shown ){
 				shown.fadeout();
 				signal.once( "pic.kill", e=>{
+					signal.off( "pic.kill", this)
 					document.querySelector("#canvas").style.display="block";
 					busy=false;
 					});
-				setTimeout( e=>sfx.music.volume(.12), 1000 );
-				setTimeout( e=>sfx.music.volume(.06), 2000 );
-				setTimeout( e=>sfx.music.volume(.03), 3000 );
-				setTimeout( e=>sfx.music.volume(.02), 4000 );
+				setTimeout( e=>sfx.music.volume(.12), 2500 );
+				setTimeout( e=>sfx.music.volume(.06), 4000 );
+				setTimeout( e=>sfx.music.volume(.03), 5500 );
+				setTimeout( e=>sfx.music.volume(.02), 7000 );
 				}
 			}
 			
 		}
-	Object.keys( handlers ).forEach( event=> document.body.addEventListener( event, handlers[ event ] ) );
-	
+//	Object.keys( handlers ).forEach( event=> document.body.addEventListener( event, handlers[ event ] ) );
+	Object.keys( handlers ).forEach( event=> signal.onBody( event, handlers[ event ] ) );
+	activeFinderHandlers=handlers;
 }
 
 
@@ -812,5 +919,5 @@ const action={
 document.addEventListener('keydown', e=>(action[e.code] || action.help)( e ) );
 
 
-sequence( 0 );
+//sequence( 0 );
  }
