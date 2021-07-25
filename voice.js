@@ -22,11 +22,22 @@ export 	const newVoice= (speaker, cfg={})=> {
 		say:	 line=>{
 			if(  self.caption )	self.caption.innerText= self?.script[ line ] || "";
 			console.log( "VOICE SAYS: " + line );
-			if( 	 self?.audio[  line ] )	self.audio[line].play()
+			if( 	 self?.audio[  line ] )	{
+						self.audio[line].onended= e=>  {
+				//				clearInterval( self.jiggle );
+								available= true;
+								last.time=Date.now();
+								signal.fire("spoken");
+								};
+						self.audio[line].play()
+						}
 			else if( self?.script[ line ] )	self.speak( self.script[ line ] );
 			else signal.fire("spoken");
 			return self;
 			},
+
+ 
+
 		speak:	words=>{
 
 			if( !available || ((last.words === words )&& ((Date.now()-last.time)<1000 )) )		return self;
@@ -110,7 +121,7 @@ claro:{
 	
 	start:
 		`Build the model using this math wheel.
-		It is a tool that lets you inset mathematical expressions.`,
+		It is a tool that lets you insert mathematical expressions.`,
 	start_ask:   `Turn the wheel to the Start position and press the button.`,
 	start_wrong: `No. That’s not the start button.`,
 	start_right: `Right. Let's get started.`,
@@ -189,7 +200,7 @@ claro:{
 		`We put a stone wall on the map near the explosion. 
 		What is the smallest charge that can damage the wall?
 		Spin up and down to change omega.
-		Roll left and right to explore dstance.`,
+		Roll left and right to explore distance.`,
 	q1_ask:   	`Spin the ball and roll it.
 				Find the smallest omega that can damage the wall.`,
 	q1_high:	`No, that omega is too high. You'll cause unnecessary damage. Try a lighter touch.`,
@@ -218,7 +229,7 @@ claro:{
 
 // ROMEO TALKS NOW
 
-
+/*
 	choose:
 		`Use your model find the right munition to break the steel bridge.
 		You must disable the bridge when the munition lands within twenty yards.
@@ -230,7 +241,7 @@ claro:{
 	choose_wrong: `This munition was too small. Choose another one.`,
 	choose_close: `That did the job on the bridge. But it is very large and dangerous.`,
 	choose_close: `Good job of munitions selection.`,
-
+*/
 	end: `You did very well.
 		Thank you so much for your help with math and science.
 		`},
@@ -345,15 +356,15 @@ romeo:	{
 		These are cultural treasures of the Rumini people.
 		You must be careful not to break the windows.`,
 		
-	bombsite2:
+	aim2:
 		`Uh oh. We're out of time. You can only make one more strike!
 		You must design a munition to disable both remaining bridges in one blow!
 		Remember one is stone and one is steel. 
 		And you must be very careful not to break the ancient glass!`,
-	bombsite2_ask: `Set your target.`,
-	bombsite2_wrong: `Pick a target in the right area.`,
-	bombsite2_close: `Pick a better target.`,
-	bombsite2_right: `Good target.`,
+	aim2_ask: `Both remaining bridges in one blow`,
+	aim2_wrong: `Pick a target in the right area.`,
+	aim2_close: `Pick a better target.`,
+	aim2_right: `Good target.`,
 
 	bomb2:
 		`Tough problem, Doc.
@@ -373,4 +384,7 @@ romeo:	{
 	}
 }
 
-const audio={};
+const audio= { claro: {}, romeo:{}};
+
+Object.keys( script.claro).forEach( name => audio.claro[ name ]=new Audio(`./assets/voice/claro/${name}.ogg`) );
+Object.keys( script.romeo).forEach( name => audio.romeo[ name ]=new Audio(`./assets/voice/romeo/${name}.ogg`) );
