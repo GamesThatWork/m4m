@@ -6,6 +6,8 @@ const pitch={ claro:1.1, romeo:0.7 };
 const last= {};
 var available = true;
 
+
+
 export 	const Voice={ get speaking() { return !available }} 
 
 export 	const newVoice= (speaker, cfg={})=> {
@@ -20,44 +22,46 @@ export 	const newVoice= (speaker, cfg={})=> {
 		jiggle:  null,
 
 		say:	 line=>{
-			if(  self.caption )	self.caption.innerText= self?.script[ line ] || "";
 			console.log( "VOICE SAYS: " + line );
-			if( 	 self?.audio[  line ] )	{
-						self.audio[line].onended= e=>  {
-				//				clearInterval( self.jiggle );
-								available= true;
-								last.time=Date.now();
-								signal.fire("spoken");
-								};
-						self.audio[line].play()
-						}
-			else if( self?.script[ line ] )	self.speak( self.script[ line ] );
-			else signal.fire("spoken");
+			if(  	 self.caption )			self.caption.innerText= self?.script[ line ] || "";
+			if(      self?.audio[  line ] )	self.speak( line );
+			else if( self?.script[ line ] )	self.utter( line  );
+			else 	 signal.fire("spoken");
 			return self;
 			},
 
- 
+		speak:	line=>{
+			if( !available  )	{	console.log(`Speech: Unavailable to [${line}]`);  return self;}
+			if( (last.line===line)&& ((Date.now()-last.time)<1000 ))	
+								{	console.log(`Speech: block repeat of [${line}]`);  return self;}	
+			last.line = line;
+			available=false;	
+			console.log( "  <speak>  ", line);
+			self.audio[ line ].onended= e=> {
+				available= true;
+				last.time=Date.now();
+				signal.fire("spoken");
+				};
+			self.audio[ line ].play();
+			return self;
+			},	 
 
-		speak:	words=>{
-
-			if( !available || ((last.words === words )&& ((Date.now()-last.time)<1000 )) )		return self;
-			last.words = words;
+		utter:	line=>{
+			if( !available || ((last.line === line )&& ((Date.now()-last.time)<1000 )) )		return self;
+			last.line = line;
 			speechSynthesis.cancel( );
 			available=false;	
-//			self.jiggle= setInterval( e=>speechSynthesis.resume(), 500 );
-			console.log( "  < speak >  ", words);
-			let utterance = new SpeechSynthesisUtterance(words);
-//			utterance.voice = speechSynthesis.getVoices()[21*Math.random()],//self.voice;
+			console.log( "  < utter >  ", line);
+			let utterance = new SpeechSynthesisUtterance( self.script[line]);
 			utterance.pitch = pitch[ speaker ];
 			utterance.onend= e=> {
-//				clearInterval( self.jiggle );
 				available= true;
 				last.time=Date.now();
 				signal.fire("spoken");
 				};
 			speechSynthesis.speak(  utterance );
 			return self;
-			}	
+			},	 
 		}
 	selfs[ speaker ] = self;
 	return self;
@@ -72,9 +76,12 @@ claro:{
 	`	`,
 	welcome: 
 	`	Welcome.
-		We could use help here at the Air Force Research Lab.
-		We are looking for a brave young person who is not afraid to use math and science.
-		Maybe you can help.`,
+		Here at the Air Force Research Lab,
+		We are looking for a brave young person 
+		who is not afraid to use math and science.`,
+	//	We could use help here at the Air Force Research Lab.
+	//	We are looking for a brave young person who is not afraid to use math and science.
+	//	Maybe you can help.`,
 	challenge:
 	`	Let’s see if you have what it takes to be a Lab scientist.
 		In our Lab, we study many things. One thing we study is how munitions work.
@@ -109,7 +116,7 @@ claro:{
 	glass:
 		`The yellow line shows where the pressure can break glass.`,
 	steel:
-		`Pressure can break steel when it reaches this.`,
+		`Pressure can break steel when it reaches this level.`,
 	stone:
 		`Or break up a stone structure at the level of this red line.`,
 
@@ -170,7 +177,7 @@ claro:{
 
 	prop: 
 		`When energy spreads out in three dimensions,
-		pressure dissipates according to distance -  to the third power.
+		pressure dissipates according to distance - exponentially - to the third power.
 		Divide pressure by the distance cubed.`,
 	prop_ask:   `Find the term for expanding in three dimensions.`,
 	prop_wrong: `Keep looking.`,
@@ -298,7 +305,7 @@ romeo:	{
 
 	bridge1:	`It looks to me like they plan to cross the Josko river
 		and attack our Base
-		But you can stop them, Doc. 
+		But you can stop them. 
 		They can't cross the Josko if you knock out the bridges.`,
 	bridge1_ask:	`Do you see Bridge Number One?
 					Right in front of our blue jeep.`,
@@ -352,7 +359,7 @@ romeo:	{
 	shrine_wrong:`That isn’t the shrine`,
 	shrine_close:`Look for the obelisk on the map.`,
 	shrine_right:
-		`Those ancient stained glass windows are protected structures.
+		`Those ancient stained glass windows are protected by treaty.
 		These are cultural treasures of the Rumini people.
 		You must be careful not to break the windows.`,
 		
