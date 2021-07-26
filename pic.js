@@ -1,8 +1,8 @@
 
 import  { signal     } from './signal.js'    ;
 
-
 	const fadeoutDuration= 7000;//ms
+
 	const url= { 	
 	imgserver: "https://storage.googleapis.com/storage/v1/b/unscrew-u/" ,
 	      img: "https://storage.googleapis.com/unscrew-u/",
@@ -45,7 +45,7 @@ import  { signal     } from './signal.js'    ;
 		bridge1:  "./assets/target/1.jpg",
 		bridge2:  "./assets/target/2.jpg",
 		bridge3:  "./assets/target/3.jpg",
-		bridge023:"./assets/target/3.jpg",  // combo 0+2+3
+		bridge23: "./assets/target/23.jpg",  // combo 0+2+3
 		hq:  	  "./assets/blue/camp.jpg",
 		win:  	  "./assets/blue/happy.jpg",
 		lose:  	  "./assets/blue/sad.jpg",
@@ -97,7 +97,7 @@ export const newPic= (name, cfg) => {
 							setTimeout( self.kill, fadeoutDuration ); 
 							 						console.log("pic: Fade ",name);    return self;  },
 
-			scan:  	()=> {	
+			scan:  	()=> {	//  CURRENTLY NOT USED IN THE GAME
 					const zoom =4;
 					if( !self._scan ){   
 						style.transition="transform 0s";
@@ -138,14 +138,14 @@ export const newPic= (name, cfg) => {
 				let pre = `url("${url[name]}`;
 				let post= pre.replace( '/target/', '/target/bda/');
 				console.log( "showing BDA effect", pre, post );
-				//style.backgroundImage=	pre;
+				style.backgroundImage=	pre;
 				style.transitionProperty=  "background-image" ;
-				//style.transitionTimingFunction= "ease-in-out";
+				style.transitionTimingFunction= "ease-in";
 				style.transitionDuration = "1200ms";
-				style.transitionDelay = "800ms";
+				style.transitionDelay = "1800ms";
 				style.backgroundImage=	post;
 				setTimeout( e=>style.backgroundImage=	post, 100);
-				console.log("pic: Fade ",name);    return self;  }, 
+				console.log("pic: bda ",name);    return self;  }, 
 
 			timeoutID: false,
 			rando: (run=true) =>{	
