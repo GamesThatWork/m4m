@@ -5,7 +5,8 @@ const url= {
 	server: "./assets/icon/",
 	stone:  "stone.png",
 	glass:  "glass.png",
-  	 blue:  "bluecrew.png",
+   shrine:  "shrine.png",
+	 blue:  "bluecrew.png",
 	 red1:  "1red.png",
 	 red3:  "3red.png",
 	};
@@ -67,24 +68,33 @@ const drive={	road:road[0], across:across[0], position:0,	lead:20, timers:[], ro
 			     		: (drive.position >(drive.across+drive.lead)? 	"late"
 						: 												"okay" )   };
 
-const selfs=[];
+const selfs={};
 var parent= document.querySelector("#pix");
 
 
 export const newIcon= (name, cfg) => {
 
 	console.log("icon", name );
+	if( name=="all")	{
+		Object.keys(selfs).forEach( name=> {
+			console.log("<all> is hiding icon "+ name);
+			selfs[name].hide();
+			});
+		return Object.values(selfs)[0];
+		}
 	if( selfs[ name ] )	return selfs[name];
 	if( cfg.parent )	parent=cfg.parent;
-
-
-
 	var g=false; 
 
     const self={
+		name, 
 		get g() { return g },
 		construct: ()=>{
 			let imgfile= cfg.img || name;
+			if( !url[imgfile])  {
+				console.warn("Missing icon file", imgfile, name );
+				return;
+				}
 			g = new PIXI.Sprite.from( url.server + url[ imgfile ]);
 			parent.addChild( g )
 			return self;
@@ -114,6 +124,8 @@ export const newIcon= (name, cfg) => {
 								return self;},
 		getTime:	drive.time,
 		destruct: ()=>g.destroy(),
+
+		
         }
     return selfs[ name ]=self.construct();
     }
