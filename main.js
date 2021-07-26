@@ -71,9 +71,9 @@ window.onload= e=>{
     
     //********************* test the oscilloscope *************
 
-		const b=2*wavelength;
-		const m= .7;	
-		const s = .7;
+		const b= 4*wavelength;  // move the wavecrest further right == expose more wave, older wave
+		const m= 1;		     	// adjust the horizontal scale
+		const s =.2;  			// adjust vertical scale
     
 	const lineFunction={
 		none:  (x,n)=>  0,                    
@@ -95,9 +95,9 @@ window.onload= e=>{
 	const areaFunction={
 		none:  (x,n)=>  -.0007,
 		start: (x,n)=>   .0007,
-		power: (x,n)=>  n>350? 0 : .005,                                                                                      // power constant - everywhere all at once
+		power: (x,n)=>  n>350? 0 : .005,                                                                                      // power constant - everywhere all the time
 		pulse: (x,n)=>  x<n+wavelength?   .005                                                                  :   0   ,   // pulse (heaviside)
-		wave:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.001        :   0   ,   // wavetrain
+		wave:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 - (n-x))/wavelength ) *Math.PI)  / 500     +0.0015       :   0   ,   // wavetrain
 		decay: (x,n)=>  x<n+wavelength?  n==x? .00355 : Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / ((1+(n-x)*35  ) )  :   0   ,     // decay
 		prop:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // propagation
 		full:  (x,n)=>  x<n+wavelength?  Math.sin( ((0 + (n-x))/wavelength ) *Math.PI)  / (n**2-n*x)            :   0 ,     // full featured shockwave 
@@ -197,40 +197,43 @@ var tZero=0;
       if( synch ) setRadius( synch, x*111+50);
       }
     
-	let existingTrace=null;
+
+	let activeTrace=null;
 
 //every mouse move  // pointerlocked  
-    const trace= ( yes=true )=>{
+    const trace= ( enable=true )=>{
 	
-		if( existingTrace  )return yes? existingTrace  : existingTrace.remove() ;
 
-		var km=0;
-		const kmScale   = 1/50;  // trackball movemant to km
-		const scopeScale= 500/8; // km to scope display units
-		const dbg=document.querySelector("#help");
-		const bus=document.querySelector("#bus");
-		scope.reset();
-		
-		const self={
-			mousemove: e=>{
-				if( Math.abs( e.movementX)< Math.abs( e.movementY)  )	return;
-				e.stopImmediatePropagation();
-				km += e.movementX * kmScale;
-				km = Math.max( 0.01, Math.min( km, 12));
-				//dbg.innerText= Math.floor(km*100)/100;
-				//dbg.innerText= km - km%0.001;
-				scope.plot( areaBuffer( areaFunc,  km* scopeScale ) ); 
-				signal.fire( "radius", {km} );
-				},
-	    	remove: e=>{ 
-				existingTrace =null;
-				scope.reset();
-				signal.offBody("mousemove", self.mousemove )
-				},
+		if( !enable )
+			if( activeTrace  ) activeTrace.remove();
+			else console.warn(  "Turning off non-existent trace." );
+		else{
+			if( activeTrace  ) return activeTrace;
+
+			var km=0;
+			const kmScale   = 1/50;  // trackball movemant to km
+			const scopeScale= 500/8; // km to scope display units
+			scope.reset();
+			
+			const self={
+				mousemove: e=>{
+					if( Math.abs( e.movementX)< Math.abs( e.movementY)  )	return;
+	//				e.stopImmediatePropagation();
+					km += e.movementX * kmScale;
+					km = Math.max( 0.01, Math.min( km, 12));
+					scope.plot( areaBuffer( areaFunc,  km* scopeScale ) ); 
+					signal.fire( "radius", {km} );
+					},
+				remove: e=>{ 
+					activeTrace =null;
+					scope.reset();
+					signal.offBody("mousemove", self.mousemove )
+					},
+				}
+			activeTrace =self;
+			signal.onBody("mousemove", self.mousemove );
+			return self;
 			}
-		existingTrace =self;
-		signal.onBody("mousemove", self.mousemove );
-		return yes? self : self.remove() ;
 		}
  
     
@@ -256,16 +259,16 @@ var tZero=0;
 											} )*/
  
 
-	var oldSpinner;
+	var spinner;
 
 	const makeSpinner = cfg=> {
 
 
 	
 		const oldFrame = document.querySelector("#spinnerwindow");
-		if( oldSpinner )	oldSpinner.remove();
+		if( spinner )	spinner.remove();
 		if( oldFrame   )	oldFrame.remove();
-		oldSpinner = false;
+		spinner = false;
 
 
 		if( cfg===false )	return;
@@ -282,7 +285,7 @@ var tZero=0;
 				};
 		const facetNames=allFacets[ domain ];
 
-		const tracing= domain=="xplo";
+		const tracing= domain=="xplo" && !!activeTrace;
 
 //		console.log( cfg, facetNames, answers );
 
@@ -341,7 +344,7 @@ var tZero=0;
 				document.querySelector( ".pause").setAttribute( "visibility", !plot? "hidden":"visible" );
 				//target.innerText= plot?"⏸︎":"⏵︎";
 				}
-			else */if( answers[ name ]=="right" ){
+			else */if( answers[ name ]=="right" && name!="start"){
 				plotLine("none");
 				plotArea( name );
 				plot=true;
@@ -357,33 +360,58 @@ var tZero=0;
 			console.log( "<find> fires: "+ name +" => "+ answers[ name ] );
 			};
 		
-		oldSpinner = newSpinner( root, { hover, unhover, click, mousepad:document.body }  );
+		spinner = newSpinner( root, { hover, unhover, click, mousepad:document.body }  );
 		return facetNames;
 		};
 			
 
 
 
-var dbgid;
-const mouseresponse	= e=> {
-//	e.target.removeEventListener( "mousemove", mouseresponse);
-	signal.offBody( "mousemove", mouseresponse);
+var dbgid, currentSpeakerPic;
+
+const listeners=[];
+
+// self cancelling handlers
+
+   //note that this handler is packaged inside the object,unlike the other 3
+const respondOnceToBrowserEvent= {
+	eventName: "",
+	handler: e=>{
+		signal.offBody( respondOnceToBrowserEvent.eventName, respondOnceToBrowserEvent.handler );
+		signal.fire("response");
+		}
+	};
+const respondOnceToMouseMovement	= e=> {
+	signal.offBody( "mousemove", respondOnceToMouseMovement);
 	setTimeout( e=>signal.fire( "response"), 300);
 	console.log( "user responds to: ", dbgid );		
 	sfx.ok.play(); 
 	};
+	
+const respondOnceToSpeechEnds	= e=> {
+	signal.off( "spoken",   respondOnceToSpeechEnds );
+	setTimeout( e=>signal.fire( "response"), 300);
+	currentSpeakerPic.pause();
+	console.log( "Respond to end of speech ", dbgid );		
+	};
+	
+const speechEndsExpectMouseMovement	= e=> {
+	signal.off( "spoken",  speechEndsExpectMouseMovement );
+	signal.onBody( "mousemove", respondOnceToMouseMovement);
+	currentSpeakerPic.pause();
+	console.log( "Wait for mouse movement after speech ", dbgid );		
+	};
+	
 
-const listeners=[];
 
 const perform = {
 	end: 	()=> signal.fire( "end" ), //mostly internal use
 	now: 		next	=> sequence(next===true?"next":next ), //no user interaction
 	timeout: 	seconds	=> setTimeout( e=>signal.fire("response"), seconds*1000 ),
-	//await:		action	=> document.body.addEventListener( action, e=>signal.fire("response"), {once:true}),
-	await:		action	=> signal.onBody( action, e=>signal.fire("response"), {once:true}),
+	await:		action	=> signal.onBody( respondOnceToBrowserEvent.eventName=action, respondOnceToBrowserEvent.handler ),
 	
 //immediate has problems, deprecated
-	immediate: 	msg		=> signal.fire( typeof msg=="string"? msg : "response" ), //no user interaction
+/*	immediate: 	msg		=> signal.fire( typeof msg=="string"? msg : "response" ), //no user interaction
 	/// deprecated function
 	speak: words=> {
 		speechSynthesis.cancel( );
@@ -392,7 +420,7 @@ const perform = {
 		u.onend= signal.fire( "spoken" ), 
 		speechSynthesis.speak(  u );
 		},
-	
+*/	
 	voice: script=>	
 		Object.keys( script ).forEach( speaker=>
 			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )),
@@ -400,35 +428,24 @@ const perform = {
 	monolog: script=>	
 		Object.keys( script ).forEach( speaker=>{
 			dbgid = speaker  +": "+ script[speaker].substring(0,12);
-
-			let pic = newPic( speaker );
-			pic.rando();
+			currentSpeakerPic = newPic( speaker );
+			currentSpeakerPic.rando();
 			console.log( "say: ", dbgid );
-			signal.on( "spoken", e=> setTimeout( e=>signal.fire( "response"), 250 ) ); 
+			signal.on( "spoken", respondOnceToSpeechEnds  ); 
 			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
 			}),
 	
 	
-	dialog: script=>	
-	Object.keys( script ).forEach( speaker=>{
-		dbgid = speaker  +": "+ script[speaker].substring(0,50);
-
-		let pic = newPic( speaker );
-		pic.rando();
-		console.log( "say: ", dbgid );
-/*		signal.on( "spoken", e=>	{
-			console.log( "spoken: ", dbgid );
-			pic.pause();
-			document.body.addEventListener( "mousemove", mouseresponse, {once:true} );
-			}, {once:true} );*/
-		signal.once( "spoken", e=>	{
-			console.log( "spoken: ", dbgid );
-			pic.pause();
-			signal.onceBody( "mousemove", mouseresponse);
-			});
-		newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
-		}),
-	
+	dialog: script=>	// will probably fail badly with more than one speaker - would need to serialize it, if needed
+		Object.keys( script ).forEach( speaker=>{
+			dbgid = speaker  +": "+ script[speaker].substring(0,50);
+			currentSpeakerPic = newPic( speaker );
+			currentSpeakerPic.rando();
+			console.log( "say: ", dbgid );
+			signal.on( "spoken", speechEndsExpectMouseMovement );
+			newVoice( speaker, {caption:document.querySelector("#caption")} ).say( script[speaker] )	
+			}),
+		
 	
 	
 	
@@ -455,16 +472,18 @@ const perform = {
 					}),
  	
 	scope: 		script=> Object.keys( script ).forEach( command=> scope[     command ]( script[command] ) ),
+	spinner: 	script=> Object.keys( script ).forEach( command=> spinner[   command ]( script[command] ) ),
 	reticle: 	script=> Object.keys( script ).forEach( command=> reticle[   command ]( script[command] ) ),
 	equation: 	script=> Object.keys( script ).forEach( command=> equation[  command ]( script[command] ) ),
 	music: 		script=> Object.keys( script ).forEach( command=> sfx.music[ command ]( script[command] ) ),
+	reboot: 	(    )=> window.location.reload(),
 
 	find:	data => finder(data),
-	trace:  yes=>{
+	trace:  enable=>{
 				scope.reset();
 				plot=false;
 				areaFunc="full";
-				trace( yes  );
+				trace( enable );
 				},
 
 	plot:  yes=>plot=yes,
@@ -509,20 +528,19 @@ const perform = {
 
         let currentevents = Object.keys( events ).map( k=> `  ${k} -> "${events[k]} "`).join(" | ");
 		console.log( "entering  <perform.respond> to compose:  ", currentevents);
-		//console.log( "  < listeners >  ", listeners);
 		
 		// clear all existing listeners
-//		document.body.removeEventListener( "mousemove", mouseresponse );
-		signal.offBody( "mousemove", mouseresponse );
 		while( listeners.length){
 			let o= listeners.pop();
 			signal.off( o.event, o.handler );
 			}
 		signal.clear();
-		
-		// wait until current speech is completed before building response system
+//		signal.onBody( "mousemove", respondOnceToMouseMovement );
 
-		let composeResponses=  e=>
+				// wait until current speech is completed before building response system
+		let composeResponses=  e=>{
+			if( e )		signal.off("spoken", composeResponses );
+			
 			Object.keys( events ).forEach( event=> {
 				let listener={ event };
 				listener.handler= ((nextStep,event)=>{
@@ -534,13 +552,13 @@ const perform = {
 					})( events[ event ], event);
 				listeners.push( listener );
 				signal.on( listener.event, listener.handler );
-				});
+				})};
 
 
 		console.log( ( Voice.speaking? " -Deferred ":" - Immediate ") + "composition of <response> Handler(s) for --> "+currentevents)
 
-		if( Voice.speaking )	signal.once("spoken", composeResponses);
-		else					composeResponses();
+		if( Voice.speaking )	signal.on("spoken", composeResponses );
+		else					composeResponses( false ) ;
 		}
 	}
 
@@ -553,7 +571,7 @@ function sequence(  i  ){
 	console.log(`<SEQUENCE idStep  = "${i}" >`);
 	if( 			i === "next"    ) i = lastStep+1;
 	else if (typeof i === "string"  ) i = program.findIndex ( step=> step.id===i );
-	if(             i >=  program.length )	return;
+	if(             i >=  program.length )	i=0;
 	console.log(`<SEQUENCE idStep==> "${i}"   >(${ program[i].id })`);
 
 	if( i<0 )	console.error(`Cannot find  ${incoming} among ${ program.map(o=>o.id ) }`)
@@ -646,10 +664,12 @@ function sequence(  i  ){
 function positionIcon(  ){
 	const m= newMap("bridges");
 		
-newIcon("win",  {parent:layerMap, img:"blue" } ).x(  811).y( 830).size([  60,  60]).show();
-newIcon("lose", {parent:layerMap, img:"blue" } ).x(  660).y( 847).size([  60,  60]).show();
-newIcon("bomb2",{parent:layerMap, img:"blue" } ).x( 1301).y( 747).size([  60,  60]).show();
-newIcon("blue", {parent:layerMap, img:"blue" } ).x(  266).y( 735).size([  60,  60]).show();
+newIcon("win",  {parent:layerMap, img:"blue" }     ).x(  811).y( 830).size([  60,  60]).show();
+newIcon("lose", {parent:layerMap, img:"blue" }     ).x(  660).y( 847).size([  60,  60]).show();
+newIcon("bomb2",{parent:layerMap, img:"blue" }     ).x( 1301).y( 747).size([  60,  60]).show();
+newIcon("blue", {parent:layerMap, img:"blue" }     ).x(  266).y( 735).size([  60,  60]).show();
+//newIcon("shrine", {parent:layerMap, img:"shrine" } ).x(  493).y( 768).size([  35,  65] ).show();
+newIcon("shrine", {parent:layerMap, img:"shrine" } ).x( 1610).y( 764).size([  35,  65] ).show();
 
 /*
 win  {x: 840, y: 852} 47.14122855808092
@@ -661,12 +681,12 @@ bothtarget{x: 1405, y: 288} 125.0797135508448
     newIcon("red.2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 70]).show();
     newIcon("red.3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
 */
-	let which="blue";
-
+	let which="shrine";
 	const probe =newReticle( retOptions ).hide();
+
 //	const probe =newIcon( which, { parent:layerMap, img:which } );
 	
- 	const size=[ 85,85];
+ 	const size=[ 35,65];
 	const pos={x:1300, y:10};
 	var shifted= 1, nudge=1, resize=1.05, radius=25, beenhere=0;
 document.querySelector("#caption").setAttribute("contentEditable", "true");
@@ -686,7 +706,8 @@ document.querySelector("#caption").style.top= "400px";
 		Escape:		probe.drive,
 		help:		e=>  {}
 		};
-	document.addEventListener('keydown', e=>{
+	//document.addEventListener('keydown', e=>{
+	signal.onBody('keydown', e=>{
 		(tweak[e.code] || tweak.help)( e );
 		probe.x( pos.x ).y( pos.y ).radius( radius ).show();
 //		probe.x( pos.x ).y( pos.y ).size( size ).show();
@@ -695,7 +716,8 @@ document.querySelector("#caption").style.top= "400px";
 
 		if( !beenhere++) document.querySelector("body").requestFullscreen();
 		});
-	document.addEventListener('keyup',   e=> shifted = e.code.includes("Shift")? 1:shifted ) ;
+//	document.addEventListener('keyup',   e=> shifted = e.code.includes("Shift")? 1:shifted ) ;
+	signal.onBody('keyup',   e=> shifted = e.code.includes("Shift")? 1:shifted ) ;
 }
 
 
@@ -719,26 +741,26 @@ const finder = cfg =>{
 			{ name: "red1",    x:  275, y: 267, radius: 80, color:    "red" },
 			{ name: "red2",    x: 1160, y: 100, radius: 80, color:    "red" },
 			{ name: "red3",    x: 1245, y:  16, radius: 66, color:    "red" },
-			{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+			{ name: "shrine" , x: 1433, y: 277, radius: 73, color:   "blue" },
 			{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
 			{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
 			{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
 			{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
 			],
 		aim1: [
-			{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+			{ name: "shrine",  x: 1625, y: 804, radius: 90, color:   "blue" },
 			{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
 			{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
 			{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
 			{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
 			],
-		aim2: [
-			{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
-			{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
-			{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
-			{ name: "bridge23",x: 1405, y: 288, radius:160, color: "yellow" },
-			{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
-			{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
+		aim2:  [
+			{ name: "shrine",  x: 1625, y: 804, radius: 90, color:   "blue" },
+		//	{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
+			{ name: "bridge2", x: 1324, y: 346, radius: 54, color: "yellow" },
+			{ name: "bridge23",x: 1405, y: 288, radius:190, color: "yellow" },
+			{ name: "bridge3", x: 1488, y: 236, radius: 54, color: "yellow" },
+		//	{ name: "hq",      x: 1338, y: 905, radius:159, color:   "blue" }
 			],
 		bda1:{
 			win: [
@@ -753,13 +775,13 @@ const finder = cfg =>{
 		bda2:{
 			win: [
 				{ name: "win",     x: 1330, y: 770, radius: 66, color:   "blue" },
-				{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+				{ name: "shrine",  x: 1433, y: 277, radius: 73, color:   "blue" },
 				{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow", bda:true },
 				{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow", bda:true },
 				],
 			lose: [
 				{ name: "lose",    x: 1330, y: 770, radius: 66, color:   "blue" },
-				{ name: "target0", x: 1433, y: 277, radius: 73, color:   "blue" },
+				{ name: "shrine",  x: 1433, y: 277, radius: 73, color:   "blue" },
 				{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow", bda:true },
 				{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow", bda:true },
 				],
@@ -773,19 +795,30 @@ const finder = cfg =>{
 		intro: e=>{
 			newIcon("blue",{parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
 			newIcon("red0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
-			newIcon("red1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135, 135]).show();
-			newIcon("red2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135, 135]).show();
+			newIcon("red1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135,  60]).show();
+			newIcon("red2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135,  60]).show();
 			newIcon("red3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
 			},
 		aim1: e=>{	},
-		aim2: e=>{	},
+		aim2: e=>{
+//			newIcon("shrine",{parent:layerMap, img:"shrine" } ).x(1433).y( 277).size([ 95, 95]).show();
+			newIcon("shrine",{parent:layerMap, img:"shrine" } ).x(1610).y( 764).size([ 35,  65] ).show();
+			},
 		bda1:{
 			win:  e=>newIcon("win",  {parent:layerMap, img:"blue" } ).x(  811).y( 830).size([  60,  60]).show(),
 			lose: e=>newIcon("lose", {parent:layerMap, img:"blue" } ).x(  660).y( 847).size([  60,  60]).show()
 			},
 		bda2:{
-			win:  e=>newIcon("win",  {parent:layerMap, img:"blue" } ).x( 1301).y( 747).size([  60,  60]).show(),
-			lose: e=>newIcon("lose", {parent:layerMap, img:"blue" } ).x( 1301).y( 747).size([  60,  60]).show()
+			win:  e=>{
+				newIcon("win",  {parent:layerMap, img:"blue" } ).x( 1301).y( 747).size([  30,  30]).show();
+				newIcon("shrine",{parent:layerMap, img:"shrine" } ).x(1610).y( 764).size([ 35,  65] ).show();
+	//			newIcon("shrine",{parent:layerMap, img:"shrine" } ).x(1433).y( 277).size([ 95, 95]).show();
+				},
+			lose: e=>{
+				newIcon("lose", {parent:layerMap, img:"blue" } ).x( 1301).y( 747).size([  30,  30]).show();
+				newIcon("shrine",{parent:layerMap, img:"shrine" } ).x(1610).y( 764).size([ 35,  65] ).show();
+	//			newIcon("shrine",{parent:layerMap, img:"shrine" } ).x(1433).y( 277).size([ 95, 95]).show();
+				}
 			}
 		};
 	let domain = cfg.domain ?? "bda2";
@@ -840,7 +873,7 @@ const finder = cfg =>{
 			sfx.current.up.play();
 			if( shown ){
 				shown.fadeout();
-				signal.once( "pic.kill", e=>{
+				signal.on( "pic.kill", e=>{
 					signal.off( "pic.kill", this)
 					document.querySelector("#canvas").style.display="block";
 					busy=false;
@@ -850,7 +883,9 @@ const finder = cfg =>{
 				setTimeout( e=>sfx.music.volume(.03), 5500 );
 				setTimeout( e=>sfx.music.volume(.02), 7000 );
 				}
-			}
+			},
+
+		keydown: e=>(action[e.code] ?? action.help)( e ) 
 			
 		}
 //	Object.keys( handlers ).forEach( event=> document.body.addEventListener( event, handlers[ event ] ) );
@@ -860,7 +895,7 @@ const finder = cfg =>{
 
 
 
-
+signal.onBody('keydown', e=>(action[e.code] || action.help)( e ) );
 
 
   
@@ -895,8 +930,8 @@ const action={
 	KeyZ:   e=>   newPic("bridge2").show().full().bda(),
 	KeyF:   finder,
 	KeyQ:   positionIcon,
-	KeyA:   e=>	sequence( 0 ),
-    KeyW:   e=> makeSpinner( oldSpinner? false : { domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
+	KeyA:   e=> sequence( 0 ),
+    KeyW:   e=> makeSpinner( spinner? false : { domain:"math", answers:{ start:{win:true}}}), // e=>  newMap,
     KeyM:       map.show(),
     KeyR:   e=> reticle.show().listen(),
     KeyG:       scope.show,
@@ -915,8 +950,5 @@ const action={
               }
         };
 
-document.addEventListener('keydown', e=>(action[e.code] || action.help)( e ) );
-
-
-//sequence( 0 );
+sequence(0);
  }
