@@ -243,7 +243,8 @@ const minVal=-.001;
         let g = gridLayer;     
         g.interactive=true;
         g.interactiveChildren=true;
-        g.beginFill(0x122100);
+        g.lineStyle(  3, 0x228822, 1);
+    	g.beginFill(0x122100);
         g.drawRect(0,0, r.x.px, r.y.px);
         g.endFill();
         g.beginFill(0x113311);
@@ -280,12 +281,13 @@ const minVal=-.001;
 //console.log( g,gridLayer );
         return self;
         },
-      
+      // wants a control string not an object
 	bounds: (elements=grid.activeBounds)=>{
         console.log( "SCOPE: bounds", elements );
 
-		if( !elements || elements=="")	return;
-        elements=(typeof (elements=="string") && (elements!="*") )? String( elements ) : "glass stone left right hg760 steel";
+		if( !elements )			elements="";
+		if(  elements==="*" )	elements= "glass stone left right hg760 steel";
+        elements= 	String( elements );
 		grid.activeBounds = elements;
 
         let g= boundsLayer;
@@ -294,25 +296,25 @@ const minVal=-.001;
 
 		let edges = { left:0, right:1 };
 		Object.keys( edges ).forEach( edge =>{
-			if( !elements.includes( edge )) return;
-			textStyle.edges.layer=boundsLayer;
-			g.lineStyle(  grid.edges.width, grid.edges.color );
-			let x = [ pad.left, r.x.px-pad.right][edges[ edge ]]
-			g.moveTo(   x,   pad.top           );
-			g.lineTo(   x,   r.y.px-pad.bottom );
-			txt(        x+6, r.y.px-17, "edges", [ "Ground Zero","5 Mile" ][edges[ edge ]] );
-			});
+			if( elements.includes(    edge )){
+				textStyle.edges.layer=boundsLayer;
+				g.lineStyle(  grid.edges.width, grid.edges.color );
+				let x = [ pad.left, r.x.px-pad.right][edges[ edge ]]
+				g.moveTo(   x,   pad.top           );
+				g.lineTo(   x,   r.y.px-pad.bottom );
+				txt(        x+6, r.y.px-17, "edges", [ "Ground Zero","5 Mile" ][edges[ edge ]] );
+				}});
 
 		let threshhold = { hg760:0.86,  glass:0.72, steel:0.24, stone:0.12 };
 		Object.keys( threshhold ).forEach( material =>{
-			if( !elements.includes( material )) return;
-			textStyle[ material ].layer=boundsLayer;
-			g.lineStyle(  grid[ material ].width, grid[ material ].color );
-			let y = threshhold[ material ] * (r.y.px-pad.bottom-pad.top)+pad.top;
-			g.moveTo(   pad.left,         y);
-			g.lineTo(   r.x.px-pad.right, y);
-			txt( r.x.px-pad.left-10, y-17, material );
-			});
+			if( elements.includes( material )){
+				textStyle[ material ].layer=boundsLayer;
+				g.lineStyle(  grid[ material ].width, grid[ material ].color );
+				let y = threshhold[ material ] * (r.y.px-pad.bottom-pad.top)+pad.top;
+				g.moveTo(   pad.left,         y);
+				g.lineTo(   r.x.px-pad.right, y);
+				txt( r.x.px-pad.left-10, y-17, material );
+				}});
 
         return self;
         }, 
