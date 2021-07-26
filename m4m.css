@@ -35,6 +35,9 @@ button { background-color: rgb(170, 224, 19); margin: 20px;   }
 .listeners { font-size:26px;}
 .listeners sub{ color:grey;}
 .listeners system{ color:cyan;}
+#fired {colr:"red"}
+.keepAlive {color:grey; }
+.keepAlive  sup {color:rgb(77, 74, 74); }
 
 li {
     font-family: 'Share Tech Mono';
