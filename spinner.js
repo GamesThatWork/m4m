@@ -25,7 +25,7 @@ export const newSpinner = ( root, cfg) =>{
 	let momentum=0, rotation=2/12;
 
 
-let oldTime, spinning = false;
+let oldTime, spinning = false, frozen=false;
 
 const spin = time=>{
 
@@ -34,9 +34,16 @@ const spin = time=>{
 	let t = time - (oldTime || time );
 	oldTime = time;
 
+
+
 	let rot=(rotation+2)%1;  /// always  0<= rotation <1
+
+	if( frozen ) rot= 0.1; // freeze in facet 0; subfacet 2
+
+
 	let segment= Math.floor(24*rot); //0-23
 	trig = (segment %4)==1? -2 : Math.floor(((24-segment)/4)%6);
+	if( frozen )	trig=-1;
 	if( trig>-1 ) 	rot= 1-  trig/6;
 
 	window.requestAnimationFrame( spin );
@@ -58,17 +65,13 @@ const spin = time=>{
 		});
 	const spinScale = .004;//   360 /mousepad.getBoundingClientRect().height * 2;
 	console.log( mousepad.getBoundingClientRect().height);
-//	mousepad.addEventListener( 'mousemove', mouseMove, );
-//	mousepad.addEventListener( 'mousedown', mouseDown  );
-//	mousepad.addEventListener( 'mouseup',   mouseUp    );
-
 	signal.onBody( 'mousemove', mouseMove, );
-	signal.onBody(  'mousedown', mouseDown  );
-	signal.onBody(  'mouseup',   mouseUp    );
+	signal.onBody( 'mousedown', mouseDown  );
+	signal.onBody( 'mouseup',   mouseUp    );
 
 	function mouseMove( e ) {
 		if( Math.abs( e.movementX) > Math.abs( e.movementY)  )	return;
-		e.stopImmediatePropagation();
+	//	e.stopImmediatePropagation();
 		rotation +=e.movementY * spinScale;
 	    if(!spinning)	spin();
 		}
@@ -87,10 +90,8 @@ const spin = time=>{
 
 
 	const self ={
+		freeze: froze=> frozen= froze, 
 		remove: ()=>{
-//			mousepad.removeEventListener( 'mousemove', mouseMove  );
-//			mousepad.removeEventListener( 'mousedown', mouseDown  );
-//			mousepad.removeEventListener( 'mouseup',   mouseUp    );
 			signal.offBody( 'mousemove', mouseMove  );
 			signal.offBody( 'mousedown', mouseDown  );
 			signal.offBody( 'mouseup',   mouseUp    );
