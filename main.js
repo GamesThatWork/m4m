@@ -257,23 +257,27 @@ var tZero=0;
 											decay:{ },
 											prop:{win:true}
 											} )*/
- 
+
+	const authorizePointerLock = e=>{
+		document.body.requestPointerLock();
+		document.exitPointerLock();
+		signal	.offBody( "click", authorizePointerLock );
+		}
+	signal		.onBody(  "click", authorizePointerLock );
 
 	var spinner;
 
 	const makeSpinner = cfg=> {
 
-
-	
 		const oldFrame = document.querySelector("#spinnerwindow");
 		if( spinner )	spinner.remove();
 		if( oldFrame   )	oldFrame.remove();
 		spinner = false;
-
+		document.exitPointerLock();
 
 		if( cfg===false )	return;
-
-
+		
+		document.body.requestPointerLock();
 
 		const domain  = cfg?.domain  || "math";
 		const answers = cfg?.answers || {}; 
@@ -658,8 +662,11 @@ function sequence(  i  ){
 
 
 
-
-
+const f11= event=>{
+	event.currentTarget.requestFullscreen();
+//	document.body.requestFullscreen();
+	signal.offBody( "click", f11 );		}
+signal.onBody(      "click", f11 );		
 
 function positionIcon(  ){
 	const m= newMap("bridges");
