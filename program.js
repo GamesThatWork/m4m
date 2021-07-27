@@ -5,9 +5,11 @@ const show={show:true},  hide={hide:true }, listen={listen:true },unlisten={unli
 
 export const program=[
 
-	{ id:"attractmode", map:{ title:{ show:true } }, await:"click", scope:hide,        			then },
+//	{ id:"desktop",     map:{ desktop:{ show:true }}, await:"click",			       			then },   //:"xplo" },	
+	{ id:"attractmode", map:{   title:{ show:true }}, icon:{ logo:{ x:1620,y:986, size:[255,73],show:true }}, 
+	 												  await:"click", scope:hide,       			then },
 //	{ id:"init", dialog:{ claro:"welcome" }, map:{ blur:show }, 	then }, /// defective recording
-	{ dialog:{ claro:"challenge"  },  map:{ blur:show },                  										then },
+	{ dialog:{ claro:"challenge"  }, map:{ blur:show },  icon:{ logo:hide }, 					then },
 	{ dialog:{ claro:"intro"      }, 				       										then },
 	{ dialog:{ claro:"model"      },    				  										then },
 	{ dialog:{ claro:"heros"      }, pic:{ romeo:"show"}, 										then },
@@ -23,7 +25,7 @@ export const program=[
 	{ id:"equation",  dialog:{ claro:"equation"},	map:{blur:show},  pic:{ claro:"medium" },  
 	 							scope:{ bounds:"", show:true },	equation:show, 		 then },
 
-	{ id:"start",        dialog:{ claro:"start"  }, 	spin:{ domain:"math", answers:{ start:"right", default:"wrong" }},
+	{ id:"start",        dialog:{ claro:"start"  }, spin:{ domain:"math", answers:{ start:"right", default:"wrong" }},
 												 	respond: {pickRightWrong:"start"} },
 	{ id:"start_ask"  ,  voice:{ claro:"start_ask"   }  },
 	{ id:"start_wrong",  voice:{ claro:"start_wrong" }  },
@@ -72,17 +74,17 @@ export const program=[
 				 spin:{ domain:"xplo", answers:{default:"ok" }}, respond: {ok:"next"},    now },
 	{ id:"omega",  dialog:{ claro:"omega"  }  },
 	{ id:"scrub",  dialog:{ claro:"scrub"  }, spinner: {freeze:true  }, trace:true }, 
-	{ id:"mapped", dialog:{ claro:"mapped" }, spinner: {freeze:false }, map:{range:show},reticle:{ show:true, position:[300,300], listen:true } },
+	{ id:"mapped", dialog:{ claro:"mapped" },  map:{range:show},reticle:{ show:true, position:[300,300], listen:true } },
 
 
 	{ id:"q1", 
 	
 			voice:{ claro:"q1" }, 
-			scope: {  show: true, bounds: "stone hg760",  simulating:false  },
+			scope: {  show: true, bounds: "stone hg760",  simulating:false  },spinner: {freeze:false },
 			trace: true,
 			pic:   {   claro:"small" }, 
 			map:   {   range: show }, 
-			reticle: {       	         x:300,y:352, listen:true,  show:true, listen:true },
+			reticle: {       	         x:300,y:352, listen:true,  show:true },
 			icon:{ 	stone:{ img:"stone", x:244,y:292, size:[50,50], show:true } }, 
 			spin:{ domain:"xplo", answers:{ xp0:"low",xp1:"low",xp2:"low",xp3:"low",xp4:"right",xp5:"high"}},
 			respond: {pickHighLow:"q1"}   },

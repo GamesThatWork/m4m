@@ -9,6 +9,7 @@ const url= {
 	 blue:  "bluecrew.png",
 	 red1:  "1red.png",
 	 red3:  "3red.png",
+	 logo:  "GTW.png",
 	};
 
 const across = [ 41, 37, 49]
