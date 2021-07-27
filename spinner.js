@@ -77,9 +77,9 @@ const spin = time=>{
 		}
 	
 	function mouseDown( e ) {	
-		if(  elements[ trig ]  && !Voice.speaking ){
-			//	document.exitPointerLock();
-			click( elements[ trig ]);
+		if(  ( elements[ trig ] || frozen ) && !Voice.speaking ){
+			//document.exitPointerLock();
+			click(  elements[ frozen? 0 : trig ] );
 			sfx.current = sfx.button;
 			}
 		else sfx.current = sfx.button.disabled;
