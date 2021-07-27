@@ -9,7 +9,6 @@ body{
 	font-size:44px;
 	width: 100vw;
 	height: 100vh;
-  	border: 3px dotted rgb(87, 74, 74);
 	user-select: none;
 	} 
 #container {  position: relative; overflow: hidden; }
@@ -60,6 +59,7 @@ ul{
 	left:0px;
 	top: 0px;
 	border: thick solid rgba(0, 146, 37, 0.981);
+	box-shadow: 12px 12px 40px 7px black;
 	background-size: cover;
 	}
 #claro        	{ width:1000px; height: 666px;	left: 500px; top: 180px;	}
@@ -75,7 +75,8 @@ ul{
 #equation {position:absolute;	left: 790px; top:182px; display: none;
 			background-color: rgba(4, 49, 13, 0.871); text-align: center;
 			box-shadow: 12px 12px 40px 7px black;
-			border: thin dotted rgba(233, 161, 5, 0.789); padding:12px 20px;}
+		/*	border: thin dotted rgba(233, 161, 5, 0.789);  */
+			padding:12px 20px;}
 
 #spinnerwindow {
 	perspective-origin: center;  
