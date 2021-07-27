@@ -10,6 +10,8 @@ var available = true;
 
 export 	const Voice={ get speaking() { return !available }} 
 
+const loudSpeaker= new Audio();
+
 export 	const newVoice= (speaker, cfg={})=> {
 
 	if( selfs[ speaker ]	)	return selfs[ speaker ];
@@ -37,12 +39,21 @@ export 	const newVoice= (speaker, cfg={})=> {
 			last.line = line;
 			available=false;	
 			console.log( "  <speak>  ", line);
+
 			self.audio[ line ].onended= e=> {
 				available= true;
 				last.time=Date.now();
 				signal.fire("spoken");
 				};
 			self.audio[ line ].play();
+/*			loudSpeaker.onended= e=> {
+				available= true;
+				last.time=Date.now();
+				signal.fire("spoken");
+				};
+			loudSpeaker.src = `./assets/voice/${speaker}/${line}.ogg`;
+			loudSpeaker.play();*/
+
 			return self;
 			},	 
 
