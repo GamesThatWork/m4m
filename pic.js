@@ -141,9 +141,9 @@ export const newPic= (name, cfg) => {
 				style.backgroundImage=	pre;
 				style.transitionProperty=  "background-image" ;
 				style.transitionTimingFunction= "ease-in";
-				style.transitionDuration = "1200ms";
-				style.transitionDelay = "1800ms";
-				style.backgroundImage=	post;
+				style.transitionDuration = "1800ms";
+				style.transitionDelay = "1200ms";
+	//			style.backgroundImage=	post;
 				setTimeout( e=>style.backgroundImage=	post, 100);
 				console.log("pic: bda ",name);    return self;  }, 
 
