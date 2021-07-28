@@ -63,7 +63,7 @@ const spin = time=>{
 		element.style.transform =	`rotateX(${ step * stepAngle}deg) translateZ(${radius}px)`;
 		element.classList.add("dull");
 		});
-	const spinScale = .004;//   360 /mousepad.getBoundingClientRect().height * 2;
+	const spinScale = -.004;//   360 /mousepad.getBoundingClientRect().height * 2;
 	console.log( mousepad.getBoundingClientRect().height);
 	signal.onBody( 'mousemove', mouseMove, );
 	signal.onBody( 'mousedown', mouseDown  );
