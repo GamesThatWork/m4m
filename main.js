@@ -527,6 +527,12 @@ const perform = {
 					early   :events.pickLateEarly+"_early", 
 					okay    :events.pickLateEarly+"_okay", 
 					response:events.pickLateEarly+"_end" };
+
+		if( events.pickLate )	events= { 
+					late    :events.pickLate+"_late", 
+					early   :events.pickLate+"_okay", 
+					okay    :events.pickLate+"_okay", 
+					response:events.pickLate+"_end" };
 		
 		
 
@@ -732,7 +738,7 @@ let activeFinderHandlers={};
 
 const finder = cfg =>{
 
-	var found= null,  radius=0, shown=null;
+	var found= null, answered=null,  radius=0, shown=null;
 	const probe =newReticle( retOptions ).unlisten();
 
 //	Object.keys( activeFinderHandlers ).forEach( event=> document.body.removeEventListener( event, activeFinderHandlers[ event ] ) );
@@ -748,7 +754,7 @@ const finder = cfg =>{
 			{ name: "red1",    x:  275, y: 267, radius: 80, color:    "red" },
 			{ name: "red2",    x: 1160, y: 100, radius: 80, color:    "red" },
 			{ name: "red3",    x: 1245, y:  16, radius: 66, color:    "red" },
-			{ name: "shrine" , x: 1433, y: 277, radius: 73, color:   "blue" },
+			{ name: "shrine",  x: 1625, y: 804, radius: 90, color:   "blue" },
 			{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
 			{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow" },
 			{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow" },
@@ -782,13 +788,13 @@ const finder = cfg =>{
 		bda2:{
 			win: [
 				{ name: "win",     x: 1330, y: 770, radius: 66, color:   "blue" },
-				{ name: "shrine",  x: 1433, y: 277, radius: 73, color:   "blue" },
+				{ name: "shrine",  x: 1625, y: 804, radius: 90, color:   "blue" },
 				{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow", bda:true },
 				{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow", bda:true },
 				],
 			lose: [
 				{ name: "lose",    x: 1330, y: 770, radius: 66, color:   "blue" },
-				{ name: "shrine",  x: 1433, y: 277, radius: 73, color:   "blue" },
+				{ name: "shrine",  x: 1625, y: 804, radius: 90, color:   "blue" },
 				{ name: "bridge2", x: 1324, y: 346, radius: 84, color: "yellow", bda:true },
 				{ name: "bridge3", x: 1488, y: 236, radius: 84, color: "yellow", bda:true },
 				],
@@ -802,9 +808,10 @@ const finder = cfg =>{
 		intro: e=>{
 			newIcon("blue",{parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
 			newIcon("red0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
-			newIcon("red1",{parent:layerMap, img:"red3" } ).x( 211).y( 190).size([ 135,  60]).show();
-			newIcon("red2",{parent:layerMap, img:"red3" } ).x(1100).y(  30).size([ 135,  60]).show();
+			newIcon("red1",{parent:layerMap, img:"red3" } ).x( 211).y( 210).size([ 135,  60]).show();
+			newIcon("red2",{parent:layerMap, img:"red3" } ).x(1100).y(  50).size([ 135,  60]).show();
 			newIcon("red3",{parent:layerMap, img:"red1" } ).x(1225).y( -20).size([  55,  55]).show();
+			newIcon("shrine",{parent:layerMap, img:"shrine" } ).x(1610).y( 764).size([ 35,  65] ).show();
 			},
 		aim1: e=>{	},
 		aim2: e=>{
@@ -863,11 +870,10 @@ const finder = cfg =>{
 						:	(!found?                       "Nothing found"	
 						: 	(cfg.answers[ found.name ] ?? 
 							 cfg.answers.default       ?? (`No answer (nor default) for ${found.name}`  ))));
-
-			if( found ) 	signal.fire( answer );
-			console.log( "<find> fires: "+ found?.name +" => "+ answer );
+			console.log( "<find> will fire: "+ found?.name +" => "+ answer );
 			sfx.current = found? sfx.button : sfx.button.disabled;
 			sfx.current.down.play(); 
+			answered=found? answer : null;
 			if( found )	{
 				sfx.music.volume(0.35);
 				shown = newPic( found.name ).show().full();
@@ -878,6 +884,8 @@ const finder = cfg =>{
 			},
 		mouseup: e =>{ 
 			sfx.current.up.play();
+			if( answered ) 	signal.fire( answered );
+			console.log( "<find> fires: "+ answered );
 			if( shown ){
 				shown.fadeout();
 				signal.on( "pic.kill", e=>{
