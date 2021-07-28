@@ -5,11 +5,13 @@ const show={show:true},  hide={hide:true }, listen={listen:true },unlisten={unli
 
 export const program=[
 
-//	{ id:"desktop",     map:{ desktop:{ show:true }}, await:"click",			       			then },   //:"xplo" },	
 	{ id:"attractmode", map:{   title:{ show:true }}, icon:{ logo:{ x:1620,y:986, size:[255,73],show:true }}, 
 	 												  await:"click", scope:hide,       			then },
-//	{ id:"init", dialog:{ claro:"welcome" }, map:{ blur:show }, 	then }, /// defective recording
-	{ dialog:{ claro:"challenge"  }, map:{ blur:show },  icon:{ logo:hide }, 					then },
+
+//	{ id:"desktop",     map:{ desktop:{ show:true }}, await:"click",			       			then :"romeo_out" },	
+
+ 	{ id:"init", dialog:{ claro:"welcome" }, map:{ blur:show }, icon:{ logo:hide },          	then }, /// defective recording
+	{ dialog:{ claro:"challenge"  }, map:{ blur:show },         icon:{ logo:hide }, 			then },
 	{ dialog:{ claro:"intro"      }, 				       										then },
 	{ dialog:{ claro:"model"      },    				  										then },
 	{ dialog:{ claro:"heros"      }, pic:{ romeo:"show"}, 										then },
@@ -74,18 +76,21 @@ export const program=[
 				 spin:{ domain:"xplo", answers:{default:"ok" }}, respond: {ok:"next"},    now },
 	{ id:"omega",  dialog:{ claro:"omega"  }  },
 	{ id:"scrub",  dialog:{ claro:"scrub"  }, spinner: {freeze:true  }, trace:true }, 
-	{ id:"mapped", dialog:{ claro:"mapped" },  map:{range:show},reticle:{ show:true, position:[300,300], listen:true } },
+	{ id:"mapped", dialog:{ claro:"mapped" }, spinner: {freeze:false }, map:{range:show},reticle:{ show:true, position:[300,300], listen:true } },
 
 
-	{ id:"q1", 
-	
-			voice:{ claro:"q1" }, 
-			scope: {  show: true, bounds: "stone hg760",  simulating:false  },spinner: {freeze:false },
+	{ id:"pre_q1", 
+			voice:{ claro:"q1" }, 	
+			spinner: {freeze:false  },
+			scope: {  show: true, bounds: "stone hg760",  simulating:false  },
 			trace: true,
 			pic:   {   claro:"small" }, 
 			map:   {   range: show }, 
 			reticle: {       	         x:300,y:352, listen:true,  show:true },
-			icon:{ 	stone:{ img:"stone", x:244,y:292, size:[50,50], show:true } }, 
+			icon:{ 	stone:{ img:"stone", x:235,y:285, size:[60,45], show:true } },
+			plot: false,	
+//																				 now },
+//	{ id:"q1", 
 			spin:{ domain:"xplo", answers:{ xp0:"low",xp1:"low",xp2:"low",xp3:"low",xp4:"right",xp5:"high"}},
 			respond: {pickHighLow:"q1"}   },
 	{ id:"q1_ask"  , voice:{ claro:"q1_ask"    }   },
@@ -119,16 +124,16 @@ export const program=[
 
 	{ id:"jumphere",   now:"next" 	},
  
-	{ dialog:{ claro:"mission" }, pic:{ claro:"big",    romeo:"show"  }, scope:hide, reticle:hide, plot:false, spin:false  },
-	{ dialog:{ romeo:"intro"   }, pic:{ claro:"fadeout"               }, music:{ volume:0.03, play:true } },
+	{ dialog:{ claro:"mission" }, pic:{ claro:"big",    romeo:"show"  }, scope:hide, reticle:hide, plot:false, spin:false, then},
+	{ dialog:{ romeo:"intro"   }, pic:{ claro:"fadeout"               }, music:{ volume:0.03, play:true }, then },
 	{ dialog:{ romeo:"context" }, pic:{ claro:"hide",   romeo:"medium"}, map:{ range:hide, bridges:show},
-//		icon:{ blue: { img:"blue", x: 266, y: 735,  size: [  60,  40], show:true },
-//			red0: { img:"red1", x:  10, y: 660,  size: [  60,  40], show:true },
-//			red1: { img:"red3", x: 211, y: 190,  size: [ 135,  75], show:true },
-//			red2: { img:"red3", x:1100, y:  30,  size: [ 135,  75], show:true },
-//			red3: { img:"red1", x:1225, y: -20,  size: [  55,  36], show:true }
-//			} 
-	},
+		icon:{ blue: { img:"blue", x: 266, y: 735,  size: [  60,  40], show:true },
+			red0: { img:"red1", x:  10, y: 660,  size: [  60,  40], show:true },
+			red1: { img:"red3", x: 211, y: 190,  size: [ 135,  75], show:true },
+			red2: { img:"red3", x:1100, y:  30,  size: [ 135,  75], show:true },
+			red3: { img:"red1", x:1225, y: -20,  size: [  55,  36], show:true }
+			} ,
+	then	},
 	{ id:"blue",      monolog:{ romeo:"blue"  }, 	find:{ domain:"intro", answers:{ blue:"right", default:"wrong" }},
 //		icon:{ 	blue: { img:"blue", x: 266, y: 735, size: [  60,  40], show:true }},
 													respond: {pickRightWrong:"blue"}  	 },
@@ -146,7 +151,7 @@ export const program=[
 	{ id:"red_close", dialog:{ romeo:"red_close"  	} },
 	{ id:"red_right", dialog:{ romeo:"red_right"  	}, then },
 
-	{ id:"reds",      monolog:{ romeo:"reds"  }, 	find:{ domain:"intro", answers:{ red1:"right",red2:"right",red3:"right",default:"wrong" }},
+	{ id:"reds",      dialog:{ romeo:"reds"  }, 	find:{ domain:"intro", answers:{ red1:"right",red2:"right",red3:"right",default:"wrong" }},
 //		icon:{
 //			red1: { img:"red3", x: 211, y: 190,  size: [ 135,  75], show:true },
 //			red2: { img:"red3", x:1100, y:  30,  size: [ 135,  75], show:true },
@@ -255,7 +260,7 @@ export const program=[
 		equation: hide,
 		pic:   { romeo:"small"},
 		scope: { show:true, bounds: "steel stone glass hg760"},
-	 	icon:{
+	 	icon:{  all:	hide,
 		 		shrine: { x:483, y:768, size:[40,75], show:true },
 	     		red2:  { img:"red3", show:true, drive:1,  size:[130,65] },
 	            red3:  { img:"red3", show:true, drive2:2, size:[130,65] }},	now },	
@@ -266,11 +271,11 @@ export const program=[
 	{ id:"bomb2_ask"  , dialog:{ romeo:"bomb2_ask"  } },
 	{ id:"bomb2_wrong", dialog:{ romeo:"bomb2_wrong"} },
 	{ id:"bomb2_close", dialog:{ romeo:"bomb2_close"} },
-	{ id:"bomb2_right", 							respond: {pickLateEarly:"bomb2"}, now},
+	{ id:"bomb2_right", 							respond: {pickLate:"bomb2"}, now},
 	{ id:"bomb2_time", 	icon:{ blue:{ time:true }}     },
-	{ id:"bomb2_late",  monolog:{ romeo:"bomb2_late"   },	then: "bomb2_end"  	},
-	{ id:"bomb2_early", monolog:{ romeo:"bomb2_early"  },  	then: "bomb2_end"  	},
-	{ id:"bomb2_okay",  monolog:{ romeo:"bomb2_okay"   },	then: "bomb2_end"  	},
+	{ id:"bomb2_late",  monolog:{ romeo:"bomb2_right"   },	then: "bomb2_end"  	},
+	{ id:"bomb2_early", monolog:{ romeo:"bomb1_early"  },  	then: "bomb2_end"  	},
+	{ id:"bomb2_okay",  monolog:{ romeo:"bomb2_right"  },	then: "bomb2_end"  	},
 	{ id:"bomb2_end",	scope:hide, reticle:hide,plot:false, spin:false, equation: hide, icon:{ all:hide },	then },
 
 
@@ -279,12 +284,9 @@ export const program=[
 	{ id:"bda2_ask"  , dialog:{ romeo:"bridge3_ask"   }  },
 	{ id:"bda2_wrong", dialog:{ romeo:"bridge2_ask" }  },
 	{ id:"bda2_close", dialog:{ romeo:"blue_right"}  },
-	{ id:"bda2_right", dialog:{ romeo:"bomb1_right"}, then },
-	{ id:"romeo_out", 
-			find:{ hide }, icon:{ all:hide },	reticle:hide, icon:{ all:hide },
-			map:{blur:show }, pic:{romeo:"big"},  dialog:{ romeo:"end"},  	then   },
-		
-	{ id:"claro_out",  dialog:{ claro:"end"}, pic:{ claro:"big", romeo:"fadeout"}, reticle:hide, music:{volume:0}, icon:{ all:hide }, find:false, then },
-	
+	{ id:"bda2_right", dialog:{ romeo:"bomb1_right"},then },
+
+	{ id:"romeo_out",  dialog:{ romeo:"end"}, icon:{ all:hide }, find:false, reticle:hide, map:{blur:show }, pic:{romeo:"big"},  then },
+	{ id:"fade_out",   dialog:{ claro:"end"},pic:{ claro:"big", romeo:"fadeout"},  then  }, 
 	{ id:"gameover",   reboot:true  },
 	];
