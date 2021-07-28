@@ -109,6 +109,7 @@ export const newIcon= (name, cfg) => {
 		size:   s	  =>{	g.width=s[0]; g.height=s[1];			  		return self;},
 		road:	r	  =>{	drive.road=road[ r ]; drive.across=road[ r ]; 	return self;},
 		drive:	r	  =>{   drive.road= road[ r%road.length ];
+							drive.position = 0;
 							drive.timers.push( setInterval( e=>
 								self.move( drive.road[ Math.min(drive.position++, drive.road.length-1)] ),
 								1250));										return self;},	
@@ -116,6 +117,7 @@ export const newIcon= (name, cfg) => {
 								self.move( drive.road[ Math.max(0, Math.min( drive.position-drive.lead, drive.road.length-1))] ),
 								1250));										return self;},
 		drive2:  r	  =>{   drive.road2= road[ r%road.length ];
+							drive.position2 = 0;
 							drive.timers.push( setInterval( e=>
 								self.move( drive.road2[ Math.min(drive.position2++, drive.road2.length-1)] ),
 								2250));										return self;},
