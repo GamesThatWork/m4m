@@ -10,7 +10,7 @@ var available = true;
 
 export 	const Voice={ get speaking() { return !available }} 
 
-const loudSpeaker= new Audio();
+let loudSpeaker= new Audio();
 
 export 	const newVoice= (speaker, cfg={})=> {
 
@@ -25,9 +25,9 @@ export 	const newVoice= (speaker, cfg={})=> {
 
 		say:	 line=>{
 			console.log( "VOICE SAYS: " + line );
-			if(  	 self.caption )			self.caption.innerText= self?.script[ line ] || "";
-			if(      self?.audio[  line ] )	self.speak( line );
-			else if( self?.script[ line ] )	self.utter( line  );
+			if( self.caption                        )	self.caption.innerText= self?.script[ line ] || "";
+			if( loudSpeaker || self?.audio[  line ] )	self.speak( line );
+			else          if(  self?.script[ line ] )	self.utter( line  );
 			else 	 signal.fire("spoken");
 			return self;
 			},
@@ -40,20 +40,22 @@ export 	const newVoice= (speaker, cfg={})=> {
 			available=false;	
 			console.log( "  <speak>  ", line);
 
-			self.audio[ line ].onended= e=> {
+/*			self.audio[ line ].onended= e=> {
 				available= true;
 				last.time=Date.now();
 				signal.fire("spoken");
 				};
-			self.audio[ line ].play();
-/*			loudSpeaker.onended= e=> {
+			self.audio[ line ].play();*/
+			
+			loudSpeaker.onended= e=> { // only need to set once?
 				available= true;
 				last.time=Date.now();
 				signal.fire("spoken");
 				};
 			loudSpeaker.src = `./assets/voice/${speaker}/${line}.ogg`;
-			loudSpeaker.play();*/
-
+			loudSpeaker.load();
+			loudSpeaker.play();
+			console.log( `Loudspeaker: ${speaker} says: ${line}`  );
 			return self;
 			},	 
 
@@ -403,6 +405,5 @@ romeo:	{
 }
 
 const audio= { claro: {}, romeo:{}};
-
-Object.keys( script.claro).forEach( name => audio.claro[ name ]=new Audio(`./assets/voice/claro/${name}.ogg`) );
-Object.keys( script.romeo).forEach( name => audio.romeo[ name ]=new Audio(`./assets/voice/romeo/${name}.ogg`) );
+//Object.keys( script.claro).forEach( name => audio.claro[ name ]=new Audio(`./assets/voice/claro/${name}.ogg`) );
+//Object.keys( script.romeo).forEach( name => audio.romeo[ name ]=new Audio(`./assets/voice/romeo/${name}.ogg`) );
