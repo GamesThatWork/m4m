@@ -888,8 +888,8 @@ const finder = cfg =>{
 			console.log( "<find> fires: "+ answered );
 			if( shown ){
 				shown.fadeout();
-				signal.on( "pic.kill", e=>{
-					signal.off( "pic.kill", this)
+				signal.on( "pickill", e=>{
+					signal.off( "pickill", this)
 					document.querySelector("#canvas").style.display="block";
 					busy=false;
 					});
