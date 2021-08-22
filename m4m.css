@@ -24,7 +24,9 @@ canvas        {  z-index:  1;    top:  0px; left:   0px; width: 100vw; height: 1
 
 .pic.fullscreen   {  z-index:  8;    top:  0px; left:   0px; width: 100vw; height: 100vh; transition: opacity 2s;  }
 #caption      {  z-index:  7;    top: 920px; left: 440px; width:1400px; padding:12px 20px; 
-				font-size:27px; color:rgb(4, 155, 85)/*rgb(196, 171, 107)*/; font-family:'Share Tech Mono', sans-serif; }
+				font-size:27px;  font-family:'Share Tech Mono', sans-serif; 
+				color:rgb(19, 255, 145);
+				text-shadow:   4px 4px 5px black, -1px -2px 3px rgb(153, 23, 0),  1px 1px 5px black; }
 #help         {  z-index:  8;    top:  40px; left:  40px;                              }
 button { background-color: rgb(170, 224, 19); margin: 20px;   }
 
