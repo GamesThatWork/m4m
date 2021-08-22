@@ -19,7 +19,8 @@ const debugging  = ()=>	signal.dbg.innerHTML=
 			+`</div><div class="listeners fired">
 				<span id="fired" class="event">${fired}</span></div>`;
 
-const showListeners = ()=>	{};  // debugging;
+  const showListeners = ()=>	{};  
+//const showListeners = debugging;
 							
 const addEventListener= ( event, handler,cfg)=>{
 		signal.bus.addEventListener( event, handler, cfg );
