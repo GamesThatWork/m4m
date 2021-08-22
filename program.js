@@ -8,7 +8,7 @@ export const program=[
 	{ id:"attractmode", map:{   title:{ show:true }}, icon:{ logo:{ x:1620,y:986, size:[255,73],show:true }}, 
 	 												  await:"click", scope:hide,       			then },
 
-//	{ id:"desktop",     map:{ desktop:{ show:true }}, await:"click",			       			then :"romeo_out" },	
+//	{ id:"desktop",     map:{ desktop:{ show:true }}, await:"click",			       			then :"bomb2" },	
 
  	{ id:"init", dialog:{ claro:"welcome" }, map:{ blur:show }, icon:{ logo:hide },          	then }, /// defective recording
 	{ dialog:{ claro:"challenge"  }, map:{ blur:show },         icon:{ logo:hide }, 			then },
@@ -101,7 +101,7 @@ export const program=[
 
 
 	{ id:"q2", 
-			voice:{ claro:"q2" }, 
+			monolog:{ claro:"q2" }, 
 			scope: {  show: true, bounds: "glass hg760",  simulating:false  },
 			trace:  	true,
 			pic:    { claro:"small" }, 
@@ -114,7 +114,7 @@ export const program=[
 					glass3:{ x: 325, y:700, img:"glass", size:[20,30], show:true}, 
 					}, 
 			spin:{ domain:"xplo", answers:{ xp0:"low",xp1:"low",xp2:"low",xp3:"right",xp4:"high",xp5:"high"}},
-			respond: {pickHighLow:"q2"}  },
+			respond: {pickHighLow:"q2"}, then },
 
 	{ id:"q2_ask"  ,  voice:{ claro:"q2_ask"    } },
 	{ id:"q2_high",   voice:{ claro:"q2_high"   } },
@@ -215,6 +215,10 @@ export const program=[
 
 		 	},										now },	
 
+
+
+
+
 	{ id:"bomb1",      monolog:{ romeo:"bomb1"},	spin:{ domain:"xplo", answers:{ xp0:"low",xp1:"low",xp2:"low",xp3:"low",xp4:"right",xp5:"high"}},
 											 		respond: { pickHighLow:"bomb1"}},
 	{ id:"bomb1_ask", 	dialog:{ romeo:"bomb1_ask" } },
@@ -222,22 +226,40 @@ export const program=[
 	{ id:"bomb1_high",  dialog:{ romeo:"bomb1_high"}  },
 	{ id:"bomb1_right", 							respond: { pickLateEarly:"bomb1"}, now:"bomb1_time" 	},
 	{ id:"bomb1_time", 	icon:{ blue:{ time:true } }								},
-	{ id:"bomb1_late",  monolog:{ romeo:"bomb1_late"   },	then: "bomb1_end"  	},
-	{ id:"bomb1_early", monolog:{ romeo:"bomb1_early"  },  	then: "bomb1_end"  	},
-	{ id:"bomb1_okay",  monolog:{ romeo:"bomb1_okay"   },	then: "bomb1_end"  	},
-	{ id:"bomb1_end",	scope:hide, reticle:hide,plot:false, spin:false, equation: hide, icon:{ blue:hide, red1:hide},
-						now:"next"  },
+	{ id:"bomb1_late",  voice:{ romeo:"bomb1_late"   },	now: "bomb1_lose"  },
+	{ id:"bomb1_early", voice:{ romeo:"bomb1_early"  }, now: "bomb1_lose"  },
+	{ id:"bomb1_okay",  voice:{ romeo:"bomb1_okay"   },	now: "bomb1_win"  	},
+	{ id:"bomb1_lose",	scope:hide, reticle:hide,plot:false, spin:false, equation: hide, icon:{ blue:hide, red1:hide},
+							pic:{ lose:"pulse"     },           				then: "bda1"  },
+	{ id:"bomb1_win",	scope:hide, reticle:hide,plot:false, spin:false, equation: hide, icon:{ blue:hide, red1:hide},
+							pic:{ win: "pulse" 	   },           				then: "bda1"  },
+	{ id:"bda1",  		   	pic:{ bridge1:"bdapulse"  },                        then: "shrine" },
+
+
+	//	{ id:"bomb1_late",  monolog:{ romeo:"bomb1_late"   },	then: "bomb1_end"  	},
+//	{ id:"bomb1_early", monolog:{ romeo:"bomb1_early"  },  	then: "bomb1_end"  	},
+//	{ id:"bomb1_okay",  monolog:{ romeo:"bomb1_okay"   },	then: "bomb1_end"  	},
+//	{ id:"bomb1_end",	scope:hide, reticle:hide,plot:false, spin:false, equation: hide, icon:{ blue:hide, red1:hide},
+//										now:"next"  },
+						
+
+
+
 	
+
+
+
+/*						
 	{ id:"bda1",       dialog:{ romeo:"bda"  },   	find:{ domain:"bda1", answers:{ bridge1:"right", win:"close", lose:"close", default:"wrong" }}, 
 													respond: {pickRightWrong:"bda1"}  },
 	{ id:"bda1_ask"  , monolog:{ romeo:"aim1_ask"   }  },
 	{ id:"bda1_wrong",   voice:{ romeo:"aim1_wrong" }  },
 	{ id:"bda1_close",   voice:{ romeo:"bomb1_right"}  },
 	{ id:"bda1_right",  dialog:{ romeo:"bomb1_right"}, then },
+*/
 
 
-
-	{ id:"shrine",       dialog:{ romeo:"shrine"  }, find:{ domain:"aim2", answers:{ shrine:"right", target0:"right", default:"close" }},
+	{ id:"shrine",       dialog:{ romeo:"shrine"  },    find:{ domain:"aim2", answers:{ shrine:"right", target0:"right", default:"close" }},
 						    pic:{ romeo:"small"   },	respond: {pickRightWrong:"shrine"}   },
 	{ id:"shrine_ask"  , dialog:{ romeo:"shrine_ask"    } },
 	{ id:"shrine_wrong",  voice:{ romeo:"shrine_wrong"  } },
@@ -268,10 +290,34 @@ export const program=[
 	
 	{ id:"bomb2",      dialog:{ romeo:"bomb2"  }, 	spin:{ domain:"xplo", answers:{ xp0:"close",xp1:"close",xp2:"close",xp3:"close",xp4:"right",xp5:"wrong"}},
 													respond: {pickRightWrong:"bomb2"} },
-	{ id:"bomb2_ask"  , dialog:{ romeo:"bomb2_ask"  } },
-	{ id:"bomb2_wrong", dialog:{ romeo:"bomb2_wrong"} },
-	{ id:"bomb2_close", dialog:{ romeo:"bomb2_close"} },
-	{ id:"bomb2_right", 							respond: {pickLate:"bomb2"}, now},
+//	{ id:"bomb2_ask"  , dialog:{ romeo:"bomb2_ask"  } },
+	{ id:"bomb2_wrong", voice:{ romeo:"bomb2_wrong"}, now:"bomb2_lose" },
+	{ id:"bomb2_close", voice:{ romeo:"bomb2_close"}, now:"bomb2_weak"  },
+	{ id:"bomb2_right", voice:{ romeo:"bomb2_right"}, now:"bomb2_win" },
+
+
+
+
+
+	{ id:"bomb2_weak",	scope:hide, reticle:hide,plot:false, spin:false, equation: hide, icon:{ blue:hide, red1:hide},
+		  		 		   	pic:{ bridge2:"pulse"  },                      		then: "bda3" },
+	{ id:"bomb2_lose",	scope:hide, reticle:hide,plot:false, spin:false, equation: hide, icon:{ blue:hide, red1:hide},
+							pic:{  target0:"bdapulse"     },           			then: "bda2"  },
+	{ id:"bomb2_win",	scope:hide, reticle:hide,plot:false, spin:false, equation: hide, icon:{ blue:hide, red1:hide},
+							pic:{ win: "pulse" 	   },           				then: "bda2"  },
+	{ id:"bda2",  		   	pic:{ bridge2:"bdapulse"  },                        then },
+	{ id:"bda3",  			pic:{ bridge3:"bdapulse"  },                        then },
+
+
+
+/*
+
+
+
+
+
+
+
 	{ id:"bomb2_time", 	icon:{ blue:{ time:true }}     },
 	{ id:"bomb2_late",  monolog:{ romeo:"bomb2_right"   },	then: "bomb2_end"  	},
 	{ id:"bomb2_early", monolog:{ romeo:"bomb1_early"  },  	then: "bomb2_end"  	},
@@ -285,8 +331,8 @@ export const program=[
 	{ id:"bda2_wrong", dialog:{ romeo:"bridge2_ask" }  },
 	{ id:"bda2_close", dialog:{ romeo:"blue_right"}  },
 	{ id:"bda2_right", dialog:{ romeo:"bomb1_right"},then },
-
+*/
 	{ id:"romeo_out",  dialog:{ romeo:"end"}, icon:{ all:hide }, find:false, reticle:hide, map:{blur:show }, pic:{romeo:"big"},  then },
-	{ id:"fade_out",   dialog:{ claro:"end"},pic:{ claro:"big", romeo:"fadeout"},  then  }, 
+	{ id:"fade_out",   dialog:{ claro:"end"}, pic:{ claro:"big", romeo:"fadeout"},  then  }, 
 	{ id:"gameover",   reboot:true  },
 	];
