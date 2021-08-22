@@ -1,6 +1,8 @@
 
 import  { signal     } from './signal.js'    ;
 
+import  { sfx		 } from './sfx.js';
+
 	const fadeoutDuration= 7000;//ms
 
 	const url= { 	
@@ -15,7 +17,6 @@ import  { signal     } from './signal.js'    ;
 		romeo: [
 			"./assets/romeo/5.jpg",
 			"./assets/romeo/5.jpg",
-			"./assets/romeo/5.jpg",
 			"./assets/romeo/4.jpg",
 			"./assets/romeo/3.jpg",
 			"./assets/romeo/2.jpg",
@@ -23,16 +24,27 @@ import  { signal     } from './signal.js'    ;
 			"./assets/romeo/1.jpg"
 			],
 		claro: [
-			"./assets/claro/1.webp",
+			"./assets/claro/n0.webp",
+			"./assets/claro/n1.webp",
+			"./assets/claro/n2.webp", 
+			"./assets/claro/n3.webp" 
 		//	"./assets/claro/2.webp", not wearing (or holding) glasses
-			"./assets/claro/3.webp",
-			"./assets/claro/4.webp",
-			"./assets/claro/5.webp",
-			"./assets/claro/6.webp",
-			"./assets/claro/7.webp"
 			],
+		drclaro: [
+			"./assets/claro/g0.webp",
+			"./assets/claro/g1.webp",
+			"./assets/claro/g2.webp", 
+			"./assets/claro/g3.webp", 
+			"./assets/claro/g4.webp",
+			"./assets/claro/g5.webp",
+			"./assets/claro/g6.webp", 
+			"./assets/claro/g7.webp", 
+			"./assets/claro/g8.webp" 
+				//	"./assets/claro/2.webp", not wearing (or holding) glasses
+					],
 		bg:{	
 			claro: "./assets/claro/lab.jpg",
+			drclaro: "./assets/claro/lab.jpg",
 			},
 		blue:     "./assets/blue/crew.jpg",
 		red0:     "./assets/red/0.jpg",
@@ -46,6 +58,10 @@ import  { signal     } from './signal.js'    ;
 		bridge2:  "./assets/target/2.jpg",
 		bridge3:  "./assets/target/3.jpg",
 		bridge23: "./assets/target/23.jpg",  // combo 0+2+3
+		bda0:     "./assets/target/bda/0.jpg",   
+		bda1:     "./assets/target/bda/1.jpg",
+		bda2:     "./assets/target/bda/2.jpg",
+		bda3:     "./assets/target/bda/3.jpg",
 		hq:  	  "./assets/blue/camp.jpg",
 		win:  	  "./assets/blue/happy.jpg",
 		lose:  	  "./assets/blue/sad.jpg",
@@ -53,9 +69,9 @@ import  { signal     } from './signal.js'    ;
 		};
 
 
-const cadence = {	claro: { mean: 1.5, dev:.25 },	romeo: { mean: 1, dev:.75 }, alert: { mean: 2, dev:0 }  };
+const cadence = {	claro: { mean: 1.5, dev:.25 },	drclaro: { mean: 1.0, dev:.25 },	romeo: { mean: 1, dev:.75 }, alert: { mean: 2, dev:0 }  };
 
-
+const ids = { claro:[ "claro", "drclaro"], romeo:[ "romeo"] };
 const selfs={};
 
 export const newPic= (name, cfg) => {
@@ -86,17 +102,20 @@ export const newPic= (name, cfg) => {
 			medium:	()=> { classify( "medium" );    console.log("pic: Medium",name);   return self;  },
 			big:   	()=> { classify( "big" );       console.log("pic: Big  ",name);    return self;  },
 			full:  	()=> { classify( "fullscreen" );console.log("pic: Full ",name);    return self;  },
-			show:	()=> { style.display="block";   console.log("pic: Show ",name);    return self;  },
-			hide:	()=> { style.display="none";    console.log("pic: Hide ",name);    return self;  },
+			show:	()=> { 	style.display="block";  console.log("pic: Show ",name);    return self;  },
+			hide:	()=> {  style.display="none";    console.log("pic: Hide ",name);    return self;  },
 			kill:	()=> { 	div.remove(); 
 						   	delete selfs[name]; 
-							signal.fire("pic.kill", {name});
+							signal.fire("pickill",  {name});
 													console.log("pic: Kill ",name);    return self;  },
 			fadeout:()=> { 	style.transition=`opacity ${fadeoutDuration}ms`; 
+							//style.transitionProperty=  "opacity" ;
+							//style.transitionDuration = "6500ms";
+							//style.transitionDelay = "500ms";
 							style.opacity="0"; 
 							setTimeout( self.kill, fadeoutDuration ); 
 							 						console.log("pic: Fade ",name);    return self;  },
-
+			
 			scan:  	()=> {	//  CURRENTLY NOT USED IN THE GAME
 					const zoom =4;
 					if( !self._scan ){   
@@ -119,9 +138,51 @@ export const newPic= (name, cfg) => {
 						self._scan= null;
 						}
 						console.log("pic: Scan ",name);    return self;  },						
+		
 						
-		
-		
+
+
+			pulse: e => {
+				console.log("pic: Pulse ",name); 
+				sfx.music.play(); 
+				sfx.music.volume(0.35);
+				self.show().full();
+				document.querySelector("#canvas").style.display="none";
+				setTimeout(	e =>{ 
+					self.fadeout();
+					signal.on( "pickill", e=>{
+						signal.off( "pickill", this)
+						signal.fire( "response" );
+						document.querySelector("#canvas").style.display="block";
+						console.log("pic: end Pulse ",name); 
+						});
+					setTimeout( e=>sfx.music.volume(.12), 2500 );
+					setTimeout( e=>sfx.music.volume(.06), 4000 );
+					setTimeout( e=>sfx.music.volume(.03), 5500 );
+					setTimeout( e=>sfx.music.volume(.02), 7000 );
+					}, 2000	)},
+
+			bdapulse: e => {
+				console.log("pic: Pulse ",name); 
+				sfx.music.play(); 
+				sfx.music.volume( 0.60 );
+				self.show().full().bda();
+				document.querySelector("#canvas").style.display="none";
+				setTimeout(	e =>{ 
+					self.fadeout();
+					signal.on( "pickill", e=>{
+						signal.off( "pickill", this)
+						signal.fire( "response" );
+						document.querySelector("#canvas").style.display="block";
+						console.log("pic: end Pulse ",name); 
+						});
+					setTimeout( e=>sfx.music.volume(.25), 2500 );
+					setTimeout( e=>sfx.music.volume(.12), 4000 );
+					setTimeout( e=>sfx.music.volume(.06), 5500 );
+					setTimeout( e=>sfx.music.volume(.03), 7000 );
+					}, 3000	)},
+
+	
 			zoom:  ()=> {
 				style.transform="scale(7) translate(245px,135px)"; 
 				style.opacity="0"; 
@@ -150,8 +211,10 @@ export const newPic= (name, cfg) => {
 			timeoutID: false,
 			rando: (run=true) =>{	
 				if( self.timeoutID ) clearTimeout( self.timeoutID );
-				let basis     =   cadence[ name ].mean -cadence[ name ].dev;
-				let variation = 2*cadence[ name ].dev;
+				let id = ids[ name ][Math.floor(Math.random()*ids[ name].length)];
+
+				let basis     =   cadence[ id ].mean -cadence[ id ].dev;
+				let variation = 2*cadence[ id ].dev;
 				self.paused   = !run; 
 			
 				let next= self.paused?
@@ -161,8 +224,8 @@ export const newPic= (name, cfg) => {
 						let t = basis+variation*Math.random();
 						self.timeoutID = setTimeout( next, 1000*t+250 );
 						style.transition=`background-image ${t}s`;
-						style.backgroundImage=	`url("${url[ name ][Math.floor(Math.random()*url[ name ].length)]}")
-						     ${ url.bg[name]?  `,url("${url.bg[name]}`  : '' }`;
+						style.backgroundImage=	`url("${url[ id ][Math.floor(Math.random()*url[ id ].length)]}")
+						     ${ url.bg[ id  ]?  `,url("${url.bg[ id ]}`  : '' }`;
 						}  
 				next();
 				console.log("pic: Rando ",name);    return self;  },
