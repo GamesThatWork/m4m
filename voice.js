@@ -388,12 +388,12 @@ romeo:	{
 
 	bomb2:
 		`Tough problem, Doc.
-		You have oner shot to knock out both a steel bridge and a stone bridge
+		You have one shot to knock out both a steel bridge and a stone bridge
 		without damaging the ancient stained glass windows.`,
 
 	bomb2_ask: `Choose the munition very carefully.`,
-	bomb2_wrong: `That munition is too big. We can’t damage the windows! Try another one.`,
-	bomb2_close: `Your munition was too small. It didn't disable the bridge. Try again.`,
+	bomb2_wrong: `That munition is too big. We can’t damage the windows!`,// Try another one.`,
+	bomb2_close: `Your munition was too small. It didn't disable the bridge.`,// Try again.`,
 	bomb2_right: `Good choice. You disabled the bridge without damaging the shrine.`,
 
 	bda:	`Let's take a look.
