@@ -56,10 +56,15 @@ const dispatchEvent=  event =>{
 
 	
 const keepAlive={
-		inactivityLimit: 	   120, 	// after 2 minutes of inaction, reboot game.
+		inactivityLimit: 	    90, 	// after 2 minutes of inaction, reboot game.
 		TTL:    		   	5*3600,		// unstarted game reboots after five hours
 		tick:	()	=>       		  keepAlive.TTL = keepAlive.inactivityLimit,
-		test:	()	=>{ 		if(  !keepAlive.TTL-- )  window.location.reload();  },
+		test:	()	=>{ 	
+							if(      !keepAlive.TTL-- )   window.location.reload();
+							else if(  keepAlive.TTL==30 ) document.querySelector("#caption").innerHTML+=
+									`<div class="hint">ROLL THE BALL</div>`;
+		
+		  },
 		init:	()	=>				  keepAlive.interval= setInterval( keepAlive.test, 1000),
 		stop:	()	=> clearInterval( keepAlive.interval)
 		};
