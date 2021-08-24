@@ -748,11 +748,15 @@ const finder = cfg =>{
 
 
 	const targetSets= {
+		gameover: [
+			{ name: "restart", x:  620, y: 464, radius:156, color: "yellow" },
+			{ name: "replay",  x: 1300, y: 464, radius:150, color:   "blue" },
+			],
 		intro: [
 			{ name: "blue",    x:  300, y: 770, radius: 66, color:   "blue" },
 			{ name: "red0",    x:   45, y: 690, radius: 60, color:    "red" },
-			{ name: "red1",    x:  275, y: 267, radius: 80, color:    "red" },
-			{ name: "red2",    x: 1160, y: 100, radius: 80, color:    "red" },
+			{ name: "red1",    x:  275, y: 237, radius: 80, color:    "red" },
+			{ name: "red2",    x: 1160, y:  70, radius: 80, color:    "red" },
 			{ name: "red3",    x: 1245, y:  16, radius: 66, color:    "red" },
 			{ name: "shrine",  x: 1625, y: 804, radius: 90, color:   "blue" },
 			{ name: "bridge1", x:  772, y: 879, radius: 80, color: "yellow" },
@@ -805,6 +809,13 @@ const finder = cfg =>{
 	newMap("bridges").show();
 	
 	const setIcons={
+		gameover: e=>{
+			//newIcon("restart",{parent:layerMap, img:"restart" } ).x( 556).y( 400).size([ 128, 128]).show();
+			//newIcon("replay" ,{parent:layerMap, img:"replay"  } ).x(1236).y( 400).size([ 128, 128]).show();
+			signal.on("restart",  e=>{  localStorage.setItem("start","attractmode");  window.location.reload();} );
+			signal.on("replay",   e=>{  localStorage.setItem("start","replay"     );  window.location.reload();} );
+			newMap("gameover").show();
+ 			},
 		intro: e=>{
 			newIcon("blue",{parent:layerMap, img:"blue" } ).x( 266).y( 735).size([  60,  60]).show();
 			newIcon("red0",{parent:layerMap, img:"red1" } ).x(  10).y( 660).size([  60,  60]).show();
@@ -868,8 +879,8 @@ const finder = cfg =>{
 			let answer = 	!cfg?                     	   "No parameters on Finder"
 						: 	(!cfg.answers?                 "No answers supplied"
 						:	(!found?                       "Nothing found"	
-						: 	(cfg.answers[ found.name ] ?? 
-							 cfg.answers.default       ?? (`No answer (nor default) for ${found.name}`  ))));
+						: 	(cfg?.answers[ found.name ] ?? 
+							 cfg?.answers?.default      ?? found.name )));// (`No answer (nor default) for ${found.name}`  ))));
 			console.log( "<find> will fire: "+ found?.name +" => "+ answer );
 			sfx.current = found? sfx.button : sfx.button.disabled;
 			sfx.current.down.play(); 
@@ -955,7 +966,8 @@ const action={
     KeyT: 	trace,
     KeyS: e=>{  synch= (synch=="max")? false : "max";     scope.reset();     scope.show(); }, 
     KeyX: e=>{  synch= (synch=="min")? false : "min";     scope.reset();     scope.show(); }, 
-    help: e=>{  console.log(e.code); return;
+    KeyZ: e=>{  localStorage.setItem( "start", "jumphere");  window.location.reload(); }, 
+	help: e=>{  console.log(e.code); return;
 	            let body = document.querySelector("body");
                 body.requestFullscreen();
 				body.requestPointerLock()
@@ -965,5 +977,10 @@ const action={
               }
         };
 
-sequence(0);
+let start= localStorage.getItem(   "start") || 0;
+           localStorage.removeItem("start");
+
+
+
+sequence( start );
  }

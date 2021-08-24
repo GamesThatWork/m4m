@@ -10,6 +10,9 @@ export const program=[
 
 //	{ id:"desktop",     map:{ desktop:{ show:true }}, await:"click",			       			then :"bomb2" },	
 
+
+
+
  	{ id:"init", dialog:{ claro:"welcome" }, map:{ blur:show }, icon:{ logo:hide },          	then }, /// defective recording
 	{ dialog:{ claro:"challenge"  }, map:{ blur:show },         icon:{ logo:hide }, 			then },
 	{ dialog:{ claro:"intro"      }, 				       										then },
@@ -125,6 +128,7 @@ export const program=[
 	{ id:"jumphere",   now:"next" 	},
  
 	{ dialog:{ claro:"mission" }, pic:{ claro:"big",    romeo:"show"  }, scope:hide, reticle:hide, plot:false, spin:false, then},
+	{ id:"replay",   now:"next" 	},
 	{ dialog:{ romeo:"intro"   }, pic:{ claro:"fadeout"               }, music:{ volume:0.03, play:true }, then },
 	{ dialog:{ romeo:"context" }, pic:{ claro:"hide",   romeo:"medium"}, map:{ range:hide, bridges:show},
 		icon:{ blue: { img:"blue", x: 266, y: 735,  size: [  60,  40], show:true },
@@ -334,5 +338,6 @@ export const program=[
 */
 	{ id:"romeo_out",  dialog:{ romeo:"end"}, icon:{ all:hide }, find:false, reticle:hide, map:{blur:show }, pic:{romeo:"big"},  then },
 	{ id:"fade_out",   dialog:{ claro:"end"}, pic:{ claro:"big", romeo:"fadeout"},  then  }, 
-	{ id:"gameover",   reboot:true  },
+	{ id:"gameover",  map:{blur:show }, find:{ domain:"gameover", answers:{}},    					       },
+//	{ id:"gameover",   reboot:true  },
 	];

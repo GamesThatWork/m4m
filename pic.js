@@ -65,7 +65,8 @@ import  { sfx		 } from './sfx.js';
 		hq:  	  "./assets/blue/camp.jpg",
 		win:  	  "./assets/blue/happy.jpg",
 		lose:  	  "./assets/blue/sad.jpg",
-		
+		replay:   "./assets/blue/happy.jpg",
+		restart:  "./assets/blue/crew.jpg"		
 		};
 
 

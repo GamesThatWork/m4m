@@ -3,6 +3,7 @@ const url= {
 	server   :  "./assets/map/",
 	bridges  :  "bridges_123.png",
 	bridges1 :  "bridges_1.png",
+	gameover :  "gameover.png",
 	bridges23:  "bridges_23.png",
 	range    :  "eglinred.jpg",
 	title    :  "title.png",
