@@ -149,8 +149,8 @@ claro:{
 	power:
 		`To get high pressure, you use high explosives.
 		Explosive power is the first feature of our shockwave model. 
-		Start building the model with “omega”, the symbol for explosive power.`,
-	power_ask:	`Find omega. It looks like a “w”.`,
+		Start building the model with “Omega”, the symbol for explosive power.`,
+	power_ask:	`Find Omega. It looks like a “w”.`,
 	power_wrong: `No. That’s not it. It looks like a little “w”.`,
 	power_close: `Almost right - but completely wrong.`,
 	power_right: `Right. Omega means explosive power.
@@ -163,7 +163,7 @@ claro:{
 		and “s” for speed - to model how fast the wave travels.`,
 	pulse_ask:   `Find "d" for distance, "t" for time and "s" for speed.`,
 	pulse_wrong: `No... Make sure you see the "s" for speed.`,
-	pulse_close: `That's very close, but you really need the "s" for speed`,
+	pulse_close: `That's very close, but you really need the "s" for speed.`,
 	pulse_right: `That’s it. The "H" function is like a trigger, all or nothing.
 				 Our model shows a supersonic wall of pressure moving through the air.
 				 But it isn't really a wall.
@@ -181,7 +181,7 @@ claro:{
 	decay: 
 		`We want math to show each wave weaker than the one before.
 		We can call this a decay function.
-		We can use the symbol "dK"`,
+		We can use the symbol "dK".`,
 	decay_ask:   `Use "dK" to represent the wave Decay function.`,
 	decay_wrong: `Not that one, choose “dK” for Decay.`,
 	decay_right: `Bingo! Our model is looking great.
@@ -198,15 +198,15 @@ claro:{
 				We can use it to predict the power of any munition.
 				At any distance.`,
 
-	omega:
-		`Let's experiment with different values of omega. 
+	Omega:
+		`Let's experiment with different values of Omega. 
 		Remember: Omega represents the amount of explosives.
-		This new wheel has six different omega values.
+		This new wheel has six different Omega values.
 		Spin the wheel, see the different values. Then press the button.`,
 	
 	scrub:
 		`Here is a new way to use the instrument: 
-		Roll the ball sideways. Left and right.
+		Roll the ball sideways!    Left and right.
 		Roll it slow, to see the pressure at any distance.
 		Press the button when you are done.`,
 	
@@ -219,12 +219,12 @@ claro:{
 	q1: 
 		`We put a stone wall on the map near the explosion. 
 		What is the smallest charge that can damage the wall?
-		Spin up and down to change omega.
+		Spin up and down to change Omega.
 		Roll left and right to explore distance.`,
 	q1_ask:   	`Spin the ball and roll it.
-				Find the smallest omega that can damage the wall.`,
-	q1_high:	`No, that omega is too high. You'll cause unnecessary damage. Try a lighter touch.`,
-	q1_low: 	`Sorry - that omega is too low. It won't knock down the wall.
+				Find the smallest Omega that can damage the wall.`,
+	q1_high:	`No, that Omega is too high. You'll cause unnecessary damage. Try a lighter touch.`,
+	q1_low: 	`Sorry - that Omega is too low. It won't knock down the wall.
 				The pressure peak must be above the red line when the wave hits the wall.`,
 	q1_right: `That’s it. That's the smallest munition that will serve this purpose.
 			You did well.`,
@@ -235,7 +235,7 @@ claro:{
 		This time I want you to find the largest munition.`,
 	q2_ask:   	`Spin the ball and roll it.
 				Find the largest munition that does not break any glass.`,
-	q2_high:	`No, that omega is too high. You're going to break windows like that.
+	q2_high:	`No, that Omega is too high. You're going to break windows like that.
 				The pressure peak must be below the yellow line when it hits the first window.`,
 	q2_low: 	`Sorry - that is too small. Make it bigger, without breaking any glass.`,
 	q2_right: `That’s it. That's the largest munition for this situation.
@@ -289,7 +289,7 @@ romeo:	{
 		They are plenty mad... and they brought their friends.`,
 		
 	blue:	`You see us? We’re the Blue guys.`,
-	blue_ask:	`Find the Blue hummer.`,
+	blue_ask:	`Find the Blue Hummer.`,
 	blue_wrong: `No, the good guys are always Blue.`,
 	blue_close: `No, we're in a jeep.`,
 	blue_right: `There you go. That's us.`,
@@ -309,7 +309,7 @@ romeo:	{
 	reds_right: `Yeah, that’s the bad guys.`,
 
 	hq: `Today is a bad day for us to get visitors.
-		Our guys are all out EaSt and we don't have much air support.
+		Our guys are all out East and we don't have much air support.
 		Nobody to protect our Base.`,
 	hq_ask: `Do you see our Headquarters?`,
 	hq_wrong: `No. Up north, coming down fast.`,
@@ -317,7 +317,7 @@ romeo:	{
 	hq_right: `Yeah, that’s them.`,
 
 	bridge1:	`It looks to me like they plan to cross the Josko river
-		and attack our Base
+		and attack our Base!
 		But you can stop them. 
 		They can't cross the Josko if you knock out the bridges.`,
 	bridge1_ask:	`Do you see Bridge Number One?
@@ -327,7 +327,7 @@ romeo:	{
 	bridge1_right: `Yeah. It's a steel truss bridge. Gotta hit it hard.`,
 
 	bridge2:	`Bridge Two is upriver a few kilometers.`,
-	bridge2_ask:	`Can you see Bridge Two?`,
+	bridge2_ask:   `Can you see Bridge Two?`,
 	bridge2_wrong: `No- not there.`,
 	bridge2_close: `Not that one.`,
 	bridge2_right: `Yeah. That's a simple steel beam bridge.
@@ -343,12 +343,12 @@ romeo:	{
 
 	aim1:	`Let's start with Bridge One
 			and stop the guys who are chasing us.`,
-	aim1_ask: 	`Bridge One`,
+	aim1_ask: 	`Bridge One.`,
 	aim1_wrong: `No- not there.`,
 	aim1_close: `Not that one.`,
 	aim1_right: `Good. Just do me a favor.
 			Make sure we get across before you hit it.
-			And make sure the bad guys don't.`,
+			And make sure the bad guys don't!`,
 
 	bomb1:
 		`You have your target, and the estimated point of impact.
@@ -369,7 +369,7 @@ romeo:	{
 		Let's knock out the other bridges.
 		But first, look at the Rumini Historic Shrine.`,
 	shrine_ask:  `Do you see the shrine?`,
-	shrine_wrong:`That isn’t the shrine`,
+	shrine_wrong:`That isn’t the shrine.`,
 	shrine_close:`Look for the obelisk on the map.`,
 	shrine_right:
 		`Those ancient stained glass windows are protected by treaty.
@@ -381,7 +381,7 @@ romeo:	{
 		You must design a munition to disable both remaining bridges in one blow!
 		Remember one is stone and one is steel. 
 		And you must be very careful not to break the ancient glass!`,
-	aim2_ask: `Both remaining bridges in one blow`,
+	aim2_ask: `Both remaining bridges in one blow.`,
 	aim2_wrong: `Pick a target in the right area.`,
 	aim2_close: `Pick a better target.`,
 	aim2_right: `Good target.`,
@@ -397,7 +397,7 @@ romeo:	{
 	bomb2_right: `Good choice. You disabled the bridge without damaging the shrine.`,
 
 	bda:	`Let's take a look.
-			Check out the results of your strike`,
+			Check out the results of your strike!`,
 
 	end:   `Good work, Doc.
 			You saved Rumini from the Red invasion!			`
@@ -405,5 +405,3 @@ romeo:	{
 }
 
 const audio= { claro: {}, romeo:{}};
-//Object.keys( script.claro).forEach( name => audio.claro[ name ]=new Audio(`./assets/voice/claro/${name}.ogg`) );
-//Object.keys( script.romeo).forEach( name => audio.romeo[ name ]=new Audio(`./assets/voice/romeo/${name}.ogg`) );
