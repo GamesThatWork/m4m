@@ -13,8 +13,12 @@ export const program=[
 
 
 
- 	{ id:"init", dialog:{ claro:"welcome" }, map:{ blur:show }, icon:{ logo:hide },          	then }, /// defective recording
-	{ dialog:{ claro:"challenge"  }, map:{ blur:show },         icon:{ logo:hide }, 			then },
+ 	{ id:"init", dialog:{ claro:"welcome" }, map:{ blur:show }, icon:{ logo:hide },          	then }, /// semi defective recording
+
+//{ id:"gameover",   map:{blur:show }, find:{ domain:"gameover", answers:{}} }  ,
+
+	 { dialog:{ claro:"challenge"  }, map:{ blur:show },         icon:{ logo:hide }, 			then },
+	
 	{ dialog:{ claro:"intro"      }, 				       										then },
 	{ dialog:{ claro:"model"      },    				  										then },
 	{ dialog:{ claro:"heros"      }, pic:{ romeo:"show"}, 										then },
@@ -338,6 +342,6 @@ export const program=[
 */
 	{ id:"romeo_out",  dialog:{ romeo:"end"}, icon:{ all:hide }, find:false, reticle:hide, map:{blur:show }, pic:{romeo:"big"},  then },
 	{ id:"fade_out",   dialog:{ claro:"end"}, pic:{ claro:"big", romeo:"fadeout"},  then  }, 
-	{ id:"gameover",  map:{blur:show }, find:{ domain:"gameover", answers:{}},    					       },
+	{ id:"gameover",   map:{blur:show }, find:{ domain:"gameover", answers:{}},    					       },
 //	{ id:"gameover",   reboot:true  },
 	];
